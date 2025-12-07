@@ -38,12 +38,19 @@ def curve(y: numpy.ndarray, x: numpy.ndarray=None, **kwargs):
         Specify the order where axis are labeled using scientific notation. (default (-3, 3))
     figsize : (int, int), optional
         Specify the width and height of plot (default is (8,6))
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
     """
 
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
-    _, axis = pyplot.subplots(figsize=figsize)
+    fig, axis = pyplot.subplots(figsize=figsize)
     comp.curve(axis, y, x, **kwargs)
+
+    if file_name is not None:
+        fig.savefig(file_name)
+        pyplot.close(fig)
 
 
 def comparison(y: list[numpy.ndarray], x=None, **kwargs):
@@ -294,12 +301,19 @@ def bar(y, x=None, **kwargs):
         Specify the limits for the x axis. (default None)
     figsize : (int, int), optional
         Specify the width and height of plot (default is (8,6))
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
     """
 
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
-    _, axis = pyplot.subplots(figsize=figsize)
+    fig, axis = pyplot.subplots(figsize=figsize)
     comp.bar(axis, y, x, **kwargs)
+
+    if file_name is not None:
+        fig.savefig(file_name, bbox_inches='tight', dpi=300)
+        pyplot.close(fig)
 
 
 def twinx_bar_line(y_bar: numpy.ndarray, y_line: numpy.ndarray, x_bar: numpy.ndarray=None, x_line: numpy.ndarray=None, **kwargs):

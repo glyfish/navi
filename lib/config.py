@@ -9,14 +9,15 @@ def save_post_asset(figure, post, plot):
     path = os.path.join(plot_asset_path, post, plot) + ".png"
     figure.savefig(path, bbox_inches="tight")
 
-project_root = '..'
+project_root = os.getcwd()
+
 for _ in range(45):
     style_file = os.path.join(os.path.abspath(project_root), 'gly.fish.mplstyle')
     if os.path.isfile(style_file):
         break
     project_root += '/..'
 
-glyfish_style = pathlib.Path(style_file).as_uri()
+glyfish_style = style_file
 
 plot_asset_path = os.path.join(os.getcwd(), 'plots')
 
@@ -51,3 +52,34 @@ distribution_sample_cycler = cycler("color", ["#329EFF", "#320075"])
 alternate_cycler = cycler("color", ["#0067C4", "#8C35FF", "#FF9500", "#FFE800", "#329EFF", "#FFC574", "#320075"])
 bar_plot_colors = ["#0067C4", "#FF9500", "#320075", "#FFE800", "#329EFF", "#FFC574", "#8C35FF"]
 bar_plot_cycler = cycler("color", bar_plot_colors)
+
+class SharedCycler:
+    """
+    A class to manage a shared cycler instance for consistent styling across plots.
+    """
+
+    def __init__(self, cycler_obj):
+        """
+        Initialize with a cycler object.
+        :param cycler_obj: A cycler instance to manage.
+        """
+        self.cycler_obj = cycler_obj
+        self.iterator = iter(self.cycler_obj)
+
+    def get_next(self):
+        """
+        Retrieve the next style from the cycler.
+        :return: A dictionary of properties for the next cycle.
+        """
+        try:
+            return next(self.iterator)
+        except StopIteration:
+            # Reset the iterator if exhausted
+            self.iterator = iter(self.cycler_obj)
+            return next(self.iterator)
+
+    def reset(self):
+        """
+        Reset the cycler to the beginning.
+        """
+        self.iterator = iter(self.cycler_obj)

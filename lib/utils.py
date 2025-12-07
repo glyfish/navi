@@ -1,6 +1,9 @@
+import os
 import numpy
 from enum import Enum
 from typing import Tuple
+from numpy.typing import NDArray
+import shortuuid
 
 from pandas import read_csv, DataFrame
 
@@ -85,7 +88,7 @@ def verify_type(param, expected_type):
     if not isinstance(param, expected_type):
         raise Exception(f"{param} is type {type(param)}. Expected {expected_type}")
 
-def create_space(**kwargs) -> numpy.ndarray[float]:
+def create_space(**kwargs) -> NDArray:
     """
     Create linear space with specified parameters.
 
@@ -121,7 +124,7 @@ def create_space(**kwargs) -> numpy.ndarray[float]:
         npts = int((xmax-xmin)/Δx) + 1
     return numpy.linspace(xmin, xmax, npts)
 
-def create_logspace(**kwargs) -> numpy.ndarray[float]:
+def create_logspace(**kwargs) -> NDArray:
     """
     Create log space with specified parameters.
 
@@ -143,7 +146,7 @@ def create_logspace(**kwargs) -> numpy.ndarray[float]:
     xmin = get_param_default_if_missing("xmin", 1.0, **kwargs)
     return numpy.logspace(numpy.log10(xmin), numpy.log10(xmax/xmin), npts)
 
-def create_parameter_scan(source, *args) -> Tuple[list[numpy.ndarray[float]], list[numpy.ndarray[float]]]:
+def create_parameter_scan(source, *args) -> Tuple[list[NDArray], list[NDArray]]:
     """
     Generate a parameter scan for the specified data source using the 
     specified parameters
@@ -169,7 +172,7 @@ def create_parameter_scan(source, *args) -> Tuple[list[numpy.ndarray[float]], li
         t_scan.append(t)
     return t_scan, scan
 
-def create_ensemble(source, nsim: int, **kwargs) -> Tuple[numpy.ndarray[float], list[numpy.ndarray[float]]]:
+def create_ensemble(source, nsim: int, **kwargs) -> Tuple[NDArray, list[NDArray]]:
     """
     Generate a parameter scan for the specified data source using the 
     specified parameters
@@ -195,7 +198,7 @@ def create_ensemble(source, nsim: int, **kwargs) -> Tuple[numpy.ndarray[float], 
         ensemble.append(samples)
     return t, numpy.array(ensemble)
 
-def apply_to_ensemble(func, t: numpy.ndarray[float], ensemble: list[numpy.ndarray[float]], **kwargs) -> Tuple[numpy.ndarray[float], list[numpy.ndarray[float]]]:
+def apply_to_ensemble(func, t: NDArray, ensemble: list[NDArray], **kwargs) -> Tuple[NDArray, list[NDArray]]:
     """
     Apply specified function to an ensemble.
     
@@ -219,7 +222,7 @@ def apply_to_ensemble(func, t: numpy.ndarray[float], ensemble: list[numpy.ndarra
     result = [func(t, data, **kwargs) for data in ensemble]
     return result[0][0], numpy.array([data[1] for data in result])
 
-def apply_to_parameter_scan(func, t: numpy.ndarray[float], scan: list[numpy.ndarray[float]],  **kwargs) -> Tuple[numpy.ndarray[float], list[numpy.ndarray[float]]]:
+def apply_to_parameter_scan(func, t: NDArray, scan: NDArray,  **kwargs) -> Tuple[NDArray, list[NDArray]]:
     """
     Apply specified function to results of a parameter scan.
     
@@ -283,7 +286,7 @@ def get_s_vals(**kwargs) -> list[int]:
         raise Exception(f"smax and npts or svals is required")
     
 
-def extract_date_range(date: numpy.ndarray[numpy.datetime64], data: numpy.ndarray[float], start_date: str, end_date: str) -> Tuple[numpy.ndarray[float], numpy.ndarray[numpy.datetime64]]:
+def extract_date_range(date: NDArray, data: NDArray, start_date: str, end_date: str) -> Tuple[NDArray, NDArray]:
     """
     Extract data from specified start date to specified end date.
 
@@ -345,4 +348,28 @@ def read_yahoo_data(file_path: str) -> DataFrame:
     """
     
     return read_csv(file_path, index_col=0, parse_dates=['Date']).sort_values(by='Date').dropna()
+
+
+def generate_plot_file_name(file_name: str, path="./plots", extension: str = "png", uuid: str = None) -> str:
+    """
+    Generate a file name with the specified prefix, suffix and extension.
+
+    Parameters
+    ----------
+    prefix: str
+        File name prefix.
+    suffix: str
+        File name suffix.
+    extension: str
+        File name extension (default "csv").
+
+    Returns
+    -------
+    str
+        Generated file name.
+    """
+    
+    full_path = os.path.join(path, file_name)
+    uuid = uuid if uuid else shortuuid.uuid()
+    return f"{full_path}-{uuid}.{extension}"
 

@@ -16,6 +16,7 @@ from matplotlib import pyplot
 import matplotlib.dates as mdates
 import matplotlib.units as munits
 from typing import Callable
+from numpy.typing import NDArray
 
 from lib.plots.comp.axis import (PlotType, logStyle, logXStyle, logYStyle)
 from lib.utils import (get_param_throw_if_missing, get_param_default_if_missing)
@@ -23,7 +24,7 @@ from lib.plots.comp.plot_utils import (__plot_curve, __plot_curves, __twinx_tick
                                        __plot_symbol, __plot_bar)
 from lib import config
 
-def fpoints(axis: pyplot.axis, data: numpy.ndarray[float], func: numpy.ndarray[float], x: numpy.ndarray=None, fx: numpy.ndarray=None, **kwargs):
+def fpoints(axis: pyplot.axis, data: NDArray, func: NDArray, x: NDArray=None, fx: NDArray=None, **kwargs):
     """"
     Compare data to a function by plotting the data as a curve
     and the function as points.
@@ -145,7 +146,7 @@ def fpoints(axis: pyplot.axis, data: numpy.ndarray[float], func: numpy.ndarray[f
     if labels is not None:
         axis.legend(loc=legend_loc, bbox_to_anchor=(0.1, 0.1, 0.8, 0.8))
 
-def fcurve(axis: pyplot.axis, data: numpy.ndarray[float], func: numpy.ndarray[float], x: numpy.ndarray=None, fx: numpy.ndarray=None, **kwargs):
+def fcurve(axis: pyplot.axis, data: NDArray, func: NDArray, x: NDArray=None, fx: NDArray=None, **kwargs):
     """"
     Compare data to a function by plotting both as curves.
 
@@ -259,7 +260,7 @@ def fcurve(axis: pyplot.axis, data: numpy.ndarray[float], func: numpy.ndarray[fl
     if labels is not None:
         axis.legend(loc='best', bbox_to_anchor=(0.1, 0.1, 0.8, 0.8))
 
-def fscatter(axis: pyplot.axis, data: numpy.ndarray[float], func: Callable[[float], float], x: numpy.ndarray[float]=None, **kwargs):
+def fscatter(axis: pyplot.axis, data: NDArray, func: Callable[[float], float], x: NDArray=None, **kwargs):
     """"
     Compare data to a function by plotting the functions as a curve and as a scatter plot..
 
@@ -365,8 +366,8 @@ def fscatter(axis: pyplot.axis, data: numpy.ndarray[float], func: Callable[[floa
 
 
 
-def fcurve_scatter_comparison(axis: pyplot.axis, data: list[numpy.ndarray[float]], func: numpy.ndarray[float], 
-                              x: list[numpy.ndarray[float]]=None, fx: numpy.ndarray[float]=None, **kwargs):
+def fcurve_scatter_comparison(axis: pyplot.axis, data: list[NDArray], func: NDArray, 
+                              x: list[NDArray]=None, fx: NDArray=None, **kwargs):
     """"
     Compare a function to multiple datasets by plotting the functions as a curve and data 
     as a scatter plot.
@@ -421,7 +422,7 @@ def fcurve_scatter_comparison(axis: pyplot.axis, data: list[numpy.ndarray[float]
     __plot_symbols(axis, x, data, 1, **kwargs)
 
 
-def fbar(axis: pyplot.axis, y: numpy.ndarray[float], fy: numpy.ndarray[float], x: numpy.ndarray[float]=None, fx: numpy.ndarray[float]=None, **kwargs):
+def fbar(axis: pyplot.axis, y: NDArray, fy: NDArray, x: NDArray=None, fx: NDArray=None, **kwargs):
     """
     Plot samples in a bar chart and compare to a function.
 

@@ -22,7 +22,7 @@ from lib.plots.comp.axis import (PlotType, logStyle, logXStyle, logYStyle)
 from lib.utils import get_param_default_if_missing
 
 
-def __plot_curve(axis, x, y, n, **kwargs):
+def __plot_curve(axis, x, y, n, shared_cycler, **kwargs):
     lw              = get_param_default_if_missing("lw", 2, **kwargs)
     labels          = get_param_default_if_missing("labels", None, **kwargs)
     colors          = get_param_default_if_missing("colors", None, **kwargs)
@@ -54,8 +54,7 @@ def __plot_curve(axis, x, y, n, **kwargs):
     if ylim is not None:
         axis.set_ylim(ylim)
 
-    cycler = axis._get_lines.prop_cycler
-    color = colors[n] if colors is not None else next(cycler)['color']
+    color = colors[n] if colors is not None else shared_cycler.get_next()['color']
 
     axis.ticklabel_format(style='sci', axis='y', scilimits=scilimits, useMathText=True)
 
@@ -192,18 +191,19 @@ def __plot_symbol(axis, x, y, n, **kwargs):
                   alpha=alpha, zorder=5, label=label, color=color)
 
 
-def __plot_bar(axis, x, y, n, zorder=10, **kwargs):
-    alpha        = get_param_default_if_missing("alpha", 0.5, **kwargs)
-    border_width = get_param_default_if_missing("border_width", 1, **kwargs)
-    bar_width    = get_param_default_if_missing("bar_width", 1.0, **kwargs)
-    labels       = get_param_default_if_missing("labels", None, **kwargs)
-    colors       = get_param_default_if_missing("colors", None, **kwargs)
-    bar_colors   = get_param_default_if_missing("bar_colors", None, **kwargs)
-    scilimits    = get_param_default_if_missing("scilimits", (-3, 3), **kwargs)
-    xlabel       = get_param_default_if_missing("xlabel", "x", **kwargs)
-    ylabel       = get_param_default_if_missing("ylabel", "y", **kwargs)
-    xlim         = get_param_default_if_missing("xlim", None, **kwargs)
-    ylim         = get_param_default_if_missing("ylim", None, **kwargs)
+def __plot_bar(axis, x, y, shared_cycler, n, zorder=10, **kwargs):
+    alpha            = get_param_default_if_missing("alpha", 0.5, **kwargs)
+    border_width     = get_param_default_if_missing("border_width", 1, **kwargs)
+    bar_width        = get_param_default_if_missing("bar_width", 1.0, **kwargs)
+    labels           = get_param_default_if_missing("labels", None, **kwargs)
+    colors           = get_param_default_if_missing("colors", None, **kwargs)
+    bar_colors       = get_param_default_if_missing("bar_colors", None, **kwargs)
+    scilimits        = get_param_default_if_missing("scilimits", (-3, 3), **kwargs)
+    xlabel           = get_param_default_if_missing("xlabel", "x", **kwargs)
+    xlabel_rotation  = get_param_default_if_missing("xlabel_rotation", None, **kwargs)
+    ylabel           = get_param_default_if_missing("ylabel", "y", **kwargs)
+    xlim             = get_param_default_if_missing("xlim", None, **kwargs)
+    ylim             = get_param_default_if_missing("ylim", None, **kwargs)
 
     if x is None:
         x = numpy.linspace(0, len(y) - 1, len(y))
@@ -219,12 +219,12 @@ def __plot_bar(axis, x, y, n, zorder=10, **kwargs):
     axis.ticklabel_format(style='sci', axis='y', scilimits=scilimits, useMathText=True)
 
     alpha_value = alpha[n] if isinstance(alpha, list) else alpha        
-    cycler = axis._get_lines.prop_cycler
 
     if bar_colors is not None:
         color = bar_colors
-    else:    
-        color = colors[n] if colors is not None and len(colors) > n else next(cycler)['color']
+    else:
+        color = colors[n] if colors is not None and len(colors) > n else shared_cycler.get_next()['color']    
+
 
     label = labels[n] if labels is not None and len(labels) > n else None
     axis.set_ylabel(ylabel)
@@ -236,7 +236,13 @@ def __plot_bar(axis, x, y, n, zorder=10, **kwargs):
     if ylim is not None:
         axis.set_ylim(ylim)
 
-    width = bar_width*(x[1]-x[0])
+    if isinstance(x[0], float) or isinstance(x[0], int):
+        width = bar_width*(x[1]-x[0])
+    else:
+        width = bar_width
+
+    if xlabel_rotation is not None:
+        axis.tick_params("x", rotation=xlabel_rotation)
 
     return axis.bar(x, y, align='center', width=width, zorder=zorder, alpha=alpha_value, linewidth=border_width, label=label, color=color)
 
