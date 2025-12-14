@@ -2,8 +2,7 @@ import numpy
 import pandas
 import matplotlib.dates as mdates
 import matplotlib.units as munits
-from matplotlib import rcParams
-from matplotlib import pyplot
+from matplotlib import pyplot, rcParams, axes
 from datetime import datetime, date
 from numpy.typing import NDArray
 
@@ -14,13 +13,13 @@ from lib.utils import get_param_default_if_missing
 from lib import config
 from lib.config import SharedCycler
 
-def bar(axis: pyplot.axis, y: NDArray, x: NDArray=None, **kwargs):
+def bar(axis: axes.Axes, y: NDArray, x: NDArray=None, **kwargs):
     """
     Plot samples in a bar chart.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     y : numpy.ndarray[float]
         Value plotted on y-axis.
@@ -56,13 +55,13 @@ def bar(axis: pyplot.axis, y: NDArray, x: NDArray=None, **kwargs):
     __plot_bar(axis, x, y, color_cycler, 0, **kwargs)
 
 
-def positive_negative_bar(axis: pyplot.axis, y: NDArray, x: NDArray=None, **kwargs):
+def positive_negative_bar(axis: axes.Axes, y: NDArray, x: NDArray=None, **kwargs):
     """
     Plot data in a bar chart with different colors for positive and negative values.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     pos : numpy.ndarray
         Positive data values.
@@ -102,11 +101,12 @@ def positive_negative_bar(axis: pyplot.axis, y: NDArray, x: NDArray=None, **kwar
         axis.set_title(title, y=title_offset + 1.0)
     
     kwargs["bar_colors"] = numpy.where(y > 0, colors[0], colors[1])
+    color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
 
-    __plot_bar(axis, x, y, 0, **kwargs)
+    __plot_bar(axis, x, y, color_cycler, 0, **kwargs)
 
 
-def twinx_bar_line(axis: pyplot.axis, y_bar: NDArray, y_line: NDArray, x_bar: NDArray=None,
+def twinx_bar_line(axis: axes.Axes, y_bar: NDArray, y_line: NDArray, x_bar: NDArray=None,
                     x_line: NDArray=None, **kwargs):
     """
     Bar plot and line plot using same x-axis but different scales on y-axis. Bar plot is on left y-axis
@@ -114,7 +114,7 @@ def twinx_bar_line(axis: pyplot.axis, y_bar: NDArray, y_line: NDArray, x_bar: ND
     
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     y_bar : numpy.ndarray
         Bar y axis plot data.
@@ -182,10 +182,11 @@ def twinx_bar_line(axis: pyplot.axis, y_bar: NDArray, y_line: NDArray, x_bar: ND
     if title is not None:
         axis.set_title(title, y=title_offset + 1.0)
     
-    list1 = __plot_bar(axis, x_bar, y_bar, 0, 10, **dict(kwargs, ylim=bar_ylim, ylabel=bar_ylabel))
+    color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
+    list1 = __plot_bar(axis, x_bar, y_bar, color_cycler, 0, 10, **dict(kwargs, ylim=bar_ylim, ylabel=bar_ylabel))
     axis2 = __axis_twinx(axis, ylabel=line_ylabel)
-    list2 = __plot_curve(axis2, x_line, y_line, 1, **dict(kwargs, ylim=line_ylim, ylabel=line_ylabel))
-    
+    list2 = __plot_curve(axis2, x_line, y_line, color_cycler, 1, **dict(kwargs, ylim=line_ylim, ylabel=line_ylabel))
+
     __twinx_ticks(axis, axis2)
 
     if labels is not None:
@@ -195,7 +196,7 @@ def twinx_bar_line(axis: pyplot.axis, y_bar: NDArray, y_line: NDArray, x_bar: ND
 
 
 
-def twinx_bar_line_comparison(axis: pyplot.axis, y_bar: NDArray, y_line: NDArray, x_bar: NDArray=None,
+def twinx_bar_line_comparison(axis: axes.Axes, y_bar: NDArray, y_line: NDArray, x_bar: NDArray=None,
                               x_line: NDArray=None, **kwargs):
     """
     Bar plot and comparison line plot using same x-axis but different scales on y-axis. Bar plot is on left y-axis
@@ -203,7 +204,7 @@ def twinx_bar_line_comparison(axis: pyplot.axis, y_bar: NDArray, y_line: NDArray
     
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     y_bar : numpy.ndarray
         Bar y axis plot data.
@@ -275,25 +276,27 @@ def twinx_bar_line_comparison(axis: pyplot.axis, y_bar: NDArray, y_line: NDArray
     if title is not None:
         axis.set_title(title, y=title_offset + 1.0)
     
-    list1 = __plot_bar(axis, x_bar, y_bar, 0, 10, **dict(kwargs, ylim=bar_ylim, ylabel=bar_ylabel, colors=[bar_color]))
+    color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
+    list1 = __plot_bar(axis, x_bar, y_bar, color_cycler, 0, 10, **dict(kwargs, ylim=bar_ylim, ylabel=bar_ylabel, colors=[bar_color]))
     axis2 = __axis_twinx(axis, ylabel=line_ylabel)
-    list2 = __plot_curves(axis2, x_line, y_line, **dict(kwargs, ylim=line_ylim, ylabel=line_ylabel, colors=line_colors))
+    list2 = __plot_curves(axis2, x_line, y_line, 
+                          **dict(kwargs, ylim=line_ylim, ylabel=line_ylabel, color_cycler=color_cycler))
     
     __twinx_ticks(axis, axis2)
 
     if labels is not None:
-        list = [list1] + list2
-        labs = [l.get_label() for l in list]
-        axis.legend(list, labs, loc=legend_loc, bbox_to_anchor=(0.1, 0.1, 0.9, 0.9))
+        plot_list = [list1, list2]
+        labs = [l.get_label() for l in plot_list]
+        axis.legend(plot_list, labs, loc=legend_loc, bbox_to_anchor=(0.1, 0.1, 0.9, 0.9))
 
 
-def hist(axis: pyplot.axis, samples: NDArray, fx=None, **kwargs):
+def hist(axis: axes.Axes, samples: NDArray, fx=None, **kwargs):
     """
     Plot samples in histogram and compare with given function.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     samples : numpy.ndarray
         Value plotted on y-axis.
@@ -348,6 +351,9 @@ def hist(axis: pyplot.axis, samples: NDArray, fx=None, **kwargs):
     if labels is not None:
         hist_label = labels[0] 
         fx_label = labels[1]
+    else:
+        hist_label = None
+        fx_label = None
 
     _, bins, _ = axis.hist(samples, nbins, rwidth=0.8, density=density, label=hist_label, zorder=5)
 

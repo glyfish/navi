@@ -16,7 +16,9 @@ from datetime import datetime, date
 import matplotlib.ticker
 import matplotlib.dates as mdates
 import matplotlib.units as munits
-from matplotlib import pyplot
+from matplotlib import rcParams
+
+from lib.config import SharedCycler
 
 from lib.plots.comp.axis import (PlotType, logStyle, logXStyle, logYStyle)
 from lib.utils import get_param_default_if_missing
@@ -84,6 +86,7 @@ def __plot_curves(axis, x, y, **kwargs):
     legend_loc     = get_param_default_if_missing("legend_loc", "best", **kwargs)
     legend_title   = get_param_default_if_missing("legend_title", None, **kwargs)
     npts           = get_param_default_if_missing("npts", None, **kwargs)
+    color_cycler   = get_param_default_if_missing("color_cycler", None, **kwargs)
 
     ncurve = len(y)
 
@@ -100,7 +103,8 @@ def __plot_curves(axis, x, y, **kwargs):
         if not isinstance(yplot, (numpy.ndarray, numpy.generic)):
             raise Exception("y must be a numpy.array")
 
-        __plot_curve(axis, xplot, yplot, i, **kwargs)
+        color_cycler = color_cycler if color_cycler else SharedCycler(rcParams['axes.prop_cycle'])
+        __plot_curve(axis, xplot, yplot, i, color_cycler, **kwargs)
 
     if labels is not None:
         ncol = math.ceil(ncurve / 6 )

@@ -24,8 +24,7 @@ from datetime import datetime, date
 import matplotlib.ticker
 import matplotlib.dates as mdates
 import matplotlib.units as munits
-from matplotlib import rcParams
-from matplotlib import pyplot
+from matplotlib import pyplot, rcParams, axes
 from numpy.typing import NDArray
 
 
@@ -33,17 +32,16 @@ from lib.plots.comp.axis import (PlotType, logStyle, logXStyle, logYStyle)
 from lib.plots.comp.plot_utils import (__plot_curve, __plot_curves, __twinx_ticks, __plot_symbols,
                                        __plot_symbol)
 from lib.config import SharedCycler
-
 from lib.utils import get_param_default_if_missing
 
 
-def curve(axis: pyplot.axis, y: NDArray, x: NDArray=None, **kwargs):
+def curve(axis: axes.Axes, y: NDArray, x: NDArray=None, **kwargs):
     """
     Plot a curve.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     y : numpy.ndarray
         Value plotted on y-axis.
@@ -98,13 +96,13 @@ def curve(axis: pyplot.axis, y: NDArray, x: NDArray=None, **kwargs):
     color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
     __plot_curve(axis, x, y, 0, color_cycler, **kwargs)
 
-def comparison(axis: pyplot.axis, y: NDArray, x: NDArray=None, **kwargs):
+def comparison(axis: axes.Axes, y: NDArray, x: NDArray=None, **kwargs):
     """
     Plot multiple curves on same scale.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     y : [numpy.ndarray]
         Value plotted on y-axis.
@@ -172,13 +170,13 @@ def comparison(axis: pyplot.axis, y: NDArray, x: NDArray=None, **kwargs):
     __plot_curves(axis, x, y, **kwargs)
 
 
-def stack(axis: pyplot.axis, y: list[NDArray], x=None, **kwargs):
+def stack(axis: axes.Axes, y: list[NDArray], x=None, **kwargs):
     """
     Plot a horizontal stack of curves on the same x-scale.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     y : list[numpy.ndarray]
         data y-axis values.
@@ -246,16 +244,17 @@ def stack(axis: pyplot.axis, y: list[NDArray], x=None, **kwargs):
             text = axis[i].text(xpos, ypos, labels[i])
             text.set_bbox(dict(facecolor='white', alpha=0.75, edgecolor='white'))
 
-        __plot_curve(axis[i], x_plot, y_plot, i, ylabel=ylabel, **kwargs)
+        color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
+        __plot_curve(axis[i], x_plot, y_plot, i, color_cycler, ylabel=ylabel, **kwargs)
 
 
-def comparison_stack(axis: pyplot.axis, y: list[NDArray], x: list[NDArray]=None, **kwargs):
+def comparison_stack(axis: axes.Axes, y: list[NDArray], x: list[NDArray]=None, **kwargs):
     """
     Plot a horizontal stack of multiple curves on the same x-scale.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     y : list[numpy.ndarray]
         data y-axis values.
@@ -333,14 +332,14 @@ def comparison_stack(axis: pyplot.axis, y: list[NDArray], x: list[NDArray]=None,
         __plot_curves(axis[i], x_plot, y_plot, labels=labels, **kwargs)
 
 
-def twinx(axis: pyplot.axis, left: NDArray, right: NDArray, x=None, **kwargs):
+def twinx(axis: axes.Axes, left: NDArray, right: NDArray, x=None, **kwargs):
     """
     Plot two curves with different scales on the y-axis that use the same scale on the
     x-axis.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     left : numpy.ndarray
         Value plotted on left y-axis.
@@ -408,14 +407,15 @@ def twinx(axis: pyplot.axis, left: NDArray, right: NDArray, x=None, **kwargs):
     axis.set_ylabel(left_ylabel)
     axis.set_xlabel(xlabel)
 
-    list1 = __plot_curve(axis, x[0], left, 0, **kwargs)
+    color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
+    list1 = __plot_curve(axis, x[0], left, 0, color_cycler, **kwargs)
 
     axis2 = axis.twinx()
     axis2.grid(False)
     axis2._get_lines.prop_cycler = axis._get_lines.prop_cycler
     if right_ylabel is not None:
         axis2.set_ylabel(right_ylabel, rotation=-90, labelpad=15)
-    list2 = __plot_curve(axis2, x[1], right, 1, **kwargs)
+    list2 = __plot_curve(axis2, x[1], right, 1, color_cycler, **kwargs)
 
     if left_ylim is not None:
         axis.set_ylim(left_ylim)
@@ -434,14 +434,14 @@ def twinx(axis: pyplot.axis, left: NDArray, right: NDArray, x=None, **kwargs):
         axis.legend(labels_list, labs, loc=legend_loc, title=legend_title, bbox_to_anchor=(0.1, 0.1, 0.9, 0.9)).set_zorder(10)
 
 
-def twinx_comparison(axis: pyplot.axis, left: list[NDArray], right: list[NDArray], x=None, **kwargs):
+def twinx_comparison(axis: axes.Axes, left: list[NDArray], right: list[NDArray], x=None, **kwargs):
     """
     Plot two curves with different scales on the y-axis that use the same scale on the
     x-axis.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     left : list[numpy.ndarray]
         Value plotted on left y-axis.
@@ -514,7 +514,9 @@ def twinx_comparison(axis: pyplot.axis, left: list[NDArray], right: list[NDArray
     if isinstance(x, numpy.ndarray):
         x = numpy.tile(x, (nplots, 1))
 
-    list1 = [__plot_curve(axis, x[i], left[i], i, **kwargs) for i in range(len(left))]
+    color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
+
+    list1 = [__plot_curve(axis, x[i], left[i], i, color_cycler, **kwargs) for i in range(len(left))]
 
     axis2 = axis.twinx()
     axis2.grid(False)
@@ -522,7 +524,7 @@ def twinx_comparison(axis: pyplot.axis, left: list[NDArray], right: list[NDArray
     if right_ylabel is not None:
         axis2.set_ylabel(right_ylabel, rotation=-90, labelpad=15)
 
-    list2 = [__plot_curve(axis2, x[i], right[i], len(left) + i, **kwargs)  for i in range(len(right))]
+    list2 = [__plot_curve(axis2, x[i], right[i], len(left) + i, color_cycler, **kwargs)  for i in range(len(right))]
 
     axis.ticklabel_format(style='sci', axis='y', scilimits=scilimits, useMathText=True)
     axis2.ticklabel_format(style='sci', axis='y', scilimits=scilimits, useMathText=True)
@@ -544,13 +546,13 @@ def twinx_comparison(axis: pyplot.axis, left: list[NDArray], right: list[NDArray
         axis.legend(labels_list, labs, title=legend_title, loc=legend_loc, bbox_to_anchor=(0.15, 0.15, 0.85, 0.85))
 
 
-def scatter(axis: pyplot.axis, data: NDArray, x: NDArray, **kwargs):
+def scatter(axis: axes.Axes, data: NDArray, x: NDArray, **kwargs):
     """"
     Plot data in a scatter plot.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     data : numpy.ndarray
         Data compared to function.
@@ -633,13 +635,13 @@ def scatter(axis: pyplot.axis, data: NDArray, x: NDArray, **kwargs):
         axis.plot(x, data, marker=marker, markersize=marker_size, linestyle="None", markeredgewidth=1.0, alpha=0.75, zorder=5, label=labels[0])
 
 
-def scatter_comparison(axis: pyplot.axis, data: list[NDArray], x: NDArray, **kwargs):
+def scatter_comparison(axis: axes.Axes, data: list[NDArray], x: NDArray, **kwargs):
     """"
     Plot multiple data sets that share the same x-axis in a scatter plot.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     data : numpy.ndarray
         Data compared to function.

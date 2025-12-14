@@ -104,8 +104,6 @@ def stack(y: list[numpy.ndarray], x=None, **kwargs):
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
-        Axis used to draw plot.
     y : list[numpy.ndarray]
         data y-axis values.
     x : list[numpy.ndarray] or numpy.ndarray
@@ -141,8 +139,6 @@ def comparison_stack(y: list[numpy.ndarray], x=None, **kwargs):
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
-        Axis used to draw plot.
     y : list[numpy.ndarray]
         data y-axis values.
     x : list[numpy.ndarray] or numpy.ndarray
@@ -181,7 +177,7 @@ def twinx(left: numpy.ndarray[float], right: numpy.ndarray[float], x=None, **kwa
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     title : string, optional
         Plot title (default is None)
@@ -228,7 +224,7 @@ def twinx_comparison(left: list[numpy.ndarray], right: list[numpy.ndarray], x: n
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     left : list[numpy.ndarray]
         Value plotted on left y-axis.
@@ -279,7 +275,7 @@ def bar(y, x=None, **kwargs):
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     y : numpy.ndarray
         Value plotted on y-axis.
@@ -323,7 +319,7 @@ def twinx_bar_line(y_bar: numpy.ndarray, y_line: numpy.ndarray, x_bar: numpy.nda
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     bar : numpy.ndarray
         Bar plot data.
@@ -382,7 +378,7 @@ def hist(samples: numpy.ndarray, fx=None, **kwargs):
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     samples : numpy.ndarray
         Value plotted on y-axis.
@@ -428,7 +424,7 @@ def fpoints(data: numpy.ndarray[float], func: numpy.ndarray[float], x: numpy.nda
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     data : numpy.ndarray
         Data compared to function.
@@ -476,7 +472,7 @@ def fcurve(data: numpy.ndarray[float], func: numpy.ndarray[float], x: numpy.ndar
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     data : numpy.ndarray
         Data compared to function.
@@ -524,7 +520,7 @@ def fscatter(data: numpy.ndarray[float], func: Callable[[float], float], x: nump
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     data : numpy.ndarray
         Data compared to function.
@@ -576,7 +572,7 @@ def fcurve_scatter_comparison(data: list[numpy.ndarray[float]], func: Callable[[
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     data : numpy.ndarray
         Data compared to function.
@@ -670,7 +666,7 @@ def scatter(y: numpy.ndarray[float], x: numpy.ndarray[float], **kwargs):
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     y : numpy.ndarray
         Data plotted on y-axis.
@@ -712,7 +708,7 @@ def scatter_comparison(y: numpy.ndarray[float], x: numpy.ndarray[float], **kwarg
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     y : numpy.ndarray
         Data plotted on y-axis.
@@ -760,8 +756,6 @@ def positive_negative_bar(y: numpy.ndarray[float], x: numpy.ndarray=None, **kwar
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
-        Axis used to draw plot.
     pos : numpy.ndarray
         Positive data values.
     neg : numpy.ndarray

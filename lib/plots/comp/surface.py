@@ -1,5 +1,5 @@
 import numpy
-from matplotlib import pyplot, figure, colors
+from matplotlib import pyplot, figure, colors, axes
 from labellines import labelLines, labelLine
 
 from lib.plots.comp.axis import (PlotType, logStyle, logXStyle, logYStyle)
@@ -7,14 +7,14 @@ from lib.utils import get_param_default_if_missing
 from lib import config
 
 
-def contour(axis: pyplot.axis,  f: numpy.ndarray[float, float], x: numpy.ndarray[float, float],  y: numpy.ndarray[float, float], 
+def contour(axis: axes.Axes,  f: numpy.ndarray[float, float], x: numpy.ndarray[float, float],  y: numpy.ndarray[float, float], 
             values: numpy.ndarray[float], **kwargs):
     """
     Contour plot for f(x,y)
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     y : numpy.ndarray[float, float]
         Value plotted on y-axis.
@@ -62,14 +62,14 @@ def contour(axis: pyplot.axis,  f: numpy.ndarray[float, float], x: numpy.ndarray
     axis.clabel(contour, contour.levels, fmt="%.3f", inline=True, fontsize=contour_font_size)
 
 
-def contour_hist(axis: pyplot.axis, figure: figure.Figure, samples: numpy.ndarray[float, float], f: numpy.ndarray[float, float], x: numpy.ndarray[float, float], 
+def contour_hist(axis: axes.Axes, figure: figure.Figure, samples: numpy.ndarray[float, float], f: numpy.ndarray[float, float], x: numpy.ndarray[float, float], 
                  y: numpy.ndarray[float, float], values: numpy.ndarray[float], **kwargs):
     """
     Overlay data shown in a contour plot with samples shown in a histogram.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     figure: matplotlib.figure.Figure
         Plot figure which is needed to add histogram scale.
@@ -128,14 +128,14 @@ def contour_hist(axis: pyplot.axis, figure: figure.Figure, samples: numpy.ndarra
     axis.clabel(contour, contour.levels, fmt="%.3f", inline=True, fontsize=contour_font_size)
 
 
-def colored_scatter(axis: pyplot.axis, figure: figure.Figure, y: numpy.ndarray[float], x: numpy.ndarray[float], color_values: numpy.ndarray[float], **kwargs):
+def colored_scatter(axis: axes.Axes, figure: figure.Figure, y: numpy.ndarray[float], x: numpy.ndarray[float], color_values: numpy.ndarray[float], **kwargs):
     """
     Make a scatter plot of the x and y data and color the scatter dots with value 
     specified in colors.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     figure: matplotlib.figure.Figure
         Plot figure which is needed to add histogram scale.
@@ -232,14 +232,14 @@ def colored_scatter(axis: pyplot.axis, figure: figure.Figure, y: numpy.ndarray[f
             color_bar.mappable.set_clim(color_bar_limit[0], color_bar_limit[1])
 
 
-def colored_scatter_contour(axis, figure, ydata, xdata, color_values, cont_ydata, cont_xdata, **kwargs):
+def colored_scatter_contour(axis: axes.Axes, figure: figure.Figure, ydata: list[numpy.ndarray], xdata: list[numpy.ndarray], color_values: list[float], cont_ydata: list[float], cont_xdata: list[float], **kwargs):
     """
     Make a scatter plot of the x and y data and color the scatter dots with value 
     specified in colors.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     ydata : list[numpy.ndarray]
         Data plotted in scatter plot y axis.

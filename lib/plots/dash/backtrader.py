@@ -1,4 +1,4 @@
-from matplotlib import pyplot
+from matplotlib import pyplot, axes
 import matplotlib.gridspec as gridspec
 from matplotlib.lines import Line2D
 
@@ -378,8 +378,6 @@ def daily_returns_distribution(orders: DataFrame, **kwargs):
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
-        Axis used to draw plot.
     orders : DataFrame
         Data to plot.
     title : str
@@ -550,13 +548,13 @@ __position_value
 __daily_returns_distribution
     Plot daily returns distribution.
 """
-def __zscore_indicator(axis: pyplot.axis, data: DataFrame, **kwargs):
+def __zscore_indicator(axis: axes.Axes, data: DataFrame, **kwargs):
     """
     Plot zscore indicator time series.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : axes.Axes
         Axis used to draw plot.
     data : DataFrame
         Data to plot.
@@ -574,13 +572,13 @@ def __zscore_indicator(axis: pyplot.axis, data: DataFrame, **kwargs):
                     ylabel="Z-Score", lw=1)
 
 
-def __zscore_indicator_position(axis: pyplot.axis, zscore_data: DataFrame, position_data: DataFrame, **kwargs):
+def __zscore_indicator_position(axis: axes.Axes, zscore_data: DataFrame, position_data: DataFrame, **kwargs):
     """
     Plot zscore indicator time series.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     zscore : DataFrame
         Z-Score data to plot.
@@ -624,13 +622,13 @@ def __zscore_indicator_position(axis: pyplot.axis, zscore_data: DataFrame, posit
                 bbox_to_anchor=(0.05, 0.05, 0.95, 0.95)).set_zorder(20)
 
 
-def __asset_price(axis: pyplot.axis, data: DataFrame, **kwargs):
+def __asset_price(axis: axes.Axes, data: DataFrame, **kwargs):
     """
     Plot asset price series.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : axes.Axes
         Axis used to draw plot.
     data : DataFrame
         Data to plot.
@@ -649,13 +647,13 @@ def __asset_price(axis: pyplot.axis, data: DataFrame, **kwargs):
     comp.curve(axis, close, date, title=title, xlabel="Date", ylabel="Price", label=ticker, lw=1)
 
 
-def __pnl(axis: pyplot.axis, data: DataFrame, **kwargs):
+def __pnl(axis: axes.Axes, data: DataFrame, **kwargs):
     """
     Plot profit and loss time series.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : axes.Axes
         Axis used to draw plot.
     data : DataFrame
         Data to plot.
@@ -700,7 +698,7 @@ def __pnl(axis: pyplot.axis, data: DataFrame, **kwargs):
     legend.set_zorder(102)
 
 
-def __returns(axis: pyplot.axis, orders: DataFrame, **kwargs):
+def __returns(axis: axes.Axes, orders: DataFrame, **kwargs):
     """
     Daily returns are computed using the method described on page 98 of Algorithmic
     Trading by Ernest Chan.
@@ -714,7 +712,7 @@ def __returns(axis: pyplot.axis, orders: DataFrame, **kwargs):
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : axes.Axes
         Axis used to draw plot.
     data : DataFrame
         Data to plot.
@@ -765,7 +763,7 @@ def __returns(axis: pyplot.axis, orders: DataFrame, **kwargs):
     legend.set_zorder(102)
 
 
-def __sharpe_ratio(axis, orders: DataFrame, risk_free_return: float=0.0, **kwargs):
+def __sharpe_ratio(axis: axes.Axes, orders: DataFrame, risk_free_return: float=0.0, **kwargs):
     """
     Plot sharpe ratio and average and daily returns and variance of daily returns
     
@@ -778,7 +776,7 @@ def __sharpe_ratio(axis, orders: DataFrame, risk_free_return: float=0.0, **kwarg
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : axes.Axes
         Axis used to draw plot.
     data : DataFrame
         Data to plot.
@@ -818,13 +816,13 @@ def __sharpe_ratio(axis, orders: DataFrame, risk_free_return: float=0.0, **kwarg
                           left_ylabel="Return (%)", right_ylabel="Sharpe Ratio", lw=lw)
 
 
-def __gross_value(axis: pyplot.axis, data: DataFrame, **kwargs):
+def __gross_value(axis: axes.Axes, data: DataFrame, **kwargs):
     """
     Gross value of buy and sell orders.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : axes.Axes
         Axis used to draw plot.
     data : DataFrame
         Data to plot.
@@ -851,13 +849,13 @@ def __gross_value(axis: pyplot.axis, data: DataFrame, **kwargs):
     
 
 
-def __order_value(axis: pyplot.axis, data: DataFrame, **kwargs):
+def __order_value(axis: axes.Axes, data: DataFrame, **kwargs):
     """
     Values of buy and sell orders.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : axes.Axes
         Axis used to draw plot.
     data : DataFrame
         Data to plot.
@@ -889,13 +887,13 @@ def __order_value(axis: pyplot.axis, data: DataFrame, **kwargs):
                 bbox_to_anchor=(0.05, 0.05, 0.95, 0.95)).set_zorder(20)
 
 
-def __orders(axis: pyplot.axis, order_data: DataFrame, asset_price_data: DataFrame, **kwargs):
+def __orders(axis: axes.Axes, order_data: DataFrame, asset_price_data: DataFrame, **kwargs):
     """
     Plot order size and value time series.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : axes.Axes
         Axis used to draw plot.
     data : DataFrame
         Data to plot.
@@ -926,13 +924,13 @@ def __orders(axis: pyplot.axis, order_data: DataFrame, asset_price_data: DataFra
                                    marker_size=6.0, alpha=0.2) 
 
 
-def __cash_value(axis: pyplot.axis, data: DataFrame, **kwargs):
+def __cash_value(axis: axes.Axes, data: DataFrame, **kwargs):
     """
     Plot cash and value time series.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : axes.Axes
         Axis used to draw plot.
     data : DataFrame
         Data to plot.
@@ -951,7 +949,7 @@ def __cash_value(axis: pyplot.axis, data: DataFrame, **kwargs):
                     labels=["Cash", "Value"])
 
 
-def __position_value(axis: pyplot.axis, data: DataFrame, **kwargs):
+def __position_value(axis: axes.Axes, data: DataFrame, **kwargs):
     """
     Plot position value time series.
 
@@ -984,13 +982,13 @@ def __position_value(axis: pyplot.axis, data: DataFrame, **kwargs):
                 bbox_to_anchor=(0.05, 0.05, 0.95, 0.95)).set_zorder(20)
 
 
-def __daily_returns_distribution(axis, orders: DataFrame, **kwargs):
+def __daily_returns_distribution(axis: axes.Axes, orders: DataFrame, **kwargs):
     """
     Plot daily returns distribution.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : axes.Axes
         Axis used to draw plot.
     orders : DataFrame
         Data to plot.

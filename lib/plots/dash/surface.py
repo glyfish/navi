@@ -10,8 +10,6 @@ def contour(f: numpy.ndarray[float, float], x: numpy.ndarray[float, float], y: n
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
-        Axis used to draw plot.
     y : numpy.ndarray[float, float]
         Value plotted on y-axis.
     x : numpy.ndarray[float, float]
@@ -53,8 +51,6 @@ def contour_hist(samples: numpy.ndarray[float, float],
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
-        Axis used to draw plot.
     samples : numpy.ndarray[float, float]
         Two dimensional array containing sampled data plotted in histogram,
     y : numpy.ndarray[float, float]
@@ -94,8 +90,6 @@ def colored_scatter(y, x, color_values, **kwargs):
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
-        Axis used to draw plot.
     figure: matplotlib.figure.Figure
         Plot figure which is needed to add histogram scale.
     y : numpy.ndarray[float]
@@ -143,8 +137,6 @@ def colored_scatter_contour(ydata, xdata, color_values, cont_ydata, cont_xdata, 
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
-        Axis used to draw plot.
     ydata : list[numpy.ndarray]
         Data plotted in scatter plot y axis.
     cont_ydata : list[numpy.ndarray]

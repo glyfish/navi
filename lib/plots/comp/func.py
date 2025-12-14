@@ -12,7 +12,7 @@ fcurve
 import numpy
 import pandas
 from datetime import datetime, date
-from matplotlib import pyplot
+from matplotlib import pyplot, rcParams, axes
 import matplotlib.dates as mdates
 import matplotlib.units as munits
 from typing import Callable
@@ -22,16 +22,17 @@ from lib.plots.comp.axis import (PlotType, logStyle, logXStyle, logYStyle)
 from lib.utils import (get_param_throw_if_missing, get_param_default_if_missing)
 from lib.plots.comp.plot_utils import (__plot_curve, __plot_curves, __twinx_ticks, __plot_symbols,
                                        __plot_symbol, __plot_bar)
+from lib.config import SharedCycler
 from lib import config
 
-def fpoints(axis: pyplot.axis, data: NDArray, func: NDArray, x: NDArray=None, fx: NDArray=None, **kwargs):
+def fpoints(axis: axes.Axes, data: NDArray, func: NDArray, x: NDArray=None, fx: NDArray=None, **kwargs):
     """"
     Compare data to a function by plotting the data as a curve
     and the function as points.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     data : numpy.ndarray
         Data compared to function.
@@ -146,13 +147,13 @@ def fpoints(axis: pyplot.axis, data: NDArray, func: NDArray, x: NDArray=None, fx
     if labels is not None:
         axis.legend(loc=legend_loc, bbox_to_anchor=(0.1, 0.1, 0.8, 0.8))
 
-def fcurve(axis: pyplot.axis, data: NDArray, func: NDArray, x: NDArray=None, fx: NDArray=None, **kwargs):
+def fcurve(axis: axes.Axes, data: NDArray, func: NDArray, x: NDArray=None, fx: NDArray=None, **kwargs):
     """"
     Compare data to a function by plotting both as curves.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     data : numpy.ndarray
         Data compared to function.
@@ -260,13 +261,13 @@ def fcurve(axis: pyplot.axis, data: NDArray, func: NDArray, x: NDArray=None, fx:
     if labels is not None:
         axis.legend(loc='best', bbox_to_anchor=(0.1, 0.1, 0.8, 0.8))
 
-def fscatter(axis: pyplot.axis, data: NDArray, func: Callable[[float], float], x: NDArray=None, **kwargs):
+def fscatter(axis: axes.Axes, data: NDArray, func: Callable[[float], float], x: NDArray=None, **kwargs):
     """"
     Compare data to a function by plotting the functions as a curve and as a scatter plot..
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     data : numpy.ndarray
         Data compared to function.
@@ -366,7 +367,7 @@ def fscatter(axis: pyplot.axis, data: NDArray, func: Callable[[float], float], x
 
 
 
-def fcurve_scatter_comparison(axis: pyplot.axis, data: list[NDArray], func: NDArray, 
+def fcurve_scatter_comparison(axis: axes.Axes, data: list[NDArray], func: NDArray, 
                               x: list[NDArray]=None, fx: NDArray=None, **kwargs):
     """"
     Compare a function to multiple datasets by plotting the functions as a curve and data 
@@ -374,7 +375,7 @@ def fcurve_scatter_comparison(axis: pyplot.axis, data: list[NDArray], func: NDAr
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     data : numpy.ndarray
         Data compared to function.
@@ -418,17 +419,19 @@ def fcurve_scatter_comparison(axis: pyplot.axis, data: list[NDArray], func: NDAr
     if title is not None:
         axis.set_title(title, y=1.0 + title_offset)
 
-    __plot_curve(axis, fx, func, 0, **kwargs)
+
+    color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
+    __plot_curve(axis, fx, func, 0, color_cycler, **kwargs)
     __plot_symbols(axis, x, data, 1, **kwargs)
 
 
-def fbar(axis: pyplot.axis, y: NDArray, fy: NDArray, x: NDArray=None, fx: NDArray=None, **kwargs):
+def fbar(axis: axes.Axes, y: NDArray, fy: NDArray, x: NDArray=None, fx: NDArray=None, **kwargs):
     """
     Plot samples in a bar chart and compare to a function.
 
     Parameters
     ----------
-    axis : matplotlib.pyplot.axis
+    axis : matplotlib.axes.Axes
         Axis used to draw plot.
     y : numpy.ndarray
         Value plotted on y-axis.
@@ -475,7 +478,8 @@ def fbar(axis: pyplot.axis, y: NDArray, fy: NDArray, x: NDArray=None, fx: NDArra
     axis.set_ylabel(ylabel)
     axis.set_xlabel(xlabel)
 
-    __plot_bar(axis, x, y, 0, **kwargs)
+    color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
+    __plot_bar(axis, x, y, color_cycler, 0, **kwargs)
     
     label = labels[1] if labels is not None else None
     axis.plot(fx, fy, label=label, lw=lw, color="#320075", zorder=6)
