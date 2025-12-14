@@ -5,7 +5,9 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "navi"
 version = "0.1.0"
-dependencies = []
+dependencies = [
+    "python-dotenv>=1.0.0",
+]
 
 [tool.setuptools.packages.find]
 where = ["."]

@@ -1,11 +1,13 @@
 from . import config
+from . import env
+from . import logger
 from . import plots
 from . import utils
-from . import logger
 
 __all__ = [
     "config",
+    "env",
+    "logger",
     "plots",
     "utils",
-    "logger",
 ]
