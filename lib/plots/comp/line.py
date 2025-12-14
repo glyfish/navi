@@ -26,6 +26,7 @@ import matplotlib.dates as mdates
 import matplotlib.units as munits
 from matplotlib import pyplot, rcParams, axes
 from numpy.typing import NDArray
+from typing import Sequence
 
 
 from lib.plots.comp.axis import (PlotType, logStyle, logXStyle, logYStyle)
@@ -35,7 +36,7 @@ from lib.config import SharedCycler
 from lib.utils import get_param_default_if_missing
 
 
-def curve(axis: axes.Axes, y: NDArray, x: NDArray=None, **kwargs):
+def curve(axis: axes.Axes, y: NDArray, x: NDArray | None = None, **kwargs):
     """
     Plot a curve.
 
@@ -96,7 +97,7 @@ def curve(axis: axes.Axes, y: NDArray, x: NDArray=None, **kwargs):
     color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
     __plot_curve(axis, x, y, 0, color_cycler, **kwargs)
 
-def comparison(axis: axes.Axes, y: NDArray, x: NDArray=None, **kwargs):
+def comparison(axis: axes.Axes, y: NDArray, x: NDArray | None = None, **kwargs):
     """
     Plot multiple curves on same scale.
 
@@ -170,7 +171,7 @@ def comparison(axis: axes.Axes, y: NDArray, x: NDArray=None, **kwargs):
     __plot_curves(axis, x, y, **kwargs)
 
 
-def stack(axis: axes.Axes, y: list[NDArray], x=None, **kwargs):
+def stack(axis: Sequence[axes.Axes], y: list[NDArray], x=None, **kwargs):
     """
     Plot a horizontal stack of curves on the same x-scale.
 
@@ -248,7 +249,7 @@ def stack(axis: axes.Axes, y: list[NDArray], x=None, **kwargs):
         __plot_curve(axis[i], x_plot, y_plot, i, color_cycler, ylabel=ylabel, **kwargs)
 
 
-def comparison_stack(axis: axes.Axes, y: list[NDArray], x: list[NDArray]=None, **kwargs):
+def comparison_stack(axis: Sequence[axes.Axes], y: list[NDArray], x: list[NDArray] | None=None, **kwargs):
     """
     Plot a horizontal stack of multiple curves on the same x-scale.
 
@@ -288,7 +289,7 @@ def comparison_stack(axis: axes.Axes, y: list[NDArray], x: list[NDArray]=None, *
 
     title            = get_param_default_if_missing("title", None, **kwargs)
     title_offset     = get_param_default_if_missing("title_offset", 0.0, **kwargs)
-    xlabel           = get_param_default_if_missing("xlabel", None, **kwargs)
+    xlabel           = get_param_default_if_missing("xlabel", "", **kwargs)
     ylabels          = get_param_default_if_missing("ylabels", None, **kwargs)
     curve_labels     = get_param_default_if_missing("labels", [], **kwargs)
 
@@ -403,9 +404,9 @@ def twinx(axis: axes.Axes, left: NDArray, right: NDArray, x=None, **kwargs):
     if not isinstance(x, list):
         x = numpy.tile(x, (2, 1))
 
-    axis.set_title(title, y=title_offset + 1.0)
-    axis.set_ylabel(left_ylabel)
-    axis.set_xlabel(xlabel)
+    axis.set_title(title, y=title_offset + 1.0) if title is not None else None
+    axis.set_ylabel(left_ylabel) if left_ylabel is not None else None
+    axis.set_xlabel(xlabel) if xlabel is not None else None
 
     color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
     list1 = __plot_curve(axis, x[0], left, 0, color_cycler, **kwargs)
