@@ -6,8 +6,8 @@ from typing import Any, Mapping, MutableMapping, Optional
 
 import httpx
 
-from navi.lib.env import get_fred_api_key, get_fred_base_url
-from navi.lib.models.fred import (
+from lib.env import get_fred_api_key, get_fred_base_url
+from lib.clients.models.fred import (
     CategoryResponse,
     ObservationsResponse,
     ReleasesResponse,
