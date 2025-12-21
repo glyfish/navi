@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from datetime import date, datetime
 from typing import List, Optional
+import re
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class FredBaseModel(BaseModel):
@@ -14,14 +15,17 @@ class FredBaseModel(BaseModel):
     model_config = {"frozen": True}
 
 
-class Pagination(FredBaseModel):
-    realtime_start: date = Field(alias="realtime_start")
-    realtime_end: date = Field(alias="realtime_end")
+class FredResponse(FredBaseModel):
+    realtime_start: date
+    realtime_end: date
+
+
+class PaginatedResponse(FredResponse):
     order_by: Optional[str] = None
     sort_order: Optional[str] = None
-    count: int
-    offset: int
-    limit: int
+    count: Optional[int] = None
+    offset: Optional[int] = None
+    limit: Optional[int] = None
 
 
 class Category(FredBaseModel):
@@ -30,8 +34,8 @@ class Category(FredBaseModel):
     parent_id: int | None = Field(default=None, alias="parent_id")
 
 
-class CategoryResponse(Pagination):
-    categories: List[Category]
+class CategoryResponse(PaginatedResponse):
+    categories: List[Category] = Field(default_factory=list)
 
 
 class Series(FredBaseModel):
@@ -49,9 +53,27 @@ class Series(FredBaseModel):
     popularity: Optional[int] = None
     notes: Optional[str] = None
 
+    @field_validator("last_updated", mode="before")
+    @classmethod
+    def _parse_last_updated(cls, value: str | datetime) -> datetime:
+        if isinstance(value, datetime):
+            return value
+        if isinstance(value, str):
+            normalized = value
+            if re.search(r"[+-]\d{2}$", value):
+                normalized = value + "00"
+            try:
+                return datetime.strptime(normalized, "%Y-%m-%d %H:%M:%S%z")
+            except ValueError:
+                try:
+                    return datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+                except ValueError as exc:
+                    raise ValueError(f"Invalid last_updated format: {value}") from exc
+        raise ValueError("last_updated must be datetime or string")
 
-class SeriesResponse(Pagination):
-    seriess: List[Series]
+
+class SeriesResponse(PaginatedResponse):
+    seriess: List[Series] = Field(default_factory=list)
 
 
 class Observation(FredBaseModel):
@@ -61,8 +83,8 @@ class Observation(FredBaseModel):
     value: str
 
 
-class ObservationsResponse(Pagination):
-    observations: List[Observation]
+class ObservationsResponse(PaginatedResponse):
+    observations: List[Observation] = Field(default_factory=list)
 
 
 class Release(FredBaseModel):
@@ -74,5 +96,5 @@ class Release(FredBaseModel):
     realtime_end: date
 
 
-class ReleasesResponse(Pagination):
-    releases: List[Release]
+class ReleasesResponse(PaginatedResponse):
+    releases: List[Release] = Field(default_factory=list)

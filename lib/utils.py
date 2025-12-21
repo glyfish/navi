@@ -1,11 +1,13 @@
 import os
+import json
 import numpy
 from enum import Enum
-from typing import Tuple
+from typing import Callable, Tuple, Any
 from numpy.typing import NDArray
 import shortuuid
 
 from pandas import read_csv, DataFrame
+
 
 def get_param_throw_if_missing(param: str, **kwargs):
     """
@@ -31,6 +33,7 @@ def get_param_throw_if_missing(param: str, **kwargs):
     else:
         raise Exception(f"{param} parameter is required")
 
+
 def get_param_default_if_missing(param, default, **kwargs):
     """
     Get parameter from kwargs and return specified default value if it is missing.
@@ -49,6 +52,7 @@ def get_param_default_if_missing(param, default, **kwargs):
         Specified kwargs parameter.
     """
     return kwargs[param] if param in kwargs else default
+
 
 def verify_condition(param, condition: bool, condition_string: str):
     """
@@ -70,6 +74,7 @@ def verify_condition(param, condition: bool, condition_string: str):
     if not condition:
         raise Exception(f"{param} should satisfy {condition_string}")
 
+
 def verify_type(param, expected_type):
     """
     Raise exception if parameter is not specified type.
@@ -87,6 +92,7 @@ def verify_type(param, expected_type):
     """
     if not isinstance(param, expected_type):
         raise Exception(f"{param} is type {type(param)}. Expected {expected_type}")
+
 
 def create_space(**kwargs) -> NDArray:
     """
@@ -112,6 +118,7 @@ def create_space(**kwargs) -> NDArray:
     numpy.ndarray[float]
         Linear space.
     """
+
     npts = get_param_default_if_missing("npts", None, **kwargs)
     xmax = get_param_default_if_missing("xmax", None, **kwargs)
     xmin = get_param_default_if_missing("xmin", 0.0, **kwargs)
@@ -119,10 +126,12 @@ def create_space(**kwargs) -> NDArray:
     if xmax is None and npts is None:
         raise Exception(f"xmax or npts is required")
     if xmax is None:
+        assert npts is not None
         xmax = (npts - 1)*Δx + xmin
     elif npts is None:
         npts = int((xmax-xmin)/Δx) + 1
     return numpy.linspace(xmin, xmax, npts)
+
 
 def create_logspace(**kwargs) -> NDArray:
     """
@@ -146,7 +155,8 @@ def create_logspace(**kwargs) -> NDArray:
     xmin = get_param_default_if_missing("xmin", 1.0, **kwargs)
     return numpy.logspace(numpy.log10(xmin), numpy.log10(xmax/xmin), npts)
 
-def create_parameter_scan(source, *args) -> Tuple[list[NDArray], list[NDArray]]:
+
+def create_parameter_scan(source: Callable[..., Tuple[NDArray, NDArray]], *args) -> Tuple[list[NDArray], list[NDArray]]:
     """
     Generate a parameter scan for the specified data source using the 
     specified parameters
@@ -172,7 +182,8 @@ def create_parameter_scan(source, *args) -> Tuple[list[NDArray], list[NDArray]]:
         t_scan.append(t)
     return t_scan, scan
 
-def create_ensemble(source, nsim: int, **kwargs) -> Tuple[NDArray, list[NDArray]]:
+
+def create_ensemble(source: Callable[..., Tuple[NDArray, NDArray]], nsim: int, **kwargs) -> Tuple[NDArray, NDArray]:
     """
     Generate a parameter scan for the specified data source using the 
     specified parameters
@@ -193,12 +204,14 @@ def create_ensemble(source, nsim: int, **kwargs) -> Tuple[NDArray, list[NDArray]
     """
 
     ensemble = []
+    t = numpy.array([])
     for _ in range(nsim):
         t, samples = source(**kwargs)
         ensemble.append(samples)
     return t, numpy.array(ensemble)
 
-def apply_to_ensemble(func, t: NDArray, ensemble: list[NDArray], **kwargs) -> Tuple[NDArray, list[NDArray]]:
+
+def apply_to_ensemble(func, t: NDArray, ensemble: list[NDArray], **kwargs) -> Tuple[NDArray, NDArray]:
     """
     Apply specified function to an ensemble.
     
@@ -222,7 +235,8 @@ def apply_to_ensemble(func, t: NDArray, ensemble: list[NDArray], **kwargs) -> Tu
     result = [func(t, data, **kwargs) for data in ensemble]
     return result[0][0], numpy.array([data[1] for data in result])
 
-def apply_to_parameter_scan(func, t: NDArray, scan: NDArray,  **kwargs) -> Tuple[NDArray, list[NDArray]]:
+
+def apply_to_parameter_scan(func, t: NDArray, scan: NDArray,  **kwargs) -> Tuple[NDArray, NDArray]:
     """
     Apply specified function to results of a parameter scan.
     
@@ -246,7 +260,8 @@ def apply_to_parameter_scan(func, t: NDArray, scan: NDArray,  **kwargs) -> Tuple
     result = [func(t, data, **kwargs) for data in scan]
     return result[0][0], numpy.array([data[1] for data in result])
 
-def get_s_vals(**kwargs) -> list[int]:
+
+def get_s_vals(**kwargs) -> NDArray:
     """
     Compute lags for variance ratio test using provided parameters.
 
@@ -350,7 +365,10 @@ def read_yahoo_data(file_path: str) -> DataFrame:
     return read_csv(file_path, index_col=0, parse_dates=['Date']).sort_values(by='Date').dropna()
 
 
-def generate_plot_file_name(file_name: str, path="./plots", extension: str = "png", uuid: str = None) -> str:
+def generate_plot_file_name(file_name: str, 
+                            path="./plots", 
+                            extension: str = "png", 
+                            uuid: str | None= None) -> str:
     """
     Generate a file name with the specified prefix, suffix and extension.
 
@@ -373,3 +391,11 @@ def generate_plot_file_name(file_name: str, path="./plots", extension: str = "pn
     uuid = uuid if uuid else shortuuid.uuid()
     return f"{full_path}-{uuid}.{extension}"
 
+
+def print_json_vertical(obj: Any, indent: int = 2) -> None:
+    """
+    Pretty-print a JSON-serializable object with indentation.
+    Helpful when inspecting raw API payloads in notebooks or logs.
+    """
+
+    print(json.dumps(obj, indent=indent, sort_keys=True))
