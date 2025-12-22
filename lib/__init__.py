@@ -15,3 +15,6 @@ __all__ = [
     "utils",
     "models"
 ]
+
+from . import mcp_client
+__all__.append("mcp_client")
