@@ -43,6 +43,7 @@ class MCPClient:
         self._transport_cm = transport_cm
         self._session = ClientSession(read_stream, write_stream)
         await self._session.__aenter__()
+        await self._session.initialize()
 
     async def disconnect(self) -> None:
         if not self._session:
