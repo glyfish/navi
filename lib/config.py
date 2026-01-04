@@ -10,12 +10,17 @@ def save_post_asset(figure, post, plot):
     figure.savefig(path, bbox_inches="tight")
 
 project_root = os.getcwd()
+style_file: str | None = None
 
 for _ in range(45):
-    style_file = os.path.join(os.path.abspath(project_root), 'gly.fish.mplstyle')
-    if os.path.isfile(style_file):
+    candidate = os.path.join(os.path.abspath(project_root), "gly.fish.mplstyle")
+    if os.path.isfile(candidate):
+        style_file = candidate
         break
-    project_root += '/..'
+    project_root += "/.."
+
+if style_file is None:
+    raise FileNotFoundError("Unable to locate gly.fish.mplstyle in project hierarchy")
 
 glyfish_style = style_file
 

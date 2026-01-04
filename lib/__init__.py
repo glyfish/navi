@@ -16,5 +16,9 @@ __all__ = [
     "models"
 ]
 
-from . import mcp_client
-__all__.append("mcp_client")
+try:
+    from . import mcp_client  # optional dependency; skip if unsupported
+except Exception:  # pragma: no cover - best effort import
+    mcp_client = None
+else:
+    __all__.append("mcp_client")
