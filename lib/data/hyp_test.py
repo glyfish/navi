@@ -200,7 +200,7 @@ class StatisticalTestData:
                  params: list[StatisticalTestParam], 
                  sig: StatisticalTestParam, 
                  lower: StatisticalTestParam, 
-                 upper: StatisticalTestParam):
+                 upper: StatisticalTestParam | None):
         self.status = status
         self.stat = stat
         self.pval = pval

@@ -4,9 +4,10 @@ lib.data.impl.ou.py
 Simulation and analysis of the Ornstein-Uhlenbeck process.
 """
 
-from typing import Tuple
 import numpy
 import statsmodels.api as sm
+from numpy.typing import NDArray
+from typing import Any
 
 from lib.models import ou
 from lib.data.param_est import (ParamEst, OLSResult, OLSTransform, OLSParamType)
@@ -16,7 +17,7 @@ from lib.utils import (get_param_throw_if_missing, get_param_default_if_missing,
                        verify_type, create_space, create_logspace)
 
 
-def compute_mean(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_mean(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Mean value of Ornstein-Uhlenbeck process.
 
@@ -24,18 +25,18 @@ def compute_mean(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
     ----------
     npts: int
         Number of points. (default 11)
-    Δt: float
+    Δt: numpy.floating[Any]
         Width of time step. (default 1.0)
-    μ: float
+    μ: numpy.floating[Any]
         Drift coefficient.
-    λ: float
+    λ: numpy.floating[Any]
         Mean reversion rate.
-    x0: float
+    x0: numpy.floating[Any]
         Initial value.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Mean as a function of time for given parameters.
     """
 
@@ -49,7 +50,7 @@ def compute_mean(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
 
     return t, ou.mean(μ, λ, t, x0)
 
-def compute_mean_limit(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_mean_limit(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Limit as t -> infinity of Ornstein-Uhlenbeck process mean value.
 
@@ -57,14 +58,14 @@ def compute_mean_limit(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[fl
     ----------
     npts: int
         Number of points. (default 11)
-    Δt: float
+    Δt: numpy.floating[Any]
         Width of time step. (default 1.0)
-    μ: float
+    μ: numpy.floating[Any]
         Drift coefficient.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time anf mean
     """
 
@@ -75,7 +76,7 @@ def compute_mean_limit(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[fl
     return create_space(xmin=0, npts=npts, Δx=Δt), numpy.full(npts, μ)
 
 
-def compute_var(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_var(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Variance of Ornstein-Uhlenbeck process.
 
@@ -83,16 +84,16 @@ def compute_var(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
     ----------
     npts: int
         Number of points. (default 11)
-    Δt: float
+    Δt: numpy.floating[Any]
         Width of time step. (default 1.0)
-    λ: float
+    λ: numpy.floating[Any]
         Mean reversion rate.
-    σ: float
+    σ: numpy.floating[Any]
         Standard deviation of random component.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and variance.
     """
 
@@ -105,7 +106,7 @@ def compute_var(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
 
     return t, ou.var(λ, t, σ)
 
-def compute_var_limit(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_var_limit(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Limit as t -> infinity of Ornstein-Uhlenbeck process variance.
 
@@ -113,16 +114,16 @@ def compute_var_limit(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[flo
     ----------
     npts: int
         Number of points. (default 11)
-    Δt: float
+    Δt: numpy.floating[Any]
         Width of time step. (default 1.0)
-    λ: float
+    λ: numpy.floating[Any]
         Mean reversion rate.
-    σ: float
+    σ: numpy.floating[Any]
         Standard deviation of random component.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and variance.
     """
 
@@ -134,7 +135,7 @@ def compute_var_limit(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[flo
 
     return create_space(xmin=0, npts=npts, Δx=Δt), numpy.full(npts, ou.var_limit(λ, σ))
 
-def compute_cov(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_cov(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Covariance of Ornstein-Uhlenbeck process.
 
@@ -142,18 +143,18 @@ def compute_cov(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
     ----------
     npts: int
         Number of points. (default 11)
-    Δt: float
+    Δt: numpy.floating[Any]
         Width of time step. (default 1.0)
-    λ: float
+    λ: numpy.floating[Any]
         Mean reversion rate.
-    s: float
+    s: numpy.floating[Any]
         Time offset.
-    σ: float
+    σ: numpy.floating[Any]
         Standard deviation of random component.
 
             Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and covariance.
     """
 
@@ -169,7 +170,7 @@ def compute_cov(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
 
     return t, ou.cov(λ, s, t, σ)
 
-def compute_cov_limit(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_cov_limit(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Limit as t -> infinity of Ornstein-Uhlenbeck process variance.
 
@@ -177,14 +178,14 @@ def compute_cov_limit(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[flo
     ----------
     npts: int
         Number of points. (default 11)
-    Δt: float
+    Δt: numpy.floating[Any]
         Width of time step. (default 1.0)
-    s: float
+    s: numpy.floating[Any]
         Time offset.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and covariance limit.
     """
 
@@ -197,7 +198,7 @@ def compute_cov_limit(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[flo
 
     return t, numpy.full(npts, 0.0)
 
-def compute_pdf(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_pdf(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Ornstein-Uhlenbeck process PDF for a specified time.
 
@@ -205,24 +206,24 @@ def compute_pdf(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
     ----------
     npts: int
         Number of points. (default 11)
-    Δx: float
+    Δx: numpy.floating[Any]
         Width of variable increment. (default 1.0)
-    xmin: float
+    xmin: numpy.floating[Any]
         Minimum value of modeled variable. (default 0.0)
-    μ: float
+    μ: numpy.floating[Any]
         Drift coefficient.
-    λ: float
+    λ: numpy.floating[Any]
         Mean reversion rate.
-    t: float
+    t: numpy.floating[Any]
         Time
-    σ: float
+    σ: numpy.floating[Any]
         Standard deviation of random component.
-    x0: float
+    x0: numpy.floating[Any]
         Initial value.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Modeled variable and PDF.
     """
 
@@ -239,7 +240,7 @@ def compute_pdf(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
 
     return x, ou.pdf(x, μ, λ, t, σ=σ, x0=x0)
 
-def compute_cdf(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_cdf(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Ornstein-Uhlenbeck process CDF for a specified time.
 
@@ -247,24 +248,24 @@ def compute_cdf(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
     ----------
     npts: int
         Number of points. (default 11)
-    Δx: float
+    Δx: numpy.floating[Any]
         Width of variable increment. (default 1.0)
-    xmin: float
+    xmin: numpy.floating[Any]
         Minimum value of modeled variable. (default 0.0)
-    μ: float
+    μ: numpy.floating[Any]
         Drift coefficient.
-    λ: float
+    λ: numpy.floating[Any]
         Mean reversion rate.
-    t: float
+    t: numpy.floating[Any]
         Time
-    σ: float
+    σ: numpy.floating[Any]
         Standard deviation of random component.
-    x0: float
+    x0: numpy.floating[Any]
         Initial value.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Modeled variable and CDF.
     """
 
@@ -281,7 +282,7 @@ def compute_cdf(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
 
     return x, ou.cdf(x, μ, λ, t, σ=σ, x0=x0)
 
-def compute_pdf_limit(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_pdf_limit(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
      Limit as t -> infinity of Ornstein-Uhlenbeck process PDF.
 
@@ -289,20 +290,20 @@ def compute_pdf_limit(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[flo
     ----------
     npts: int
         Number of points. (default 11)
-    Δx: float
+    Δx: numpy.floating[Any]
         Width of variable increment. (default 1.0)
-    xmin: float
+    xmin: numpy.floating[Any]
         Minimum value of modeled variable. (default 0.0)
-    μ: float
+    μ: numpy.floating[Any]
         Drift coefficient.
-    λ: float
+    λ: numpy.floating[Any]
         Mean reversion rate.
-    σ: float
+    σ: numpy.floating[Any]
         Standard deviation of random component.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]] 
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]] 
         Modeled variable and PDF limit.
     """
 
@@ -317,7 +318,7 @@ def compute_pdf_limit(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[flo
 
     return x, ou.pdf_limit(x, μ, λ, σ=σ)
 
-def compute_cdf_limit(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_cdf_limit(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Ornstein-Uhlenbeck process CDF for t -> infinity.
 
@@ -325,20 +326,20 @@ def compute_cdf_limit(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[flo
     ----------
     npts: int
         Number of points. (default 11)
-    Δx: float
+    Δx: numpy.floating[Any]
         Width of variable increment. (default 1.0)
-    xmin: float
+    xmin: numpy.floating[Any]
         Minimum value of modeled variable. (default 0.0)
-    μ: float
+    μ: numpy.floating[Any]
         Drift coefficient.
-    λ: float
+    λ: numpy.floating[Any]
         Mean reversion rate.
-    σ: float
+    σ: numpy.floating[Any]
         Standard deviation of random component.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]] 
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]] 
         Modeled variable and PDF limit.
     """
 
@@ -360,12 +361,12 @@ def compute_mean_half_life(**kwargs) -> float:
 
     Parameters
     ----------
-    λ: float
+    λ: numpy.floating[Any]
         Mean reversion rate.
 
     Returns
     -------
-    float
+    numpy.floating[Any]
         Mean half life
     """
 
@@ -374,18 +375,18 @@ def compute_mean_half_life(**kwargs) -> float:
     return ou.mean_halflife(λ)
 
 
-def compute_mean_half_life_estimate(xt: numpy.ndarray[float], dt: float=1.0) -> Tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
+def compute_mean_half_life_estimate(xt: NDArray[numpy.floating[Any]], dt: float=1.0) -> tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
     """
     Estimate Ornstein-Uhlenbeck half life to limiting mean.
 
     Parameters
     ----------
-    xt: numpy.ndarray[float]
+    xt: NDArray[numpy.floating[Any]]
         Modeled variable.
 
     Returns
     -------
-    Tuple[sm.regression.linear_model.RegressionResults, OLSResult]
+    tuple[sm.regression.linear_model.RegressionResults, OLSResult]
         OLS analysis results.
     """
 
@@ -396,28 +397,29 @@ def compute_mean_half_life_estimate(xt: numpy.ndarray[float], dt: float=1.0) -> 
     __half_life_transform(result, dt)
     return report, result
 
-def create_xt_source(**kwargs) -> numpy.ndarray[float]:
+
+def create_xt_source(**kwargs) -> NDArray[numpy.floating[Any]]:
     """
     Simulation of modeled variable at a specified time with the specified parameters.
 
     Parameters
     ----------
-    μ: float
+    μ: numpy.floating[Any]
         Drift coefficient.
-    λ: float
+    λ: numpy.floating[Any]
         Mean reversion rate.
-    t: float
+    t: numpy.floating[Any]
         Time
-    σ: float
+    σ: numpy.floating[Any]
         Standard deviation of random component.
-    x0: float
+    x0: numpy.floating[Any]
         Initial value.
     n: int
         Number of values simulated.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation of modeled variable at specified time using given parameters.
     """
 
@@ -430,28 +432,29 @@ def create_xt_source(**kwargs) -> numpy.ndarray[float]:
     
     return ou.xt(μ, λ, t, σ, x0, npts)
 
-def create_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+
+def create_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Simulation of Ornstein-Uhlenbeck process using provide parameters.
 
     Parameters
     ----------
-    μ: float
+    μ: numpy.floating[Any]
         Drift coefficient.
-    λ: float
+    λ: numpy.floating[Any]
         Mean reversion rate.
-    Δt: float
+    Δt: numpy.floating[Any]
         Time increment.
     n: int
         Number of values simulated.
-    σ: float
+    σ: numpy.floating[Any]
         Standard deviation of random component.
-    x0: float
+    x0: numpy.floating[Any]
         Initial value.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation of Ornstein-Uhlenbeck process using provide parameters.
     """
 
@@ -467,7 +470,7 @@ def create_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]
     return t, ou.ou(μ, λ, Δt, npts, σ, x0)
 
 
-def __half_life_transform(result: OLSResult, dt: float):
+def __half_life_transform(result: OLSResult, dt: float) -> None:
     """
     Add transformation used for half life OLS analysis.
 

@@ -4,9 +4,14 @@ data.models.arima.py
 Simulations and analysis of ARIMA(p,d,q) random process.
 """
 
+from typing import Any
+from astroid.nodes import Unknown
 import numpy
+from numpy.typing import NDArray
+
 import statsmodels.api as sm
 import statsmodels.tsa as tsa
+from statsmodels.tsa.arima.model import ARIMA, ARIMAResults
 
 def maq_sigma(θ: list[float], σ: float=1) -> float:
     """
@@ -30,7 +35,7 @@ def maq_sigma(θ: list[float], σ: float=1) -> float:
         v += u**2
     return σ * numpy.sqrt(v + 1)
 
-def maq_cov(θ: list[float], σ: float=1) -> numpy.ndarray[float]:
+def maq_cov(θ: list[float], σ: float=1) -> NDArray[numpy.floating[Any]]:
     """
     Compute MA(q) auto covariance.
 
@@ -43,7 +48,7 @@ def maq_cov(θ: list[float], σ: float=1) -> numpy.ndarray[float]:
     
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Autocovariance.
     """
 
@@ -57,7 +62,7 @@ def maq_cov(θ: list[float], σ: float=1) -> numpy.ndarray[float]:
         s[n] = θ[n]
     return σ**2 * (c + s)
 
-def maq_acf(θ: list[float], σ: float=1, max_lag: float=15) -> numpy.ndarray[float]:
+def maq_acf(θ: list[float], σ: float=1, max_lag: int=15) -> NDArray[numpy.floating[Any]]:
     """
     Compute MA(q) auto correlation function.
 
@@ -72,7 +77,7 @@ def maq_acf(θ: list[float], σ: float=1, max_lag: float=15) -> numpy.ndarray[fl
     
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Autocorrelation function.
     """
 
@@ -159,7 +164,7 @@ def ar1_offset_sigma(φ: float, σ: float) -> float:
 
     return σ / numpy.sqrt(1.0 - φ**2)
 
-def noise(n: int) -> numpy.ndarray[float]:
+def noise(n: int) -> NDArray[numpy.floating[Any]]:
     """
     Generate gaussian noise with unit variance.
 
@@ -170,13 +175,13 @@ def noise(n: int) -> numpy.ndarray[float]:
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
     return numpy.random.normal(0.0, 1.0, n)
 
-def ar(φ: list[float], x0: list[float], n: int, σ: float) -> numpy.ndarray[float]:
+def ar(φ: list[float], x0: list[float], n: int, σ: float) -> NDArray[numpy.floating[Any]]:
     """
     Generate an AR(p) process using specified parameters.
 
@@ -193,7 +198,7 @@ def ar(φ: list[float], x0: list[float], n: int, σ: float) -> numpy.ndarray[flo
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
    """
     
@@ -208,7 +213,7 @@ def ar(φ: list[float], x0: list[float], n: int, σ: float) -> numpy.ndarray[flo
             samples[i] += φ[j] * samples[i-(j+1)]
     return samples
 
-def ou(λ: float, μ: float, n: int, σ: int=1.0) -> numpy.ndarray[float]:
+def ou(λ: float, μ: float, n: int, σ: float=1.0) -> NDArray[numpy.floating[Any]]:
     """
     Generate the Ornstein-Uhlenbeck process using an AR(1) with offset simulation
     using the specified parameters.
@@ -219,10 +224,14 @@ def ou(λ: float, μ: float, n: int, σ: int=1.0) -> numpy.ndarray[float]:
         Ornstein-Uhlenbeck parameter (0 < λ < 2).
     μ: float
         Mean value.
+    n: int
+        Number of steps in simulation.
+    σ: float
+        Standard deviation of noise term.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
@@ -230,7 +239,7 @@ def ou(λ: float, μ: float, n: int, σ: int=1.0) -> numpy.ndarray[float]:
     m = μ*λ
     return arp_offset([φ], m, n, σ)
 
-def arp_offset(φ: list[float], μ: float, n: int, σ: float) -> numpy.ndarray[float]:
+def arp_offset(φ: list[float], μ: float, n: int, σ: float) -> NDArray[numpy.floating[Any]]:
     """
     Generate AR(p) with a constant offset using the specified parameters.
 
@@ -247,13 +256,13 @@ def arp_offset(φ: list[float], μ: float, n: int, σ: float) -> numpy.ndarray[f
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
     return arp_drift(φ, μ, 0.0, n, σ)
 
-def arp_drift(φ: list[float], μ: float, γ: float, n: int, σ: float) -> numpy.ndarray[float]:
+def arp_drift(φ: list[float], μ: float, γ: float, n: int, σ: float) -> NDArray[numpy.floating[Any]]:
     """
     Generate AR(p) with drift using the specified parameters.
 
@@ -272,7 +281,7 @@ def arp_drift(φ: list[float], μ: float, γ: float, n: int, σ: float) -> numpy
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
@@ -285,7 +294,7 @@ def arp_drift(φ: list[float], μ: float, γ: float, n: int, σ: float) -> numpy
             samples[i] += φ[j] * samples[i-(j+1)]
     return samples
 
-def ar1(φ: float, n: int, σ: float=1.0) -> numpy.ndarray[float]:
+def ar1(φ: float, n: int, σ: float=1.0) -> NDArray[numpy.floating[Any]]:
     """
     Generate AR(1) using specified parameters.
 
@@ -300,19 +309,19 @@ def ar1(φ: float, n: int, σ: float=1.0) -> numpy.ndarray[float]:
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
     return arp(numpy.array([φ]), n, σ)
 
-def arp(φ: numpy.ndarray[float], n: int, σ: float=1.0) -> numpy.ndarray[float]:
+def arp(φ: NDArray[numpy.floating[Any]], n: int, σ: float=1.0) -> NDArray[numpy.floating[Any]]:
     """
     Generate AR(p) using specified parameters and the statsmodels.tas simulator.
 
     Parameters
     ----------
-    φ: numpy.ndarray[float]
+    φ: NDArray[numpy.floating[Any]]
         AR(p) parameters.
     n: int
         Number of steps in simulation.
@@ -321,21 +330,23 @@ def arp(φ: numpy.ndarray[float], n: int, σ: float=1.0) -> numpy.ndarray[float]
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
     φ_sim = numpy.r_[1, -φ]
     δ_sim = numpy.array([1.0])
-    return sm.tsa.arma_generate_sample(φ_sim, δ_sim, n, σ)
+    # 
+    return sm.tsa.arma_generate_sample(φ_sim, δ_sim, n, σ) # type: ignore[arg-type]
 
-def maq(θ: numpy.ndarray[float], n: int, σ: float=1.0) -> numpy.ndarray[float]:
+
+def maq(θ: NDArray[numpy.floating[Any]], n: int, σ: float=1.0) -> NDArray[numpy.floating[Any]]:
     """
     Generate MA(q) using specified parameters and the statsmodels.tas simulator.
 
     Parameters
     ----------
-    θ: numpy.ndarray[float]
+    θ: NDArray[numpy.floating[Any]]
         MA(q) parameters.
     n: int
         Number of steps in simulation.
@@ -344,23 +355,24 @@ def maq(θ: numpy.ndarray[float], n: int, σ: float=1.0) -> numpy.ndarray[float]
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
     φ_sim = numpy.array([1.0])
     θ_sim = numpy.r_[1, θ]
-    return sm.tsa.arma_generate_sample(φ_sim, θ_sim, n, σ)
+    return sm.tsa.arma_generate_sample(φ_sim, θ_sim, n, σ) # type: ignore[arg-type]
 
-def arma(φ: numpy.ndarray[float], θ: numpy.ndarray[float], n: int, σ: float=1.0) -> numpy.ndarray[float]:
+
+def arma(φ: NDArray[numpy.floating[Any]], θ: NDArray[numpy.floating[Any]], n: int, σ: float=1.0) -> NDArray[numpy.floating[Any]]:
     """
     Generate ARMA(p, q) using specified parameters and the statsmodels.tas simulator.
 
     Parameters
     ----------
-    φ: numpy.ndarray[float]
+    φ: NDArray[numpy.floating[Any]]
         AR(p) parameters.
-    θ: numpy.ndarray[float]
+    θ: NDArray[numpy.floating[Any]]
         MA(q) parameters.
     n: int
         Number of steps in simulation.
@@ -369,24 +381,24 @@ def arma(φ: numpy.ndarray[float], θ: numpy.ndarray[float], n: int, σ: float=1
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
     φ_sim = numpy.r_[1, -φ]
     θ_sim = numpy.r_[1, θ]
-    return sm.tsa.arma_generate_sample(φ_sim, θ_sim, n, σ)
+    return sm.tsa.arma_generate_sample(φ_sim, θ_sim, n, σ) # type: ignore[arg-type]
 
-def arima(φ: numpy.ndarray[float], δ: numpy.ndarray[float], d: int, n: int, σ: float=1.0) -> numpy.ndarray[float]:
+def arima(φ: NDArray[numpy.floating[Any]], δ: NDArray[numpy.floating[Any]], d: int, n: int, σ: float=1.0) -> NDArray[numpy.floating[Any]]:
     """
     Generate ARIMA(p,d,q) using specified parameters and the statsmodels.tas simulator arma
     and integrate the result d times to obtain the ARIMA process.
 
     Parameters
     ----------
-    φ: numpy.ndarray[float]
+    φ: NDArray[numpy.floating[Any]]
         AR(p) parameters.
-    δ: numpy.ndarray[float]
+    δ: NDArray[numpy.floating[Any]]
         MA(q) parameters.
     d: int
         Number of integrations to perform (d = 1 or 2).
@@ -397,7 +409,7 @@ def arima(φ: numpy.ndarray[float], δ: numpy.ndarray[float], d: int, n: int, σ
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
 
     Raises
@@ -416,21 +428,22 @@ def arima(φ: numpy.ndarray[float], δ: numpy.ndarray[float], d: int, n: int, σ
             samples[i] = samples[i] + 2.0*samples[i-1] - samples[i-2]
         return samples
 
-def arima_from_arma(samples: numpy.ndarray[float], d: int) -> numpy.ndarray[float]:
+
+def arima_from_arma(samples: NDArray[numpy.floating[Any]], d: int) -> NDArray[numpy.floating[Any]]:
     """
     Generate ARIMA(p,d,q) using the samples from a ARMA(p,q) process
     by integrating d times,.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         ARMA(p,q) processes samples
     d: int
         Number of integrations to perform (d = 1 or 2).
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
 
     Raises
@@ -452,52 +465,55 @@ def arima_from_arma(samples: numpy.ndarray[float], d: int) -> numpy.ndarray[floa
             result[i] = samples[i] + 2.0*result[i-1] - result[i-2]
         return result
 
-def yw(samples: numpy.ndarray[float], order: int) -> numpy.ndarray[float]:
+
+def yw(samples: NDArray[numpy.floating[Any]], order: int) -> NDArray[numpy.floating[Any]]:
     """
     Compute the coefficients of an AR(p) processes by solving the Yule-Walker equations.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         AR(p) processes samples
     order: int
         The assumed order of the AR9p) process.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Estimate of AR(p) coefficients.
     """
 
-    pacf, _ = sm.regression.yule_walker(samples, order=order, method='mle')
-    return pacf
+    pacf = sm.regression.yule_walker(samples, order=order, method='mle')
+    return pacf[0]
 
-def pacf(samples: numpy.ndarray[float], nlags: int) -> numpy.ndarray[float]:
+pacf_return_type = tuple[Unknown | NDArray[numpy.floating[Any]] | NDArray[Any], NDArray[Any]] | Unknown | NDArray[numpy.floating[Any]] | NDArray[Any]
+def pacf(samples: NDArray[numpy.floating[Any]], nlags: int) -> pacf_return_type:
     """
     Compute the partial auto-correlation function using statsmodels.tsa.stattools.pacf.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         AR(p) processes samples
     nlags: int
         The number of lags desired for the PACF.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         The of AR(p) partial autocorrelation function.
     """
 
     return sm.tsa.stattools.pacf(samples, nlags=nlags)
 
-def ___ar_model(samples: numpy.ndarray[float], order: int) -> tsa.arima.model.ARIMA:
+
+def ___ar_model(samples: NDArray[numpy.floating[Any]], order: int) -> ARIMA:
     """
     Create an AR(p) of the specified order with the specified samples.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         AR(p) processes samples
     order: int
         Model order.
@@ -508,16 +524,17 @@ def ___ar_model(samples: numpy.ndarray[float], order: int) -> tsa.arima.model.AR
         The of AR(p) model.
     """
 
-    return tsa.arima.model.ARIMA(samples, order=(order, 0, 0))
+    return ARIMA(samples, order=(order, 0, 0))
 
-def ar_fit(samples: numpy.ndarray[float], order: int) -> tsa.arima.model.ARIMAResults:
+
+def ar_fit(samples: NDArray[numpy.floating[Any]], order: int) -> ARIMAResults:
     """
     Estimate the parameters for the assumed AR(p) model from the samples
     assuming the specified order.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         AR(p) processes samples
     order: int
         Model order.
@@ -530,13 +547,14 @@ def ar_fit(samples: numpy.ndarray[float], order: int) -> tsa.arima.model.ARIMARe
 
     return ___ar_model(samples, order).fit()
 
-def __ar_offset_model(samples: numpy.ndarray[float], order: int) -> tsa.arima.model.ARIMA:
+
+def __ar_offset_model(samples: NDArray[numpy.floating[Any]], order: int) -> ARIMA:
     """
     Create and AR(p) with an offset of the specified order with the specified samples.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         AR(p) processes samples
     order: int
         Model order.
@@ -547,16 +565,17 @@ def __ar_offset_model(samples: numpy.ndarray[float], order: int) -> tsa.arima.mo
         The of AR(p) with offset model.
     """
 
-    return tsa.arima.model.ARIMA(samples, order=(order, 0, 0), trend='c')
+    return ARIMA(samples, order=(order, 0, 0), trend='c')
 
-def ar_offset_fit(samples: numpy.ndarray[float], order: int) -> tsa.arima.model.ARIMAResults:
+
+def ar_offset_fit(samples: NDArray[numpy.floating[Any]], order: int) -> ARIMAResults:
     """
     Estimate the parameters for the assumed AR(p) with offset model from the samples
     assuming the specified order.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         AR(p) processes samples
     order: int
         Model order.
@@ -569,13 +588,14 @@ def ar_offset_fit(samples: numpy.ndarray[float], order: int) -> tsa.arima.model.
 
     return __ar_offset_model(samples, order).fit()
 
-def __ma_model(samples: numpy.ndarray[float], order: int) -> tsa.arima.model.ARIMA:
+
+def __ma_model(samples: NDArray[numpy.floating[Any]], order: int) -> ARIMA:
     """
     Create a MA(p) model of the specified order with the specified samples.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         MA(p) processes samples
     order: int
         Model order.
@@ -586,16 +606,17 @@ def __ma_model(samples: numpy.ndarray[float], order: int) -> tsa.arima.model.ARI
         The of MA(p) model.
     """
 
-    return tsa.arima.model.ARIMA(samples, order=(0, 0, order))
+    return ARIMA(samples, order=(0, 0, order))
 
-def ma_fit(samples: numpy.ndarray[float], order: int) -> tsa.arima.model.ARIMAResults:
+
+def ma_fit(samples: NDArray[numpy.floating[Any]], order: int) -> ARIMAResults:
     """
     Estimate the parameters for the assumed MA(q) model from the samples
     assuming the specified order.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         AR(p) processes samples
     order: int
         Model order.
@@ -608,13 +629,14 @@ def ma_fit(samples: numpy.ndarray[float], order: int) -> tsa.arima.model.ARIMARe
 
     return __ma_model(samples, order).fit()
 
-def __ma_offset_model(samples: numpy.ndarray[float], order: int) -> tsa.arima.model.ARIMA:
+
+def __ma_offset_model(samples: NDArray[numpy.floating[Any]], order: int) -> ARIMA:
     """
     Create a MA(p) model with offset of the specified order with the specified samples.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         AR(p) processes samples
     order: int
         Model order.
@@ -625,16 +647,16 @@ def __ma_offset_model(samples: numpy.ndarray[float], order: int) -> tsa.arima.mo
         The of MA(q) with offset model.
     """
 
-    return tsa.arima.model.ARIMA(samples, order=(0, 0, order), trend='c')
+    return ARIMA(samples, order=(0, 0, order), trend='c')
 
-def ma_offset_fit(samples: numpy.ndarray[float], order: int) -> tsa.arima.model.ARIMAResults:
+def ma_offset_fit(samples: NDArray[numpy.floating[Any]], order: int) -> ARIMAResults:
     """
     Estimate the parameters for the assumed MA(q) model from the samples
     assuming the specified order.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         AR(p) processes samples
     order: int
         Model order.

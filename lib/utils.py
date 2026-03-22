@@ -2,14 +2,22 @@ import os
 import json
 import numpy
 from enum import Enum
-from typing import Callable, Tuple, Any
+from typing import Callable, Any, TypeVar, overload
 from numpy.typing import NDArray
 import shortuuid
 
 from pandas import read_csv, DataFrame
 
+_T = TypeVar("_T")
+_N = TypeVar("_N", int, float, str, bool)
+Ensemble = tuple[NDArray[numpy.floating[Any]], list[NDArray[numpy.floating[Any]]]]
 
-def get_param_throw_if_missing(param: str, **kwargs):
+@overload
+def get_param_throw_if_missing(param: str, expected_type: type[_T], **kwargs) -> _T: ...
+@overload
+def get_param_throw_if_missing(param: str, **kwargs) -> Any: ...
+
+def get_param_throw_if_missing(param: str, expected_type: type | None = None, **kwargs) -> Any:  # noqa: ARG001
     """
     Raise exception if parameter is missing from kwargs.
 
@@ -17,6 +25,8 @@ def get_param_throw_if_missing(param: str, **kwargs):
     ----------
     param: str
         Parameter to type check.
+    expected_type: type | None
+        Optional type for typed return inference.
     kwargs
         key word arguments
 
@@ -34,7 +44,7 @@ def get_param_throw_if_missing(param: str, **kwargs):
         raise Exception(f"{param} parameter is required")
 
 
-def get_param_default_if_missing(param, default, **kwargs):
+def get_param_default_if_missing(param: str, default: _T, **kwargs) -> _T:
     """
     Get parameter from kwargs and return specified default value if it is missing.
 
@@ -90,11 +100,12 @@ def verify_type(param, expected_type):
     ------
         Exception(param does not match expected type)
     """
+
     if not isinstance(param, expected_type):
         raise Exception(f"{param} is type {type(param)}. Expected {expected_type}")
 
 
-def create_space(**kwargs) -> NDArray:
+def create_space(**kwargs) -> NDArray[numpy.floating[Any]]:
     """
     Create linear space with specified parameters.
 
@@ -123,6 +134,7 @@ def create_space(**kwargs) -> NDArray:
     xmax = get_param_default_if_missing("xmax", None, **kwargs)
     xmin = get_param_default_if_missing("xmin", 0.0, **kwargs)
     Δx = get_param_default_if_missing("Δx", 1.0, **kwargs)
+
     if xmax is None and npts is None:
         raise Exception(f"xmax or npts is required")
     if xmax is None:
@@ -130,10 +142,11 @@ def create_space(**kwargs) -> NDArray:
         xmax = (npts - 1)*Δx + xmin
     elif npts is None:
         npts = int((xmax-xmin)/Δx) + 1
+
     return numpy.linspace(xmin, xmax, npts)
 
 
-def create_logspace(**kwargs) -> NDArray:
+def create_logspace(**kwargs) -> NDArray[numpy.floating[Any]]:
     """
     Create log space with specified parameters.
 
@@ -150,13 +163,14 @@ def create_logspace(**kwargs) -> NDArray:
     numpy.ndarray[float]
         Linear space.
     """
+
     npts = get_param_throw_if_missing("npts", **kwargs)
     xmax = get_param_throw_if_missing("xmax", **kwargs)
     xmin = get_param_default_if_missing("xmin", 1.0, **kwargs)
     return numpy.logspace(numpy.log10(xmin), numpy.log10(xmax/xmin), npts)
 
 
-def create_parameter_scan(source: Callable[..., Tuple[NDArray, NDArray]], *args) -> Tuple[list[NDArray], list[NDArray]]:
+def create_parameter_scan(source: Callable[..., tuple[NDArray, NDArray]], *args) -> tuple[list[NDArray], list[NDArray]]:
     """
     Generate a parameter scan for the specified data source using the 
     specified parameters
@@ -183,7 +197,7 @@ def create_parameter_scan(source: Callable[..., Tuple[NDArray, NDArray]], *args)
     return t_scan, scan
 
 
-def create_ensemble(source: Callable[..., Tuple[NDArray, NDArray]], nsim: int, **kwargs) -> Tuple[NDArray, NDArray]:
+def create_ensemble(source: Callable[..., tuple[NDArray, NDArray]], nsim: int, **kwargs) -> Ensemble:
     """
     Generate a parameter scan for the specified data source using the 
     specified parameters
@@ -208,10 +222,10 @@ def create_ensemble(source: Callable[..., Tuple[NDArray, NDArray]], nsim: int, *
     for _ in range(nsim):
         t, samples = source(**kwargs)
         ensemble.append(samples)
-    return t, numpy.array(ensemble)
+    return t, ensemble
 
 
-def apply_to_ensemble(func, t: NDArray, ensemble: list[NDArray], **kwargs) -> Tuple[NDArray, NDArray]:
+def apply_to_ensemble(func, t: NDArray, ensemble: list[NDArray], **kwargs) -> tuple[NDArray, NDArray]:
     """
     Apply specified function to an ensemble.
     
@@ -236,7 +250,7 @@ def apply_to_ensemble(func, t: NDArray, ensemble: list[NDArray], **kwargs) -> Tu
     return result[0][0], numpy.array([data[1] for data in result])
 
 
-def apply_to_parameter_scan(func, t: NDArray, scan: NDArray,  **kwargs) -> Tuple[NDArray, NDArray]:
+def apply_to_parameter_scan(func, t: NDArray, scan: NDArray,  **kwargs) -> tuple[NDArray, NDArray]:
     """
     Apply specified function to results of a parameter scan.
     
@@ -301,7 +315,7 @@ def get_s_vals(**kwargs) -> NDArray:
         raise Exception(f"smax and npts or svals is required")
     
 
-def extract_date_range(date: NDArray, data: NDArray, start_date: str, end_date: str) -> Tuple[NDArray, NDArray]:
+def extract_date_range(date: NDArray, data: NDArray, start_date: str, end_date: str) -> tuple[NDArray, NDArray]:
     """
     Extract data from specified start date to specified end date.
 

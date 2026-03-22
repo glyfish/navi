@@ -72,11 +72,9 @@ def curve(axis: axes.Axes, y: NDArray, x: NDArray | None = None, **kwargs):
         The type of axis used in the plot
     """
 
-    title           = get_param_default_if_missing("title", None, **kwargs)
-    title_offset    = get_param_default_if_missing("title_offset", 0.0, **kwargs)
-    npts            = get_param_default_if_missing("npts", None, **kwargs)
-    xlabel          = get_param_default_if_missing("xlabel", None, **kwargs)
-    ylabel          = get_param_default_if_missing("ylabel", None, **kwargs)
+    title: str | None     = get_param_default_if_missing("title", None, **kwargs)
+    title_offset: float   = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+    npts: int | None      = get_param_default_if_missing("npts", None, **kwargs)
 
     if npts is None or npts > len(y):
         npts = len(y)
@@ -84,20 +82,14 @@ def curve(axis: axes.Axes, y: NDArray, x: NDArray | None = None, **kwargs):
     if x is None:
         x = numpy.linspace(0.0, float(npts-1), npts)
 
-    if not isinstance(x, (numpy.ndarray, numpy.generic)):
-        raise Exception("x must be a numpy.array")
-
-    if not isinstance(y, (numpy.ndarray, numpy.generic)):
-        raise Exception("y must be a numpy.array")
-
-    if title is not None:
-        offset = 1.0 + title_offset
-        axis.set_title(title, y=offset)
+    offset = 1.0 + title_offset
+    axis.set_title(title or "", y=offset)
 
     color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
     __plot_curve(axis, x, y, 0, color_cycler, **kwargs)
 
-def comparison(axis: axes.Axes, y: NDArray, x: NDArray | None = None, **kwargs):
+
+def comparison(axis: axes.Axes, y: NDArray, x: NDArray | list[NDArray] | None = None, **kwargs):
     """
     Plot multiple curves on same scale.
 
@@ -193,7 +185,7 @@ def stack(axis: Sequence[axes.Axes], y: list[NDArray], x=None, **kwargs):
         X-axis label. (default None)
     ylabels : str or list[str]
         Y-axis label. (default None)
-    xlim : (float, float)
+    xlim : (float, float)x
         X-axis limits. (default None)
     ylim : (float, float)
         Y-axis limits. (default None)
@@ -203,20 +195,18 @@ def stack(axis: Sequence[axes.Axes], y: list[NDArray], x=None, **kwargs):
         Number of points to plot. (default len(y))
     """
 
-    title          = get_param_default_if_missing("title", None, **kwargs)
-    title_offset   = get_param_default_if_missing("title_offset", 0.0, **kwargs)
-    xlabel         = get_param_default_if_missing("xlabel", None, **kwargs)
-    ylabels        = get_param_default_if_missing("ylabels", None, **kwargs)
-    ylim           = get_param_default_if_missing("ylim", None, **kwargs)
-    labels         = get_param_default_if_missing("labels", None, **kwargs)
-    npts           = get_param_default_if_missing("npts", None, **kwargs)
+    title: str | None                = get_param_default_if_missing("title", None, **kwargs)
+    title_offset: float              = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+    xlabel: str | None               = get_param_default_if_missing("xlabel", None, **kwargs)
+    ylabels: str | list[str] | None  = get_param_default_if_missing("ylabels", None, **kwargs)
+    ylim: tuple[float, float] | None = get_param_default_if_missing("ylim", None, **kwargs)
+    labels: list[str] | None         = get_param_default_if_missing("labels", None, **kwargs)
+    npts: int | None                 = get_param_default_if_missing("npts", None, **kwargs)
 
     nplot = len(y)
 
-    if title is not None:
-        axis[0].set_title(title, y=1.0 + title_offset)
-
-    axis[nplot-1].set_xlabel(xlabel)
+    axis[0].set_title(title or "", y=1.0 + title_offset)
+    axis[nplot-1].set_xlabel(xlabel or "")
     kwargs.pop("xlabel", None)
 
     if x is None:
@@ -296,7 +286,7 @@ def comparison_stack(axis: Sequence[axes.Axes], y: list[NDArray], x: list[NDArra
     nplot = len(y)
     ncurve = len(y[0])
 
-    axis[nplot-1].set_xlabel(xlabel)
+    axis[nplot-1].set_xlabel(xlabel or "")
     kwargs.pop("xlabel", None)
     kwargs.pop("labels", None)
 
@@ -620,9 +610,9 @@ def scatter(axis: axes.Axes, data: NDArray, x: NDArray, **kwargs):
     if title is not None:
         axis.set_title(title, y=1.0 + title_offset)
 
-    axis.set_ylabel(ylabel)
-    axis.set_xlabel(xlabel)
-    
+    axis.set_ylabel(ylabel or "")
+    axis.set_xlabel(xlabel or "")
+
     if plot_axis_type.value == PlotType.LOG.value:
         logStyle(axis, x, data)
         axis.loglog(x, data, marker=marker, markersize=marker_size, linestyle="None", markeredgewidth=1.0, alpha=0.75, zorder=5, label=labels[0])
@@ -718,9 +708,9 @@ def scatter_comparison(axis: axes.Axes, data: list[NDArray], x: NDArray, **kwarg
     if title is not None:
         axis.set_title(title, y=1.0 + title_offset)
 
-    axis.set_ylabel(ylabel)
-    axis.set_xlabel(xlabel)
-    
+    axis.set_ylabel(ylabel or "")
+    axis.set_xlabel(xlabel or "")
+
     for i in range(ncurve):
         marker = markers[i] if markers is not None else 'o'
 

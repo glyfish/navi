@@ -6,7 +6,11 @@ Compute generic statistics functions.
 """
 
 import numpy
-from typing import Tuple
+
+from numpy.typing import NDArray
+from typing import Any
+from statsmodels.tsa.arima.model import ARIMA, ARIMAResults
+
 from enum import Enum
 import statsmodels.api as sm
 import uuid
@@ -19,7 +23,7 @@ from lib.data.hyp_test import (GrangerCausalityTestResult, GrangerCausalityTestR
 from lib.utils import (get_param_throw_if_missing, get_param_default_if_missing, get_s_vals, 
                        create_logspace, create_space)
 
-def compute_pspec(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_pspec(time: numpy.ndarray, data: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Power spectrum computed using FFT methods.
 
@@ -27,21 +31,21 @@ def compute_pspec(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) -> 
     ----------
     time: numpy.ndarray
         Time
-    data: numpy.ndarray[float]
+    data: NDArray[numpy.floating[Any]]
         Sampled data.
     nlags: int
         max number of lags computed.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Frequency and power spectrum.
     """
 
     return time[1:], stats.pspec(data)
 
 
-def compute_acf(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_acf(time: numpy.ndarray, data: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Autocorrelation function of samples computed using sm.tsa.stattools.acf.
 
@@ -49,14 +53,14 @@ def compute_acf(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) -> Tu
     ----------
     time: numpy.ndarray
         Time
-    data: numpy.ndarray[float]
+    data: NDArray[numpy.floating[Any]]
         Sampled data.
     nlags: int
         max number of lags computed.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time lags and autocovariance of samples as a function of lag.
     """
 
@@ -65,7 +69,7 @@ def compute_acf(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) -> Tu
     return time[:nlags + 1], stats.acf(data, nlags)
 
 
-def compute_ndiff(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_ndiff(time: numpy.ndarray, data: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Take the specified number of differences of the samples.
 
@@ -73,14 +77,14 @@ def compute_ndiff(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) -> 
     ----------
     time: numpy.ndarray
         Time
-    data: numpy.ndarray[float]
+    data: NDArray[numpy.floating[Any]]
         Sampled data.
     ndiff : int
         Number of differences taken (default 1).
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and samples differenced n times.
     """
 
@@ -88,7 +92,7 @@ def compute_ndiff(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) -> 
     return time[:-ndiff], stats.ndiff(data, ndiff)
 
 
-def compute_diff(time: numpy.ndarray[float], data: numpy.ndarray[float]) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_diff(time: NDArray[numpy.floating[Any]], data: NDArray[numpy.floating[Any]]) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Com[ute the sample difference].
 
@@ -96,19 +100,19 @@ def compute_diff(time: numpy.ndarray[float], data: numpy.ndarray[float]) -> Tupl
     ----------
     time: numpy.ndarray
         Time
-    data: numpy.ndarray[float]
+    data: NDArray[numpy.floating[Any]]
         Sampled data.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and samples differenced n times.
     """
 
     return time[:-1], stats.diff(data)
 
 
-def compute_cumu_mean(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_cumu_mean(time: numpy.ndarray, data: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Cumulative mean of samples.
 
@@ -116,19 +120,19 @@ def compute_cumu_mean(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs)
     ----------
     time: numpy.ndarray
         Time
-    data: numpy.ndarray[float]
+    data: NDArray[numpy.floating[Any]]
         Sampled data.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and cumulative mean of samples as a function of time.
     """
 
     return time, stats.cumu_mean(data)
 
 
-def compute_cumu_sd(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_cumu_sd(time: numpy.ndarray, data: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Cumulative standard deviation of samples.
 
@@ -136,14 +140,14 @@ def compute_cumu_sd(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) -
     ----------
     time: numpy.ndarray
         Time
-    data: numpy.ndarray[float]
+    data: NDArray[numpy.floating[Any]]
         Sampled data.
     Δt: float
         Time delta (default 1.0)
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and cumulative standard deviation of samples as a function of time.
     """
     Δt = get_param_default_if_missing("Δt", 1.0, **kwargs)
@@ -151,7 +155,7 @@ def compute_cumu_sd(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) -
     return time, stats.cumu_sd(data, Δt)
 
 
-def compute_cumu_var(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_cumu_var(time: numpy.ndarray, data: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Cumulative variance of samples.
 
@@ -159,14 +163,14 @@ def compute_cumu_var(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) 
     ----------
     time: numpy.ndarray
         Time
-    data: numpy.ndarray[float]
+    data: NDArray[numpy.floating[Any]]
         Sampled data.
     Δt: float
         Time delta (default 1.0)
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and cumulative variance of samples as a function of time.
     """
 
@@ -175,7 +179,7 @@ def compute_cumu_var(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) 
     return time, stats.cumu_var(data, Δt)
 
 
-def compute_moving_avg(time: numpy.ndarray, samples: numpy.ndarray[float], window: int) -> numpy.ndarray[float]:
+def compute_moving_avg(time: numpy.ndarray, samples: NDArray[numpy.floating[Any]], window: int) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Moving average of samples.
 
@@ -183,27 +187,27 @@ def compute_moving_avg(time: numpy.ndarray, samples: numpy.ndarray[float], windo
     ----------
     time: numpy.ndarray
         Time
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Sampled data.
     window: int
         Window size.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Moving average of samples as a function of time.
     """
 
     return time[window - 1:], stats.moving_avg(samples, window)
 
 
-def compute_moving_var(time: numpy.ndarray, samples: numpy.ndarray[float], window: int) -> numpy.ndarray[float]:
+def compute_moving_var(time: numpy.ndarray, samples: NDArray[numpy.floating[Any]], window: int) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Moving variance of samples.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Sampled data.
     time: numpy.ndarray
         Time
@@ -212,36 +216,13 @@ def compute_moving_var(time: numpy.ndarray, samples: numpy.ndarray[float], windo
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Moving variance of samples as a function of time.
     """
 
     return time[window - 1:], stats.moving_var(samples, window)
 
-
-def compute_moving_std(time: numpy.ndarray, samples: numpy.ndarray[float], window: int) -> numpy.ndarray[float]:
-    """
-    Moving standard deviation of samples.
-
-    Parameters
-    ----------
-    samples: numpy.ndarray[float]
-        Sampled data.
-    time: numpy.ndarray
-        Time
-    window: int
-        Window size.
-
-    Returns
-    -------
-    numpy.ndarray[float]
-        Moving variance of samples as a function of time.
-    """
-
-    return time[window - 1:], numpy.sqrt(stats.moving_var(samples, window))
-
-
-def compute_cumu_cov(time: numpy.ndarray, x: numpy.ndarray[float], y: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_cumu_cov(time: numpy.ndarray, x: NDArray[numpy.floating[Any]], y: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Cumulative covariance of samples.
 
@@ -249,27 +230,27 @@ def compute_cumu_cov(time: numpy.ndarray, x: numpy.ndarray[float], y: numpy.ndar
     ----------
     time: numpy.ndarray
         Time
-    x: numpy.ndarray[float]
+    x: NDArray[numpy.floating[Any]]
         Sampled data.
-    y: numpy.ndarray[float]
+    y: NDArray[numpy.floating[Any]]
         Sampled data.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and cumulative covariance of samples as a function of time.
     """
 
     return time, stats.cumu_cov(x, y)
 
 
-def compute_agg_var(data: numpy.ndarray, **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_agg_var(data: numpy.ndarray, **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute the aggregated variance using the specified bin sizes.. 
 
     Parameters
     ----------
-    data: numpy.ndarray[float]
+    data: NDArray[numpy.floating[Any]]
         Sampled data.
     npts : int
         Number of aggregation steps
@@ -280,7 +261,7 @@ def compute_agg_var(data: numpy.ndarray, **kwargs) -> Tuple[numpy.ndarray[float]
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Lags and lagged variance for each value.
     """
 
@@ -292,7 +273,7 @@ def compute_agg_var(data: numpy.ndarray, **kwargs) -> Tuple[numpy.ndarray[float]
     return m_vals, stats.agg_var(data, m_vals)
 
 
-def compute_agg(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_agg(time: numpy.ndarray, data: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Aggregate sample averages of m elements into len(samples)/m bins. 
 
@@ -300,14 +281,14 @@ def compute_agg(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) -> Tu
     ----------
     time: numpy.ndarray
         Time
-    data: numpy.ndarray[float]
+    data: NDArray[numpy.floating[Any]]
         Sampled data.
     m : int
         Number of aggregates
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Aggreated sample average.
     """
 
@@ -315,13 +296,13 @@ def compute_agg(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) -> Tu
     return stats.agg_time(time, m), stats.agg(data, m)
 
 
-def compute_lag_var(data: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_lag_var(data: NDArray[numpy.floating[Any]], **kwargs) -> tuple[list[int], NDArray[numpy.floating[Any]]]:
     """
     Compute lagged variance for a specified range of values.
 
     Parameters
     ----------
-    data: numpy.ndarray[float]
+    data: NDArray[numpy.floating[Any]]
         Unaggregated time values.
     s_max : int
         Maximum s-value.
@@ -334,7 +315,7 @@ def compute_lag_var(data: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarray
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         lagged variance for specified lag values.
     """
 
@@ -342,7 +323,7 @@ def compute_lag_var(data: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarray
     return s_vals, stats.lag_var_scan(data, s_vals)
 
 
-def compute_ensemble_mean(time: numpy.ndarray, data: numpy.ndarray[Tuple[int, int], float]) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_ensemble_mean(time: NDArray[numpy.floating[Any]], data: NDArray[numpy.floating[Any]]) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute the time varying mean of the sampled ensemble.
 
@@ -350,12 +331,12 @@ def compute_ensemble_mean(time: numpy.ndarray, data: numpy.ndarray[Tuple[int, in
     ----------
     time: numpy.ndarray
         Time
-    data: numpy.ndarray[Tuple[int, int], float]
+    data: numpy.ndarray[tuple[int, int], float]
         Sampled data.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Ensemble average mean as a function of time.
 
     Raises
@@ -367,7 +348,7 @@ def compute_ensemble_mean(time: numpy.ndarray, data: numpy.ndarray[Tuple[int, in
     return time, stats.ensemble_mean(data)
 
 
-def compute_ensemble_sd(time: numpy.ndarray, data: numpy.ndarray[Tuple[int, int], float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_ensemble_sd(time: numpy.ndarray, data: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute the time varying standard deviation of the sampled ensemble.
 
@@ -375,14 +356,14 @@ def compute_ensemble_sd(time: numpy.ndarray, data: numpy.ndarray[Tuple[int, int]
     ----------
     time: numpy.ndarray
         Time
-    data: numpy.ndarray[Tuple[int, int], float]
+    data: numpy.ndarray[tuple[int, int], float]
         Sampled data.
     Δt: float
         Time delta (default 1.0)
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Ensemble average mean as a function of time.
 
     Raises
@@ -396,7 +377,7 @@ def compute_ensemble_sd(time: numpy.ndarray, data: numpy.ndarray[Tuple[int, int]
     return time, stats.ensemble_sd(data, Δt)
 
 
-def compute_ensemble_var(time: numpy.ndarray[float], data: numpy.ndarray[Tuple[int, int], float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_ensemble_var(time: NDArray[numpy.floating[Any]], data: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute the time varying variance of the sampled ensemble.
 
@@ -404,14 +385,14 @@ def compute_ensemble_var(time: numpy.ndarray[float], data: numpy.ndarray[Tuple[i
     ----------
     time: numpy.ndarray
         Time
-    data: numpy.ndarray[Tuple[int, int], float]
+    data: numpy.ndarray[tuple[int, int], float]
         Sampled data.
     Δt: float
         Time delta (default 1.0)
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Ensemble average mean as a function of time.
 
     Raises
@@ -425,7 +406,7 @@ def compute_ensemble_var(time: numpy.ndarray[float], data: numpy.ndarray[Tuple[i
     return time, stats.ensemble_var(data, Δt)
 
 
-def compute_ensemble_acf(time: numpy.ndarray, data: numpy.ndarray[Tuple[int, int], float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_ensemble_acf(time: numpy.ndarray, data: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute the ensemble averaged autocorrelation function of the sampled ensemble.
 
@@ -433,14 +414,14 @@ def compute_ensemble_acf(time: numpy.ndarray, data: numpy.ndarray[Tuple[int, int
     ----------
     time: numpy.ndarray
         Time
-    data: numpy.ndarray[Tuple[int, int], float]
+    data: numpy.ndarray[tuple[int, int], float]
         Sampled data.
     nlags: int
         Number of lags (default len(sample))
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Ensemble averaged auto correlation function.
 
     Raises
@@ -454,7 +435,7 @@ def compute_ensemble_acf(time: numpy.ndarray, data: numpy.ndarray[Tuple[int, int
     return time[:nlags], stats.ensemble_acf(data, nlags)
 
 
-def compute_ensemble_cov(time: numpy.ndarray[float], x: numpy.ndarray[Tuple[int, int], float], y: numpy.ndarray[Tuple[int, int], float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_ensemble_cov(time: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]], y: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute the ensemble averaged covariance function of the sampled ensemble.
 
@@ -462,14 +443,14 @@ def compute_ensemble_cov(time: numpy.ndarray[float], x: numpy.ndarray[Tuple[int,
     ----------
     time: numpy.ndarray
         Time
-    x: numpy.ndarray[Tuple[int, int], float]
+    x: numpy.ndarray[tuple[int, int], float]
         x data samples.
-    y: numpy.ndarray[Tuple[int, int], float]
+    y: numpy.ndarray[tuple[int, int], float]
         y data samples.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Ensemble averaged auto correlation function.
 
     Raises
@@ -481,7 +462,7 @@ def compute_ensemble_cov(time: numpy.ndarray[float], x: numpy.ndarray[Tuple[int,
     return time, stats.ensemble_cov(x, y)
 
 
-def compute_ensemble_correlation_coefficient(time: numpy.ndarray[float], x: numpy.ndarray[Tuple[int, int], float], y: numpy.ndarray[Tuple[int, int], float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_ensemble_correlation_coefficient(time: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]], y: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute the ensemble averaged covariance function of the sampled ensemble.
 
@@ -489,14 +470,14 @@ def compute_ensemble_correlation_coefficient(time: numpy.ndarray[float], x: nump
     ----------
     time: numpy.ndarray
         Time
-    x: numpy.ndarray[Tuple[int, int], float]
+    x: numpy.ndarray[tuple[int, int], float]
         x data samples.
-    y: numpy.ndarray[Tuple[int, int], float]
+    y: numpy.ndarray[tuple[int, int], float]
         y data samples.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Ensemble averaged auto correlation function.
 
     Raises
@@ -508,13 +489,13 @@ def compute_ensemble_correlation_coefficient(time: numpy.ndarray[float], x: nump
     return time, stats.ensemble_correlation_coefficient(x, y)
 
 
-def compute_pdf_hist(data: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_pdf_hist(data: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Create a PDF histogram for the provided data.
 
     Parameters
     ----------
-    data : numpy.ndarray[float]
+    data : NDArray[numpy.floating[Any]]
         Sampled data.
     xmin : float
         Minimum x value (required).
@@ -525,7 +506,7 @@ def compute_pdf_hist(data: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarra
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         PDF histogram and bin values
 
     """
@@ -536,40 +517,40 @@ def compute_pdf_hist(data: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarra
     return pdf, bin_edges[:-1] + (bin_edges[:-1] - bin_edges[1:]) / 2
 
 
-def compute_cdf_hist(x: numpy.ndarray[float], pdf: numpy.ndarray[float]) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_cdf_hist(x: NDArray[numpy.floating[Any]], pdf: NDArray[numpy.floating[Any]]) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Create a CDF histogram from the given PDF histogram.
 
-    x : numpy.ndarray[float]
+    x : NDArray[numpy.floating[Any]]
         Random variable values.
-    pdf : numpy.ndarray[float]
+    pdf : NDArray[numpy.floating[Any]]
         PDF.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         CDF histogram.
     """
 
     return x, stats.cdf_hist(x, pdf)
 
 
-def compute_multivariate_normal_pdf(μ: numpy.ndarray[float], Ω: numpy.ndarray[float, float], n: int) -> numpy.ndarray[float]:
+def compute_multivariate_normal_pdf(μ: NDArray[numpy.floating[Any]], Ω: NDArray[numpy.floating[Any]], n: int) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Return multivariate normal PDF with the specified parameters.
 
     Parameters
     ----------
-    μ: numpy.ndarray[float]
+    μ: NDArray[numpy.floating[Any]]
         Distribution mean values contains m elements
-    Ω: numpy.ndarray[float, float]
+    Ω: NDArray[numpy.floating[Any]]
         Distribution correlation matrix contains mxm elements.
     n: int
         Number of points along an axis.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         coordinates and generated samples. Generated samples.
 
     Raises
@@ -601,13 +582,13 @@ def compute_multivariate_normal_pdf(μ: numpy.ndarray[float], Ω: numpy.ndarray[
     return vals, stats.multivariate_normal_pdf(coords, μ, Ω)
 
 
-def compute_causality_matrix(samples: numpy.ndarray[float, float], **kwargs):
+def compute_causality_matrix(samples: NDArray[numpy.floating[Any]], **kwargs):
     """
     Compute Granger causality matrix for the given samples.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float, float]
+    samples: NDArray[numpy.floating[Any]]
         Samples used in calculation.
     nlags: int
         Maximum number of lags.
@@ -618,7 +599,7 @@ def compute_causality_matrix(samples: numpy.ndarray[float, float], **kwargs):
         
     Returns
     -------
-    numpy.ndarray[float, float]
+    NDArray[numpy.floating[Any]]
         Causality matrix.
     """
 
@@ -630,15 +611,15 @@ def compute_causality_matrix(samples: numpy.ndarray[float, float], **kwargs):
     return result, __granger_causality_model_from_result(result)
 
 
-def compute_bias(pred: numpy.ndarray[float], obs: numpy.ndarray[float]) -> float:
+def compute_bias(pred: NDArray[numpy.floating[Any]], obs: NDArray[numpy.floating[Any]]) -> numpy.floating[Any]:
     """
     Compute bias between predicted and observed values.
 
     Parameters
     ----------
-    pred: numpy.ndarray[float]
+    pred: NDArray[numpy.floating[Any]]
         Predicted values.
-    obs: numpy.ndarray[float]
+    obs: NDArray[numpy.floating[Any]]
         Observed values.
 
     Returns
@@ -650,15 +631,15 @@ def compute_bias(pred: numpy.ndarray[float], obs: numpy.ndarray[float]) -> float
     return stats.bias(pred, obs)
 
 
-def compute_mae(pred: numpy.ndarray[float], obs: numpy.ndarray[float]) -> float:    
+def compute_mae(pred: NDArray[numpy.floating[Any]], obs: NDArray[numpy.floating[Any]]) -> numpy.floating[Any]:    
     """
     Compute mean absolute error of prediction relative to target.
 
     Parameters
     ----------
-    pred: numpy.ndarray[float]
+    pred: NDArray[numpy.floating[Any]]
         Predicted values.
-    obs: numpy.ndarray[float]
+    obs: NDArray[numpy.floating[Any]]
         Observed values.
 
     Returns
@@ -670,15 +651,15 @@ def compute_mae(pred: numpy.ndarray[float], obs: numpy.ndarray[float]) -> float:
     return stats.mae(pred, obs)
 
 
-def compute_rmse(pred: numpy.ndarray[float], obs: numpy.ndarray[float]) -> float:    
+def compute_rmse(pred: NDArray[numpy.floating[Any]], obs: NDArray[numpy.floating[Any]]) -> float:    
     """
     Compute root mean squared error between predicted and observed values.
 
     Parameters
     ----------
-    pred: numpy.ndarray[float]
+    pred: NDArray[numpy.floating[Any]]
         Predicted values.
-    obs: numpy.ndarray[float]
+    obs: NDArray[numpy.floating[Any]]
         Observed values.
 
     Returns
@@ -690,22 +671,22 @@ def compute_rmse(pred: numpy.ndarray[float], obs: numpy.ndarray[float]) -> float
     return stats.rmse(pred, obs)
 
 
-def create_multivariate_normal_samples_source(μ: numpy.ndarray[float], Ω: numpy.ndarray[float, float], n: int) -> numpy.ndarray[float]:
+def create_multivariate_normal_samples_source(μ: NDArray[numpy.floating[Any]], Ω: NDArray[numpy.floating[Any]], n: int) -> NDArray[numpy.floating[Any]]:
     """
     Return multivariate normal samples with the specified parameters.
 
     Parameters
     ----------
-    μ: numpy.ndarray[float]
+    μ: NDArray[numpy.floating[Any]]
         Distribution mean values contains m elements
-    Ω: numpy.ndarray[float, float]
+    Ω: NDArray[numpy.floating[Any]]
         Distribution correlation matrix contains mxm elements.
     n: int
         Number of samples.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Generated samples.
     """
 
@@ -742,20 +723,20 @@ class OLS(Enum):
     YLOG = "YLOG"
 
 
-    def single_variable_estimate(self, y: numpy.ndarray[float], x: numpy.ndarray[float]) -> Tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
+    def single_variable_estimate(self, y: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]]) -> tuple[sm.regression.linear_model.RegressionResultsWrapper, OLSResult]:
         """
         Perform single variable OLS regression on the provided data.
 
         Parameters
         ----------
-        y: numpy.ndarray[float]
+        y: NDArray[numpy.floating[Any]]
             Dependent variable
-        x: numpy.ndarray[float]
+        x: NDArray[numpy.floating[Any]]
             Variable
  
         Return
         ------
-        Tuple[sm.regression.linear_model.RegressionResults, OLSResult]
+        tuple[sm.regression.linear_model.RegressionResults, OLSResult]
             OLS report and result model.
         """
 
@@ -763,22 +744,22 @@ class OLS(Enum):
         return result, self.__ols_estimate_from_result(result)
 
 
-    def two_variable_estimate(self, y: numpy.ndarray[float], x1: numpy.ndarray[float], x2: numpy.ndarray[float]) -> Tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
+    def two_variable_estimate(self, y: NDArray[numpy.floating[Any]], x1: NDArray[numpy.floating[Any]], x2: NDArray[numpy.floating[Any]]) -> tuple[sm.regression.linear_model.RegressionResultsWrapper, OLSResult]:
         """
         Perform single variable OLS regression on the provided data.
 
         Parameters
         ----------
-        y: numpy.ndarray[float]
+        y: NDArray[numpy.floating[Any]]
             Dependent variable
-        x1: numpy.ndarray[float]
+        x1: NDArray[numpy.floating[Any]]
             Independent variable one
-        x2: numpy.ndarray[float]
+        x2: NDArray[numpy.floating[Any]]
             Independent variable two
  
         Return
         ------
-        Tuple[sm.regression.linear_model.RegressionResults, OLSResult]
+        tuple[sm.regression.linear_model.RegressionResults, OLSResult]
             OLS report and result model.
         """
 
@@ -786,20 +767,20 @@ class OLS(Enum):
         return result, self.__ols_estimate_from_result(result)
     
 
-    def multi_variable_estimate(self, y: numpy.ndarray[float], x: numpy.ndarray[float, float]) -> Tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
+    def multi_variable_estimate(self, y: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]]) -> tuple[sm.regression.linear_model.RegressionResultsWrapper, OLSResult]:
         """
         Perform multi variable OLS regression on the provided data.
 
         Parameters
         ----------
-        y: numpy.ndarray[float]
+        y: NDArray[numpy.floating[Any]]
             Dependent variable
-        x: numpy.ndarray[float, float]
+        x: NDArray[numpy.floating[Any]]
             Independent variables
  
         Return
         ------
-        Tuple[sm.regression.linear_model.RegressionResults, OLSResult]
+        tuple[sm.regression.linear_model.RegressionResults, OLSResult]
             OLS report and result model.
         """
 
@@ -811,15 +792,15 @@ class OLS(Enum):
         return result, self.__ols_estimate_from_result(result)
 
 
-    def __OLS_fit(self, y: numpy.ndarray[float], x: numpy.ndarray[float]) -> sm.regression.linear_model.RegressionResults:
+    def __OLS_fit(self, y: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]]) -> sm.regression.linear_model.RegressionResultsWrapper:
         """ 
         Create statsmodels OLS object using specified samples assuming a single dependent variable.
 
         Parameters
         ----------
-        y: numpy.ndarray[float]
+        y: NDArray[numpy.floating[Any]]
             Dependent variable
-        x: numpy.ndarray[float]
+        x: NDArray[numpy.floating[Any]]
             Variable
 
         Returns
@@ -836,7 +817,7 @@ class OLS(Enum):
         return sm.OLS(y, x, missing='drop').fit()
     
 
-    def __OLS_formula_fit(self, data: DataFrame, formula: str) -> sm.regression.linear_model.RegressionResults:
+    def __OLS_formula_fit(self, data: DataFrame, formula: str) -> sm.regression.linear_model.RegressionResultsWrapper:
         """ 
         Create statsmodels OLS object using specified samples assuming a single dependent variable.
 
@@ -856,7 +837,7 @@ class OLS(Enum):
         return smf.ols(formula=formula, data=data).fit()
 
 
-    def __ols_estimate_from_result(self, result: sm.regression.linear_model.RegressionResults) -> OLSResult:
+    def __ols_estimate_from_result(self, result: sm.regression.linear_model.RegressionResultsWrapper) -> OLSResult:
         """
         Create an OLS result model from the ols single variable returned report.
 
@@ -905,7 +886,7 @@ def __granger_causality_model_from_result(result: DataFrame) -> GrangerCausality
     return GrangerCausalityTestReport(est_id, rank, [GrangerCausalityTestResult.from_dict(r, est_id) for r in results])
 
 
-def compute_zscore(time: numpy.ndarray, samples: numpy.ndarray[float], window: int) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_zscore(time: numpy.ndarray, samples: NDArray[numpy.floating[Any]], window: int) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute z-score of samples.
 
@@ -913,104 +894,35 @@ def compute_zscore(time: numpy.ndarray, samples: numpy.ndarray[float], window: i
     ----------
     time: numpy.ndarray
         Time
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Sampled data.
     window: int
         Averaging window.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and cumulative variance of samples as a function of time.
     """
 
     return time[window - 1:], stats.zscore(samples, window)
 
 
-def compute_moving_std(time: numpy.ndarray, samples: numpy.ndarray[float], window: int) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_moving_std(time: numpy.ndarray, samples: NDArray[numpy.floating[Any]], window: int) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Moving standard deviation of samples.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Sampled data.
     window: int
         Window size.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and cumulative variance of samples as a function of time.
     """
 
     return time[window - 1:], stats.moving_std(samples, window)
-
-
-def compute_cumu_zscore(time: numpy.ndarray, data: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
-    """
-    Compute cumulative z-score of samples.
-
-    Parameters
-    ----------
-    time: numpy.ndarray
-        Time
-    data: numpy.ndarray[float]
-        Sampled data.
-    Δt: float
-        Time delta (default 1.0)
-
-    Returns
-    -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
-        Time and cumulative variance of samples as a function of time.
-    """
-
-    Δt = get_param_default_if_missing("Δt", 1.0, **kwargs)
-
-    return time[1:], stats.cumu_zscore(data, Δt)
-
-
-def compute_fractional_price_change(time: numpy.ndarray, samples: numpy.ndarray[float], window: int) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
-    """
-    Compute fractional price change used in linear trading strategy.
-
-    Parameters
-    ----------
-    time: numpy.ndarray
-        Time
-    samples: numpy.ndarray[float]
-        Samples.
-    window: int
-        Averaging window.
-
-    Returns
-    -------
-    float
-        Profit and loss curve
-    """
-
-    return time[window - 1:], stats.fractional_purchase(samples, window)
-
-
-def compute_cumu_linear_profit_loss(time: numpy.ndarray, samples: numpy.ndarray[float], window: int) -> numpy.ndarray[float]:
-    """
-    Compute cumulative profit and loss assuming linear trading strategy
-    
-    Parameters
-    ----------
-    time: numpy.ndarray
-        Time
-    samples: numpy.ndarray[float]
-        Samples.
-    window: int
-        Averaging window.
-
-    Returns
-    -------
-    float
-        Profit and loss curve
-    """
-
-    return time[window - 1:], stats.cumu_linear_profit_loss(samples, window)
-

@@ -1,5 +1,8 @@
+
 import numpy
-from typing import Tuple
+from numpy.typing import NDArray
+from typing import Any
+
 import statsmodels.api as sm
 import uuid
 
@@ -13,7 +16,7 @@ from lib.data.reports import VarianceRatioTestReport
 from lib.utils import (get_param_throw_if_missing, get_param_default_if_missing, create_space, get_s_vals, verify_type)
 
 
-def compute_mean(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_mean(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute theoretical FBM motion mean.
 
@@ -28,7 +31,7 @@ def compute_mean(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and mean value.
     """
 
@@ -39,7 +42,7 @@ def compute_mean(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
     return create_space(xmin=0, npts=npts, Δx=Δt), numpy.full(npts, μ)
 
 
-def compute_sd(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_sd(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute theoretical FBM standard deviation.
 
@@ -54,7 +57,7 @@ def compute_sd(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and standard deviation.
     """
     
@@ -63,13 +66,13 @@ def compute_sd(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
     return t, numpy.sqrt(var)
 
 
-def compute_var(t: numpy.ndarray[float]=None, **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_var(t: NDArray[numpy.floating[Any]]=None, **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute theoretical FBM motion variance.
 
     Parameters
     ----------
-    t: numpy.ndarray[float]
+    t: NDArray[numpy.floating[Any]]
         Time.
     H: float
         Hurst parameter.
@@ -82,7 +85,7 @@ def compute_var(t: numpy.ndarray[float]=None, **kwargs) -> Tuple[numpy.ndarray[f
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and variance.
     """
 
@@ -97,7 +100,7 @@ def compute_var(t: numpy.ndarray[float]=None, **kwargs) -> Tuple[numpy.ndarray[f
     return t, fbm.var(H, t)
 
 
-def compute_acf(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_acf(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Fractional brownian motion autocorrelation function.
 
@@ -112,7 +115,7 @@ def compute_acf(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and Autocorrelation.
     """
 
@@ -125,7 +128,7 @@ def compute_acf(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
     return t, fbm.acf(H, t)
 
 
-def compute_cov(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_cov(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute theoretical FBM covariance.
 
@@ -142,7 +145,7 @@ def compute_cov(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Covariance as a function of time.
     """
 
@@ -158,7 +161,7 @@ def compute_cov(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
     return t, fbm.cov(H, s, t)
 
 
-def compute_vr(t: numpy.ndarray[float]=None, **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_vr(t: NDArray[numpy.floating[Any]]=None, **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute FBM variance ratio for zero lag. For brownian motion the variance ration is 1. If the 
     variance ration is less than one the samples are anticorrelated in time and if it 
@@ -166,7 +169,7 @@ def compute_vr(t: numpy.ndarray[float]=None, **kwargs) -> Tuple[numpy.ndarray[fl
 
     Parameters
     ----------
-    t: numpy.ndarray[float]
+    t: NDArray[numpy.floating[Any]]
         Time. (default None)
     H: float
         Hurst parameter.
@@ -177,7 +180,7 @@ def compute_vr(t: numpy.ndarray[float]=None, **kwargs) -> Tuple[numpy.ndarray[fl
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and variance ratio.
     """
 
@@ -192,7 +195,7 @@ def compute_vr(t: numpy.ndarray[float]=None, **kwargs) -> Tuple[numpy.ndarray[fl
     return t, t**(2*H - 1.0)
 
 
-def compute_vr_scan(samples: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_vr_scan(samples: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute FBM variance ratio for specified lags. The lag values, s, can be
     entered or generated. Use the svals keyword to specify values and linear, smin,
@@ -214,7 +217,7 @@ def compute_vr_scan(samples: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndar
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Lags and variance ratio values.
     """
 
@@ -222,7 +225,7 @@ def compute_vr_scan(samples: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndar
     return s_vals, fbm.vr_scan(samples, s_vals)
 
 
-def compute_homo_vr_stat_scan(samples: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_homo_vr_stat_scan(samples: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute FBM homoscedastic variance ratio test statistic for specified lags. 
     The lag values, s, can be entered or generated. Use the svals keyword to specify 
@@ -244,7 +247,7 @@ def compute_homo_vr_stat_scan(samples: numpy.ndarray[float], **kwargs) -> Tuple[
 
             Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Lags and variance ratio values.
     """
 
@@ -252,7 +255,7 @@ def compute_homo_vr_stat_scan(samples: numpy.ndarray[float], **kwargs) -> Tuple[
     return s_vals, fbm.vr_stat_homo_scan(samples, s_vals)
 
 
-def compute_hetero_vr_stat_scan(samples: numpy.ndarray[float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_hetero_vr_stat_scan(samples: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute FBM heteroscedastic variance ratio test statistic for specified lags. 
     The lag values, s, can be entered or generated. Use the svals keyword to specify 
@@ -274,7 +277,7 @@ def compute_hetero_vr_stat_scan(samples: numpy.ndarray[float], **kwargs) -> Tupl
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Lags and variance ratio values.
     """
 
@@ -282,7 +285,7 @@ def compute_hetero_vr_stat_scan(samples: numpy.ndarray[float], **kwargs) -> Tupl
     return s_vals, fbm.vr_stat_hetero_scan(samples, s_vals)
 
 
-def create_noise_cholesky_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def create_noise_cholesky_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Generate fractional brownian noise using the Cholesky method and the provided 
     parameters.
@@ -295,14 +298,14 @@ def create_noise_cholesky_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.
         Number of points.  (default 1024)
     Δt: float
         Width of time step. (default 1.0)
-    dB: numpy.ndarray[float]
+    dB: NDArray[numpy.floating[Any]]
         Column vector of brownian noise.
     L: numpy.matrix[float]
         Lower diagonal Cholesky decomposition of FBM covariance matrix.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Fractional brownian noise as a function of time.
     """
 
@@ -315,7 +318,7 @@ def create_noise_cholesky_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.
     return Δt * create_space(xmin=0, npts=npts), fbm.cholesky_noise(H, npts, dB, L)
 
 
-def create_noise_fft_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def create_noise_fft_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Generate fractional brownian noise using the FFT method and the provided 
     parameters.
@@ -328,12 +331,12 @@ def create_noise_fft_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarr
         Number of points.  (default 1024)
     Δt: float
         Width of time step. (default 1.0)
-    dB: numpy.ndarray[float]
+    dB: NDArray[numpy.floating[Any]]
         Column vector of brownian noise. If value is none the brownian noise is generated.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Fractional brownian noise as a function of time.
     """
 
@@ -345,7 +348,7 @@ def create_noise_fft_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarr
     return Δt * create_space(xmin=0, npts=npts), fbm.fft_noise(H, npts, dB)
 
 
-def create_cholesky_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def create_cholesky_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Generate fractional brownian motion using the Cholesky method and the provided 
     parameters.
@@ -356,7 +359,7 @@ def create_cholesky_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarra
         Hurst parameter.
     npts: int
         Number of points.  (default 1024)
-    dB: numpy.ndarray[float]
+    dB: NDArray[numpy.floating[Any]]
         Column vector of brownian noise. If value is none the brownian noise is generated.
     L: numpy.matrix[float]
         Lower diagonal Cholesky decomposition of FBM covariance matrix. If value is None
@@ -364,7 +367,7 @@ def create_cholesky_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarra
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and Fractional brownian motion.
     """
 
@@ -377,7 +380,7 @@ def create_cholesky_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarra
     return Δt * create_space(xmin=0, npts=npts), fbm.generate_cholesky(H, npts, dB, L)
 
 
-def create_fft_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def create_fft_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Generate fractional brownian motion using the FFT method with the provided 
     parameters.
@@ -388,12 +391,12 @@ def create_fft_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[flo
         Hurst parameter.
     npts: int
         Number of points.  (default 1024)
-    dB: numpy.ndarray[float]
+    dB: NDArray[numpy.floating[Any]]
         Column vector of brownian noise. If value is none the brownian noise is generated.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and Fractional brownian motion.
     """
 
@@ -405,20 +408,20 @@ def create_fft_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[flo
     return Δt * create_space(xmin=0, npts=npts), fbm.generate_fft(H, npts, dB)
     
 
-def compute_H_estimate_periodogram(freq: numpy.ndarray[float], pspec: numpy.ndarray[float]) -> Tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
+def compute_H_estimate_periodogram(freq: NDArray[numpy.floating[Any]], pspec: NDArray[numpy.floating[Any]]) -> tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
     """
     Estimate Hurst parameter using OLS on the periodogram assuming a power law.
 
     Parameters
     ----------
-    freq: numpy.ndarray[float]
+    freq: NDArray[numpy.floating[Any]]
         Frequency.
-    pspec: numpy.ndarray[float]
+    pspec: NDArray[numpy.floating[Any]]
         Power spectrum.
 
     Returns
     -------
-    Tuple[sm.regression.linear_model.RegressionResults, OLSResult]
+    tuple[sm.regression.linear_model.RegressionResults, OLSResult]
         Ols report and result model.
     """
 
@@ -462,20 +465,20 @@ def __add_pergram_transform(result: OLSResult):
     result.set_transforms(model, [OLSTransform(param)], OLSTransform(const))
 
 
-def compute_H_estimate_variance_aggregation(m_vals: numpy.ndarray[float], agg_var: numpy.ndarray[float]) -> Tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
+def compute_H_estimate_variance_aggregation(m_vals: NDArray[numpy.floating[Any]], agg_var: NDArray[numpy.floating[Any]]) -> tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
     """
     Estimate Hurst parameter using OLS on the aggregated variance.
 
     Parameters
     ----------
-    m_vals: numpy.ndarray[float]
+    m_vals: NDArray[numpy.floating[Any]]
         Aggregation intervals.
-    agg_var: numpy.ndarray[float]
+    agg_var: NDArray[numpy.floating[Any]]
         Aggregated variance.
 
     Returns
     -------
-    Tuple[sm.regression.linear_model.RegressionResults, OLSResult]
+    tuple[sm.regression.linear_model.RegressionResults, OLSResult]
         Ols report and result model.
     """
 
@@ -519,13 +522,13 @@ def __add_agg_var_transform(result: OLSResult):
     result.set_transforms(model, [OLSTransform(param)], OLSTransform(const))
 
 
-def compute_vr_test(samples: numpy.ndarray[float], hyp_test_type: HypothesisTestType, **kwargs) -> Tuple[VarianceRatioTestReport, StatisticalTestReport]:
+def compute_vr_test(samples: NDArray[numpy.floating[Any]], hyp_test_type: HypothesisTestType, **kwargs) -> tuple[VarianceRatioTestReport, StatisticalTestReport]:
     """
     Use variance ratio test to test for brownian motion.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         samples to be tested.
     hyp_test_type: HypothesisTestType
         Hypothesis test performed,
@@ -536,7 +539,7 @@ def compute_vr_test(samples: numpy.ndarray[float], hyp_test_type: HypothesisTest
 
     Returns
     -------
-    Tuple[VarianceRatioTestReport, StatisticalTestReport]
+    tuple[VarianceRatioTestReport, StatisticalTestReport]
         Test report and result model.
     """
 
@@ -550,13 +553,13 @@ def compute_vr_test(samples: numpy.ndarray[float], hyp_test_type: HypothesisTest
         raise Exception(f"Hypothesis test type is invalid: {hyp_test_type}")
 
 
-def compute_hetero_vr_test(samples: numpy.ndarray[float], hyp_test_type: HypothesisTestType, **kwargs) -> Tuple[VarianceRatioTestReport, StatisticalTestReport]:
+def compute_hetero_vr_test(samples: NDArray[numpy.floating[Any]], hyp_test_type: HypothesisTestType, **kwargs) -> tuple[VarianceRatioTestReport, StatisticalTestReport]:
     """
     Use variance ratio test to test for brownian motion.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         samples to be tested.
     hyp_test_type: HypothesisTestType
         Hypothesis test performed,
@@ -567,7 +570,7 @@ def compute_hetero_vr_test(samples: numpy.ndarray[float], hyp_test_type: Hypothe
 
     Returns
     -------
-    Tuple[VarianceRatioTestReport, StatisticalTestReport]
+    tuple[VarianceRatioTestReport, StatisticalTestReport]
         Test report and result model.
     """
 
@@ -581,14 +584,14 @@ def compute_hetero_vr_test(samples: numpy.ndarray[float], hyp_test_type: Hypothe
         raise Exception(f"Hypothesis test type is invalid: {hyp_test_type}")
 
 
-def __vr_homo_test(samples: numpy.ndarray[float], hyp_type: HypothesisType, **kwargs) -> Tuple[VarianceRatioTestReport, StatisticalTestReport]:
+def __vr_homo_test(samples: NDArray[numpy.floating[Any]], hyp_type: HypothesisType, **kwargs) -> tuple[VarianceRatioTestReport, StatisticalTestReport]:
     """
     Perform the homoscedastic version of the variance ratio test on the provided samples and perform the specified
     hypothesis type.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Test samples.
     hyp_type: HypothesisType
         Specify the typw of hypothesis to apply: LOWER_TAIL, UPPER_TAIL, TWO_TAIL.
@@ -599,7 +602,7 @@ def __vr_homo_test(samples: numpy.ndarray[float], hyp_type: HypothesisType, **kw
         
     Returns
     -------
-    Tuple[VarianceRatioTestReport, StatisticalTestReport]
+    tuple[VarianceRatioTestReport, StatisticalTestReport]
         Test report and statistical test report model.
     """
 
@@ -610,14 +613,14 @@ def __vr_homo_test(samples: numpy.ndarray[float], hyp_type: HypothesisType, **kw
     return result, __vr_report_from_result(result)
 
 
-def __vr_hetero_test(samples: numpy.ndarray[float], hyp_type: HypothesisType, **kwargs) -> Tuple[VarianceRatioTestReport, StatisticalTestReport]:
+def __vr_hetero_test(samples: NDArray[numpy.floating[Any]], hyp_type: HypothesisType, **kwargs) -> tuple[VarianceRatioTestReport, StatisticalTestReport]:
     """
     Perform the heteroscedastic version of the variance ratio test on the provided samples and perform the specified
     hypothesis type.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Test samples.
     hyp_type: HypothesisType
         Specify the typw of hypothesis to apply: LOWER_TAIL, UPPER_TAIL, TWO_TAIL.
@@ -628,7 +631,7 @@ def __vr_hetero_test(samples: numpy.ndarray[float], hyp_type: HypothesisType, **
         
     Returns
     -------
-    Tuple[VarianceRatioTestReport, StatisticalTestReport]
+    tuple[VarianceRatioTestReport, StatisticalTestReport]
         Test report and statistical test report model.
     """
 

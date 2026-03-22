@@ -6,11 +6,12 @@ Interface to models.ecm.py
 
 import numpy
 
+from numpy.typing import NDArray
+from typing import Any
+
 from lib.models import ecm
 import statsmodels.tsa as tsa
-from typing import Tuple
 import statsmodels.api as sm
-import uuid
 
 from lib.data.param_est import (ParamEst, OLSResult, OLSTransform, OLSParamType)
 from lib.utils import (get_param_throw_if_missing, get_param_default_if_missing,
@@ -19,7 +20,7 @@ from lib.data.impl.stats import OLS
 from lib.stats import diff
 
 
-def compute_xt_mean(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_xt_mean(**kwargs) -> tuple[NDArray[numpy.float64], NDArray[numpy.float64]]:
     """
     Compute the ARIMA process mean value.
 
@@ -32,7 +33,7 @@ def compute_xt_mean(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and mean value.
     """
 
@@ -42,9 +43,9 @@ def compute_xt_mean(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float
     return create_space(xmax=npts - 1, npts=npts, Δx=Δt), numpy.full(npts, 0.0)
 
 
-def compute_yt_mean(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_yt_mean(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
-    Compute the ECM process mean value.
+    Compute the Error Correction Model (ECM) process mean value.
 
     Parameters
     ----------
@@ -55,7 +56,7 @@ def compute_yt_mean(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and mean value.
     """
 
@@ -65,7 +66,7 @@ def compute_yt_mean(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float
     return create_space(xmax=npts - 1, npts=npts, Δx=Δt), numpy.full(npts, 0.0)
 
 
-def compute_xt_var(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_xt_var(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute the ARIMA process variance value.
 
@@ -84,7 +85,7 @@ def compute_xt_var(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and mean value.
     """
 
@@ -98,9 +99,9 @@ def compute_xt_var(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]
     return t_vals, ecm.xt_var(φ, σ, t_vals)
 
 
-def compute_yt_var(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_yt_var(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
-    Compute the ECM process variance value.
+    Compute the Error Correction Model (ECM) process variance value.
 
     Parameters
     ----------
@@ -119,7 +120,7 @@ def compute_yt_var(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and mean value.
     """
 
@@ -134,9 +135,9 @@ def compute_yt_var(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]
     return t_vals, ecm.yt_var(φ, σ, β, t_vals)
 
 
-def compute_cov(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_cov(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
-    Compute the ECM process variance value.
+    Compute the Error Correction Model (ECM) process variance value.
 
     Parameters
     ----------
@@ -151,7 +152,7 @@ def compute_cov(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Time and mean value.
     """
 
@@ -166,20 +167,20 @@ def compute_cov(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
     return t_vals, ecm.cov(φ, σ, β, t_vals)
 
 
-def compute_beta_estimate(yt: numpy.ndarray[float], xt: numpy.ndarray[float]) -> Tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
+def compute_beta_estimate(yt: NDArray[numpy.floating[Any]], xt: NDArray[numpy.floating[Any]]) -> tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
     """
-    Compute OLS estimate of ECM β parameter.
+    Compute OLS estimate of Error Correction Model (ECM) β parameter.
 
     Parameters
     ----------
-    xt: numpy.ndarray[float]
+    xt: NDArray[numpy.floating[Any]]
         ECM variable.
-    yt: numpy.ndarray[float]
+    yt: NDArray[numpy.floating[Any]]
         ECM variable.
 
     Returns
     -------
-    Tuple[sm.regression.linear_model.RegressionResults, OLSResult]
+    tuple[sm.regression.linear_model.RegressionResults, OLSResult]
         Ols report and result model.
     """
 
@@ -188,22 +189,22 @@ def compute_beta_estimate(yt: numpy.ndarray[float], xt: numpy.ndarray[float]) ->
     return report, result
 
 
-def compute_gamma_lambda_estimate(yt: numpy.ndarray[float], xt: numpy.ndarray[float], est_beta: float) -> Tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
+def compute_gamma_lambda_estimate(yt: NDArray[numpy.floating[Any]], xt: NDArray[numpy.floating[Any]], est_beta: float) -> tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
     """
-    Compute OLS estimate of ECM β parameter.
+    Compute OLS estimate of Error Correction Model (ECM) β parameter.
 
     Parameters
     ----------
-    xt: numpy.ndarray[float]
+    xt: NDArray[numpy.floating[Any]]
         ECM variable.
-    yt: numpy.ndarray[float]
+    yt: NDArray[numpy.floating[Any]]
         ECM variable.
     est_beta: float
         Estimated beta.
 
     Returns
     -------
-    Tuple[sm.regression.linear_model.RegressionResults, OLSResult]
+    tuple[sm.regression.linear_model.RegressionResults, OLSResult]
         Ols report and result model.
     """
 
@@ -216,9 +217,9 @@ def compute_gamma_lambda_estimate(yt: numpy.ndarray[float], xt: numpy.ndarray[fl
     return report, result
 
 
-def create_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float, float]]:
+def create_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
-    Generate an ECM time series from an AR(1) process using the specified parameters.
+    Generate an Error Correction Model (ECM) time series from an AR(1) process using the specified parameters.
 
     Parameters
     ----------
@@ -241,7 +242,7 @@ def create_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float, 
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Generated x(t) and y(t) ECM time series.
     """
 

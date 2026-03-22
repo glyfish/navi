@@ -1,5 +1,7 @@
 
-from typing import Tuple
+from numpy.typing import NDArray
+from typing import Any
+
 import numpy
 import uuid
 
@@ -10,7 +12,7 @@ from lib.data.reports import ADFTestReport
 
 from lib.utils import get_param_default_if_missing, create_space
 
-def create_df_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def create_df_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Generate the Dickey-Fuller distribution by simulating an ensemble of solutions
     to the stochastic integral that defines it.
@@ -28,13 +30,13 @@ def create_df_source(**kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[floa
 
     return create_space(xmax=nsim, npts=nsim + 1), adf.dist_ensemble(nstep, nsim)
 
-def compute_adf_test(samples: numpy.ndarray[float], **kwargs) -> Tuple[ADFTestReport, StatisticalTestReport]:
+def compute_adf_test(samples: NDArray[numpy.floating[Any]], **kwargs) -> tuple[ADFTestReport, StatisticalTestReport]:
     """
     Perform ADF test on provided samples.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Samples to test.
     max_lag : {None, int}
         Maximum lag which is included in test, default value of
@@ -42,7 +44,7 @@ def compute_adf_test(samples: numpy.ndarray[float], **kwargs) -> Tuple[ADFTestRe
 
     Returns
     -------
-    Tuple[ADFTestReport, StatisticalTestReport]
+    tuple[ADFTestReport, StatisticalTestReport]
         ADF result report and test result model.
     """
 
@@ -51,13 +53,13 @@ def compute_adf_test(samples: numpy.ndarray[float], **kwargs) -> Tuple[ADFTestRe
     result = adf.adf_test(samples, max_lag=max_lag)
     return result, __adf_report_from_result(result, HypothesisTestType.STATIONARITY)
 
-def compute_adf_offset_test(samples: numpy.ndarray[float], **kwargs) -> Tuple[ADFTestReport, StatisticalTestReport]:
+def compute_adf_offset_test(samples: NDArray[numpy.floating[Any]], **kwargs) -> tuple[ADFTestReport, StatisticalTestReport]:
     """
     Perform ADF test assuming a constant offset on provided samples.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Samples to test.
     max_lag : {None, int}
         Maximum lag which is included in test, default value of
@@ -65,7 +67,7 @@ def compute_adf_offset_test(samples: numpy.ndarray[float], **kwargs) -> Tuple[AD
 
     Returns
     -------
-    Tuple[ADFTestReport, StatisticalTestReport]
+    tuple[ADFTestReport, StatisticalTestReport]
         ADF result report and test result model.
     """
 
@@ -74,13 +76,13 @@ def compute_adf_offset_test(samples: numpy.ndarray[float], **kwargs) -> Tuple[AD
     result = adf.adf_test_offset(samples, max_lag=max_lag)
     return result, __adf_report_from_result(result, HypothesisTestType.STATIONARITY_OFFSET)
 
-def compute_adf_drift_test(samples: numpy.ndarray[float], **kwargs) -> Tuple[ADFTestReport, StatisticalTestReport]:
+def compute_adf_drift_test(samples: NDArray[numpy.floating[Any]], **kwargs) -> tuple[ADFTestReport, StatisticalTestReport]:
     """
     Perform ADF test assuming offset and drift terms on provided samples.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Samples to test.      
     max_lag : {None, int}
         Maximum lag which is included in test, default value of
@@ -88,7 +90,7 @@ def compute_adf_drift_test(samples: numpy.ndarray[float], **kwargs) -> Tuple[ADF
 
     Returns
     -------
-    Tuple[ADFTestReport, StatisticalTestReport]
+    tuple[ADFTestReport, StatisticalTestReport]
         ADF result report and test result model.
     """
 
@@ -103,7 +105,7 @@ def __adf_report_from_result(result: ADFTestReport, hyp_test_type: HypothesisTes
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Samples to test.
     max_lag : {None, int}
         Maximum lag which is included in test, default value of
@@ -111,7 +113,7 @@ def __adf_report_from_result(result: ADFTestReport, hyp_test_type: HypothesisTes
 
     Returns
     -------
-    Tuple[ADFTestReport, StatisticalTestReport]
+    tuple[ADFTestReport, StatisticalTestReport]
         ADF result report and test result model.
     """
     
