@@ -13,7 +13,7 @@ from lib.utils import get_param_default_if_missing
 from lib import config
 from lib.config import SharedCycler
 
-def bar(axis: axes.Axes, y: NDArray, x: NDArray=None, **kwargs):
+def bar(axis: axes.Axes, y: NDArray, x: NDArray | None=None, **kwargs):
     """
     Plot samples in a bar chart.
 
@@ -55,7 +55,7 @@ def bar(axis: axes.Axes, y: NDArray, x: NDArray=None, **kwargs):
     __plot_bar(axis, x, y, color_cycler, 0, **kwargs)
 
 
-def positive_negative_bar(axis: axes.Axes, y: NDArray, x: NDArray=None, **kwargs):
+def positive_negative_bar(axis: axes.Axes, y: NDArray, x: NDArray | None=None, **kwargs):
     """
     Plot data in a bar chart with different colors for positive and negative values.
 
@@ -106,8 +106,8 @@ def positive_negative_bar(axis: axes.Axes, y: NDArray, x: NDArray=None, **kwargs
     __plot_bar(axis, x, y, color_cycler, 0, **kwargs)
 
 
-def twinx_bar_line(axis: axes.Axes, y_bar: NDArray, y_line: NDArray, x_bar: NDArray=None,
-                    x_line: NDArray=None, **kwargs):
+def twinx_bar_line(axis: axes.Axes, y_bar: NDArray, y_line: NDArray, x_bar: NDArray | None=None,
+                    x_line: NDArray | None=None, **kwargs):
     """
     Bar plot and line plot using same x-axis but different scales on y-axis. Bar plot is on left y-axis
     and line plot is on right y-axis.
@@ -196,8 +196,8 @@ def twinx_bar_line(axis: axes.Axes, y_bar: NDArray, y_line: NDArray, x_bar: NDAr
 
 
 
-def twinx_bar_line_comparison(axis: axes.Axes, y_bar: NDArray, y_line: NDArray, x_bar: NDArray=None,
-                              x_line: NDArray=None, **kwargs):
+def twinx_bar_line_comparison(axis: axes.Axes, y_bar: NDArray, y_line: NDArray, x_bar: NDArray |None=None,
+                              x_line: NDArray | None=None, **kwargs):
     """
     Bar plot and comparison line plot using same x-axis but different scales on y-axis. Bar plot is on left y-axis
     and line plot is on right y-axis.

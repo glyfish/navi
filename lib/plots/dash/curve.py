@@ -6,7 +6,7 @@ from lib.plots import comp
 from typing import Callable
 
 
-def curve(y: numpy.ndarray, x: numpy.ndarray=None, **kwargs):
+def curve(y: numpy.ndarray, x: numpy.ndarray | None=None, **kwargs):
     """
     Plot a curve.
 
@@ -53,7 +53,7 @@ def curve(y: numpy.ndarray, x: numpy.ndarray=None, **kwargs):
         pyplot.close(fig)
 
 
-def comparison(y: list[numpy.ndarray], x=None, **kwargs):
+def comparison(y: list[numpy.ndarray], x: numpy.ndarray | None=None, **kwargs):
     """
     Plot multiple curves on same scale.
 
@@ -98,7 +98,7 @@ def comparison(y: list[numpy.ndarray], x=None, **kwargs):
     comp.comparison(axis, y, x=x, **kwargs)
 
 
-def stack(y: list[numpy.ndarray], x=None, **kwargs):
+def stack(y: list[numpy.ndarray], x: list[numpy.ndarray] | numpy.ndarray | None=None, **kwargs):
     """
     Plot a horizontal stack of curves on the same x-scale.
 
@@ -133,7 +133,7 @@ def stack(y: list[numpy.ndarray], x=None, **kwargs):
     comp.stack(axis, y=y, x=x, **kwargs)
 
 
-def comparison_stack(y: list[numpy.ndarray], x=None, **kwargs):
+def comparison_stack(y: list[numpy.ndarray], x: list[numpy.ndarray] | numpy.ndarray | None=None, **kwargs):
     """
     Plot a horizontal stack of multiple curves on the same x-scale.
 
@@ -170,7 +170,7 @@ def comparison_stack(y: list[numpy.ndarray], x=None, **kwargs):
     comp.comparison_stack(axis, y=y, x=x, **kwargs)
 
 
-def twinx(left: numpy.ndarray[float], right: numpy.ndarray[float], x=None, **kwargs):
+def twinx(left: numpy.ndarray, right: numpy.ndarray, x: numpy.ndarray | None=None, **kwargs):
     """
     Plot two curves with different scales on the y-axis that use the same scale on the
     x-axis.
@@ -217,7 +217,7 @@ def twinx(left: numpy.ndarray[float], right: numpy.ndarray[float], x=None, **kwa
     comp.twinx(axis, left, right, x, **kwargs)
 
 
-def twinx_comparison(left: list[numpy.ndarray], right: list[numpy.ndarray], x: numpy.ndarray=None, **kwargs):
+def twinx_comparison(left: list[numpy.ndarray], right: list[numpy.ndarray], x: numpy.ndarray | None=None, **kwargs):
     """
     Plot two curves with different scales on the y-axis that use the same scale on the
     x-axis.
@@ -307,12 +307,12 @@ def bar(y, x=None, **kwargs):
     fig, axis = pyplot.subplots(figsize=figsize)
     comp.bar(axis, y, x, **kwargs)
 
-    if file_name is not None:
+    if file_name is not None:   
         fig.savefig(file_name, bbox_inches='tight', dpi=300)
         pyplot.close(fig)
 
 
-def twinx_bar_line(y_bar: numpy.ndarray, y_line: numpy.ndarray, x_bar: numpy.ndarray=None, x_line: numpy.ndarray=None, **kwargs):
+def twinx_bar_line(y_bar: numpy.ndarray, y_line: numpy.ndarray, x_bar: numpy.ndarray | None=None, x_line: numpy.ndarray| None=None, **kwargs):
     """
     Plot two curves with different scales on the y-axis that use the same scale on the
     x-axis.
@@ -417,7 +417,7 @@ def hist(samples: numpy.ndarray, fx=None, **kwargs):
     comp.hist(axis, samples, fx, **kwargs)
 
 
-def fpoints(data: numpy.ndarray[float], func: numpy.ndarray[float], x: numpy.ndarray=None, fx: numpy.ndarray=None, **kwargs):
+def fpoints(data: numpy.ndarray, func: numpy.ndarray, x: numpy.ndarray | None=None, fx: numpy.ndarray | None=None, **kwargs):
     """"
     Compare data to a function by plotting the data as a curve
     and the function as points.
@@ -466,7 +466,7 @@ def fpoints(data: numpy.ndarray[float], func: numpy.ndarray[float], x: numpy.nda
     comp.fpoints(axis, data, func, x, fx, **kwargs)
 
 
-def fcurve(data: numpy.ndarray[float], func: numpy.ndarray[float], x: numpy.ndarray=None, fx: numpy.ndarray=None, **kwargs):
+def fcurve(data: numpy.ndarray, func: numpy.ndarray, x: numpy.ndarray | None=None, fx: numpy.ndarray | None=None, **kwargs):
     """"
     Compare data to a function by plotting the data and functions as curves.
 
@@ -514,7 +514,7 @@ def fcurve(data: numpy.ndarray[float], func: numpy.ndarray[float], x: numpy.ndar
     comp.fcurve(axis, data, func, x, fx, **kwargs)
 
 
-def fscatter(data: numpy.ndarray[float], func: Callable[[float], float], x: numpy.ndarray[float]=None, **kwargs):
+def fscatter(data: numpy.ndarray, func: Callable[[numpy.ndarray], numpy.ndarray], x: numpy.ndarray | None=None, **kwargs):
     """"
     Compare data to a function by plotting the functions as a curve and as a scatter plot..
 
@@ -564,8 +564,8 @@ def fscatter(data: numpy.ndarray[float], func: Callable[[float], float], x: nump
     comp.fscatter(axis, data, func, x, **kwargs)
 
 
-def fcurve_scatter_comparison(data: list[numpy.ndarray[float]], func: Callable[[float], float], x: numpy.ndarray[float]=None, 
-                              fx: numpy.ndarray[float]=None, **kwargs):
+def fcurve_scatter_comparison(data: list[numpy.ndarray], func: numpy.ndarray, x: list[numpy.ndarray] | None=None, 
+                              fx: numpy.ndarray | None=None, **kwargs):
     """"
     Compare a function curve to multiple datasets by plotting the functions as a curve and data 
     as a scatter plot.
@@ -618,7 +618,7 @@ def fcurve_scatter_comparison(data: list[numpy.ndarray[float]], func: Callable[[
     comp.fcurve_scatter_comparison(axis, data, func, x, fx, **kwargs)
 
 
-def fbar(y: numpy.ndarray[float], fy: numpy.ndarray[float], x: numpy.ndarray=None, fx: numpy.ndarray=None, **kwargs):
+def fbar(y: numpy.ndarray, fy: numpy.ndarray, x: numpy.ndarray, fx: numpy.ndarray, **kwargs):
     """
     Plot samples in a bar chart and compare to a function.
 
@@ -660,7 +660,7 @@ def fbar(y: numpy.ndarray[float], fy: numpy.ndarray[float], x: numpy.ndarray=Non
     comp.fbar(axis, y, fy, x=x, fx=fx, **kwargs)
 
 
-def scatter(y: numpy.ndarray[float], x: numpy.ndarray[float], **kwargs):
+def scatter(y: numpy.ndarray, x: numpy.ndarray, **kwargs):
     """"
     Compare data to a function by plotting the functions as a curve and as a scatter plot..
 
@@ -702,7 +702,7 @@ def scatter(y: numpy.ndarray[float], x: numpy.ndarray[float], **kwargs):
     comp.scatter(axis, y, x, **kwargs)
 
 
-def scatter_comparison(y: numpy.ndarray[float], x: numpy.ndarray[float], **kwargs):
+def scatter_comparison(y: numpy.ndarray, x: numpy.ndarray, **kwargs):
     """"
     Compare data to a function by plotting the functions as a curve and as a scatter plot..
 
@@ -750,7 +750,7 @@ def scatter_comparison(y: numpy.ndarray[float], x: numpy.ndarray[float], **kwarg
     comp.scatter(axis, y, x, **kwargs)
 
 
-def positive_negative_bar(y: numpy.ndarray[float], x: numpy.ndarray=None, **kwargs):
+def positive_negative_bar(y: numpy.ndarray, x: numpy.ndarray | None=None, **kwargs):
     """
     Plot data in a bar chart with different colors for positive and negative values.
 

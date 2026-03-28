@@ -25,7 +25,7 @@ from lib.plots.comp.plot_utils import (__plot_curve, __plot_curves, __twinx_tick
 from lib.config import SharedCycler
 from lib import config
 
-def fpoints(axis: axes.Axes, data: NDArray, func: NDArray, x: NDArray=None, fx: NDArray=None, **kwargs):
+def fpoints(axis: axes.Axes, data: NDArray, func: NDArray, x: NDArray |None=None, fx: NDArray | None=None, **kwargs):
     """"
     Compare data to a function by plotting the data as a curve
     and the function as points.
@@ -68,19 +68,19 @@ def fpoints(axis: axes.Axes, data: NDArray, func: NDArray, x: NDArray=None, fx: 
         Specify legend title. (default None) 
     """
 
-    title           = get_param_default_if_missing("title", None, **kwargs)
-    title_offset    = get_param_default_if_missing("title_offset", 0.0, **kwargs)
-    xlabel          = get_param_default_if_missing("xlabel", None, **kwargs)
-    ylabel          = get_param_default_if_missing("ylabel", None, **kwargs)
-    lw              = get_param_default_if_missing("lw", 2, **kwargs)
-    labels          = get_param_default_if_missing("labels", None, **kwargs)
-    ylim            = get_param_default_if_missing("ylim", None, **kwargs)
-    xlim            = get_param_default_if_missing("xlim", None, **kwargs)
-    yscilimits      = get_param_default_if_missing("yscilimits", (-4, 4), **kwargs)
-    xscilimits      = get_param_default_if_missing("xscilimits", (-4, 4), **kwargs)
-    plot_axis_type  = get_param_default_if_missing("plot_axis_type", PlotType.LINEAR, **kwargs)
-    legend_loc      = get_param_default_if_missing("legend_loc", "best", **kwargs)
-    legend_title    = get_param_default_if_missing("legend_title", None, **kwargs)
+    title                               = get_param_default_if_missing("title", None, **kwargs)
+    title_offset                        = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+    xlabel: str | None                  = get_param_default_if_missing("xlabel", None, **kwargs)
+    ylabel: str | None                  = get_param_default_if_missing("ylabel", None, **kwargs)
+    lw: int                             = get_param_default_if_missing("lw", 2, **kwargs)
+    labels: list[str] | None            = get_param_default_if_missing("labels", None, **kwargs)
+    ylim: tuple[float, float] | None    = get_param_default_if_missing("ylim", None, **kwargs)
+    xlim: tuple[float, float] | None    = get_param_default_if_missing("xlim", None, **kwargs)
+    yscilimits: tuple[int, int]         = get_param_default_if_missing("yscilimits", (-4, 4), **kwargs)
+    xscilimits: tuple[int, int]         = get_param_default_if_missing("xscilimits", (-4, 4), **kwargs)
+    plot_axis_type: PlotType            = get_param_default_if_missing("plot_axis_type", PlotType.LINEAR, **kwargs)
+    legend_loc: str                     = get_param_default_if_missing("legend_loc", "best", **kwargs)
+    legend_title: str | None            = get_param_default_if_missing("legend_title", None, **kwargs)
 
     if x is None:
         npts = len(data)
@@ -98,9 +98,9 @@ def fpoints(axis: axes.Axes, data: NDArray, func: NDArray, x: NDArray=None, fx: 
     else:
         axis.ticklabel_format(style='sci', axis='x', scilimits=xscilimits, useMathText=True)
 
-    axis.set_xlabel(xlabel)
-    axis.set_ylabel(ylabel)
-    axis.set_title(title, y=1.0 + title_offset)
+    axis.set_xlabel(xlabel) if xlabel is not None else None
+    axis.set_ylabel(ylabel) if ylabel is not None else None
+    axis.set_title(title, y=1.0 + title_offset) if title is not None else None
 
     if xlim is not None:
         axis.set_xlim(xlim)
@@ -147,7 +147,7 @@ def fpoints(axis: axes.Axes, data: NDArray, func: NDArray, x: NDArray=None, fx: 
     if labels is not None:
         axis.legend(loc=legend_loc, bbox_to_anchor=(0.1, 0.1, 0.8, 0.8))
 
-def fcurve(axis: axes.Axes, data: NDArray, func: NDArray, x: NDArray=None, fx: NDArray=None, **kwargs):
+def fcurve(axis: axes.Axes, data: NDArray, func: NDArray, x: NDArray| None=None, fx: NDArray | None=None, **kwargs):
     """"
     Compare data to a function by plotting both as curves.
 
@@ -212,9 +212,9 @@ def fcurve(axis: axes.Axes, data: NDArray, func: NDArray, x: NDArray=None, fx: N
     else:
         axis.ticklabel_format(style='sci', axis='x', scilimits=scilimits, useMathText=True)
 
-    axis.set_xlabel(xlabel)
-    axis.set_ylabel(ylabel)
-    axis.set_title(title, y=1.0 + title_offset)
+    axis.set_xlabel(xlabel) if xlabel is not None else None
+    axis.set_ylabel(ylabel) if ylabel is not None else None
+    axis.set_title(title, y=1.0 + title_offset) if title is not None else None
 
     if xlim is not None:
         axis.set_xlim(xlim)
@@ -261,7 +261,7 @@ def fcurve(axis: axes.Axes, data: NDArray, func: NDArray, x: NDArray=None, fx: N
     if labels is not None:
         axis.legend(loc='best', bbox_to_anchor=(0.1, 0.1, 0.8, 0.8))
 
-def fscatter(axis: axes.Axes, data: NDArray, func: Callable[[float], float], x: NDArray=None, **kwargs):
+def fscatter(axis: axes.Axes, data: NDArray, func: Callable[[NDArray], NDArray], x: NDArray | None=None, **kwargs):
     """"
     Compare data to a function by plotting the functions as a curve and as a scatter plot..
 
@@ -337,12 +337,10 @@ def fscatter(axis: axes.Axes, data: NDArray, func: Callable[[float], float], x: 
     if ylim is not None:
         axis.set_ylim(ylim)
 
-    if title is not None:
-        axis.set_title(title, y=1.0 + title_offset)
+    axis.set_title(title, y=1.0 + title_offset) if title is not None else None
+    axis.set_ylabel(ylabel) if ylabel is not None else None
+    axis.set_xlabel(xlabel) if xlabel is not None else None
 
-    axis.set_ylabel(ylabel)
-    axis.set_xlabel(xlabel)
-    
     if plot_axis_type.value == PlotType.LOG.value:
         data, x = __remove_zeros_if_needed(data, x)
         logStyle(axis, x, data)
@@ -368,7 +366,7 @@ def fscatter(axis: axes.Axes, data: NDArray, func: Callable[[float], float], x: 
 
 
 def fcurve_scatter_comparison(axis: axes.Axes, data: list[NDArray], func: NDArray, 
-                              x: list[NDArray]=None, fx: NDArray=None, **kwargs):
+                              x: list[NDArray] | None=None, fx: NDArray | None=None, **kwargs):
     """"
     Compare a function to multiple datasets by plotting the functions as a curve and data 
     as a scatter plot.
@@ -425,7 +423,7 @@ def fcurve_scatter_comparison(axis: axes.Axes, data: list[NDArray], func: NDArra
     __plot_symbols(axis, x, data, 1, **kwargs)
 
 
-def fbar(axis: axes.Axes, y: NDArray, fy: NDArray, x: NDArray=None, fx: NDArray=None, **kwargs):
+def fbar(axis: axes.Axes, y: NDArray, fy: NDArray, x: NDArray, fx: NDArray, **kwargs):
     """
     Plot samples in a bar chart and compare to a function.
 
@@ -475,8 +473,8 @@ def fbar(axis: axes.Axes, y: NDArray, fy: NDArray, x: NDArray=None, fx: NDArray=
 
     axis.set_prop_cycle(config.distribution_sample_cycler)
 
-    axis.set_ylabel(ylabel)
-    axis.set_xlabel(xlabel)
+    axis.set_ylabel(ylabel) if ylabel is not None else None
+    axis.set_xlabel(xlabel) if xlabel is not None else None
 
     color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
     __plot_bar(axis, x, y, color_cycler, 0, **kwargs)

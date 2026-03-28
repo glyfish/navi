@@ -89,7 +89,7 @@ def curve(axis: axes.Axes, y: NDArray, x: NDArray | None = None, **kwargs):
     __plot_curve(axis, x, y, 0, color_cycler, **kwargs)
 
 
-def comparison(axis: axes.Axes, y: NDArray, x: NDArray | list[NDArray] | None = None, **kwargs):
+def comparison(axis: axes.Axes, y: list[NDArray], x: NDArray | list[NDArray] | None = None, **kwargs):
     """
     Plot multiple curves on same scale.
 
@@ -239,7 +239,7 @@ def stack(axis: Sequence[axes.Axes], y: list[NDArray], x=None, **kwargs):
         __plot_curve(axis[i], x_plot, y_plot, i, color_cycler, ylabel=ylabel, **kwargs)
 
 
-def comparison_stack(axis: Sequence[axes.Axes], y: list[NDArray], x: list[NDArray] | None=None, **kwargs):
+def comparison_stack(axis: Sequence[axes.Axes], y: list[NDArray], x: list[numpy.ndarray] | numpy.ndarray | None=None, **kwargs):
     """
     Plot a horizontal stack of multiple curves on the same x-scale.
 
@@ -300,7 +300,7 @@ def comparison_stack(axis: Sequence[axes.Axes], y: list[NDArray], x: list[NDArra
             for j in range(ncurve):
                 ypts = len(y[i][0])
                 x_curve.append(numpy.linspace(0.0, float(ypts-1), ypts))
-            x.append(x_curve)
+            x.append(numpy.array(x_curve))
     elif isinstance(x, numpy.ndarray):
         x = []
         for _ in range(nplot):
@@ -403,7 +403,6 @@ def twinx(axis: axes.Axes, left: NDArray, right: NDArray, x=None, **kwargs):
 
     axis2 = axis.twinx()
     axis2.grid(False)
-    axis2._get_lines.prop_cycler = axis._get_lines.prop_cycler
     if right_ylabel is not None:
         axis2.set_ylabel(right_ylabel, rotation=-90, labelpad=15)
     list2 = __plot_curve(axis2, x[1], right, 1, color_cycler, **kwargs)
@@ -425,7 +424,7 @@ def twinx(axis: axes.Axes, left: NDArray, right: NDArray, x=None, **kwargs):
         axis.legend(labels_list, labs, loc=legend_loc, title=legend_title, bbox_to_anchor=(0.1, 0.1, 0.9, 0.9)).set_zorder(10)
 
 
-def twinx_comparison(axis: axes.Axes, left: list[NDArray], right: list[NDArray], x=None, **kwargs):
+def twinx_comparison(axis: axes.Axes, left: list[NDArray], right: list[NDArray], x: NDArray | None = None, **kwargs):
     """
     Plot two curves with different scales on the y-axis that use the same scale on the
     x-axis.
@@ -502,7 +501,10 @@ def twinx_comparison(axis: axes.Axes, left: list[NDArray], right: list[NDArray],
         npts = min(n_left, n_right)
 
     nplots = len(left) + len(right)
-    if isinstance(x, numpy.ndarray):
+    if x is None:
+        ny = min(n_left, n_right)
+        x = numpy.tile(numpy.linspace(0.0, float(ny-1), ny), (nplots, 1))
+    elif isinstance(x, numpy.ndarray):
         x = numpy.tile(x, (nplots, 1))
 
     color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
@@ -511,7 +513,6 @@ def twinx_comparison(axis: axes.Axes, left: list[NDArray], right: list[NDArray],
 
     axis2 = axis.twinx()
     axis2.grid(False)
-    axis2._get_lines.prop_cycler = axis._get_lines.prop_cycler
     if right_ylabel is not None:
         axis2.set_ylabel(right_ylabel, rotation=-90, labelpad=15)
 
