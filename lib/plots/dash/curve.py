@@ -90,12 +90,19 @@ def comparison(y: list[numpy.ndarray], x: numpy.ndarray | None=None, **kwargs):
         Specify legend location. (default best)
     figsize : (int, int), optional
         Specify the width and height of plot (default is (8,6))
-    """
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
+   """
 
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
-    _, axis = pyplot.subplots(figsize=figsize)
+    fig, axis = pyplot.subplots(figsize=figsize)
     comp.comparison(axis, y, x=x, **kwargs)
+
+    if file_name is not None:
+        fig.savefig(file_name)
+        pyplot.close(fig)
 
 
 def stack(y: list[numpy.ndarray], x: list[numpy.ndarray] | numpy.ndarray | None=None, **kwargs):
@@ -124,13 +131,20 @@ def stack(y: list[numpy.ndarray], x: list[numpy.ndarray] | numpy.ndarray | None=
         Number of points to plot. (default len(y))
     figsize : (int, int)
         Figure size.
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
     """
 
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
     nplot = len(y)
-    _, axis = pyplot.subplots(nplot, sharex=True, figsize=figsize)
+    fig, axis = pyplot.subplots(nplot, sharex=True, figsize=figsize)
     comp.stack(axis, y=y, x=x, **kwargs)
+    
+    if file_name is not None:
+        fig.savefig(file_name)
+        pyplot.close(fig)
 
 
 def comparison_stack(y: list[numpy.ndarray], x: list[numpy.ndarray] | numpy.ndarray | None=None, **kwargs):
@@ -161,13 +175,20 @@ def comparison_stack(y: list[numpy.ndarray], x: list[numpy.ndarray] | numpy.ndar
         Line width. (default 1)
     figsize : (int, int)
         Figure size.
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
     """
 
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
     nplot = len(y)
-    _, axis = pyplot.subplots(nplot, sharex=True, figsize=figsize)
+    fig, axis = pyplot.subplots(nplot, sharex=True, figsize=figsize)
     comp.comparison_stack(axis, y=y, x=x, **kwargs)
+
+    if file_name is not None:
+        fig.savefig(file_name)
+        pyplot.close(fig)
 
 
 def twinx(left: numpy.ndarray, right: numpy.ndarray, x: numpy.ndarray | None=None, **kwargs):
@@ -209,12 +230,19 @@ def twinx(left: numpy.ndarray, right: numpy.ndarray, x: numpy.ndarray | None=Non
         Precision shown for y axis ticks.
     figsize : (int, int), optional
         Specify the width and height of plot (default is (8,6))
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
    """
 
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
-    _, axis = pyplot.subplots(figsize=figsize)
+    fig, axis = pyplot.subplots(figsize=figsize)
     comp.twinx(axis, left, right, x, **kwargs)
+
+    if file_name is not None:
+        fig.savefig(file_name)
+        pyplot.close(fig)
 
 
 def twinx_comparison(left: list[numpy.ndarray], right: list[numpy.ndarray], x: numpy.ndarray | None=None, **kwargs):
@@ -261,12 +289,19 @@ def twinx_comparison(left: list[numpy.ndarray], right: list[numpy.ndarray], x: n
         Specify legend location. (default best)
     figsize : (int, int), optional
         Specify the width and height of plot (default is (8,6))
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
     """
 
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
-    _, axis = pyplot.subplots(figsize=figsize)
+    fig, axis = pyplot.subplots(figsize=figsize)
     comp.twinx_comparison(axis, left=left, right=right, x=x, **kwargs)
+
+    if file_name is not None:
+        fig.savefig(file_name)
+        pyplot.close(fig)
 
 
 def bar(y, x=None, **kwargs):
@@ -299,9 +334,10 @@ def bar(y, x=None, **kwargs):
         Specify the width and height of plot (default is (8,6))
     file_name : str, optional
         Save generated plot to file if present (default is None)
-    """
+"""
 
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
     file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
     fig, axis = pyplot.subplots(figsize=figsize)
@@ -364,12 +400,19 @@ def twinx_bar_line(y_bar: numpy.ndarray, y_line: numpy.ndarray, x_bar: numpy.nda
         Bar width ras faction of x delta.
     figsize : (int, int), optional
         Specify the width and height of plot (default is (8,6))
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
    """
 
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
-    _, axis = pyplot.subplots(figsize=figsize)
+    fig, axis = pyplot.subplots(figsize=figsize)
     comp.twinx_bar_line(axis, y_bar, y_line, x_bar, x_line, **kwargs)
+
+    if file_name is not None:
+        fig.savefig(file_name)
+        pyplot.close(fig)
 
 
 def hist(samples: numpy.ndarray, fx=None, **kwargs):
@@ -409,12 +452,19 @@ def hist(samples: numpy.ndarray, fx=None, **kwargs):
         Specify legend location. (default best)
     figsize : (int, int), optional
         Specify the width and height of plot (default is (8,6))
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
     """
 
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
-    _, axis = pyplot.subplots(figsize=figsize)
+    fig, axis = pyplot.subplots(figsize=figsize)
     comp.hist(axis, samples, fx, **kwargs)
+
+    if file_name is not None:
+        fig.savefig(file_name)
+        pyplot.close(fig)
 
 
 def fpoints(data: numpy.ndarray, func: numpy.ndarray, x: numpy.ndarray | None=None, fx: numpy.ndarray | None=None, **kwargs):
@@ -458,12 +508,19 @@ def fpoints(data: numpy.ndarray, func: numpy.ndarray, x: numpy.ndarray | None=No
         The type of axis used in the plot    
     figsize : (int, int), optional
         Specify the width and height of plot (default is (8,6))
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
     """
 
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
-    _, axis = pyplot.subplots(figsize=figsize)
+    fig, axis = pyplot.subplots(figsize=figsize)
     comp.fpoints(axis, data, func, x, fx, **kwargs)
+
+    if file_name is not None:
+        fig.savefig(file_name)
+        pyplot.close(fig)
 
 
 def fcurve(data: numpy.ndarray, func: numpy.ndarray, x: numpy.ndarray | None=None, fx: numpy.ndarray | None=None, **kwargs):
@@ -506,12 +563,19 @@ def fcurve(data: numpy.ndarray, func: numpy.ndarray, x: numpy.ndarray | None=Non
         The type of axis used in the plot    
     figsize : (int, int), optional
         Specify the width and height of plot (default is (8,6))
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
     """
 
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
-    _, axis = pyplot.subplots(figsize=figsize)
+    fig, axis = pyplot.subplots(figsize=figsize)
     comp.fcurve(axis, data, func, x, fx, **kwargs)
+
+    if file_name is not None:
+        fig.savefig(file_name)
+        pyplot.close(fig)
 
 
 def fscatter(data: numpy.ndarray, func: Callable[[numpy.ndarray], numpy.ndarray], x: numpy.ndarray | None=None, **kwargs):
@@ -556,12 +620,19 @@ def fscatter(data: numpy.ndarray, func: Callable[[numpy.ndarray], numpy.ndarray]
         Specify legend title. (default None) 
     figsize : (int, int), optional
         Specify the width and height of plot (default is (8,6))
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
   """
 
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
-    _, axis = pyplot.subplots(figsize=figsize)
+    fig, axis = pyplot.subplots(figsize=figsize)
     comp.fscatter(axis, data, func, x, **kwargs)
+
+    if file_name is not None:
+        fig.savefig(file_name)
+        pyplot.close(fig)
 
 
 def fcurve_scatter_comparison(data: list[numpy.ndarray], func: numpy.ndarray, x: list[numpy.ndarray] | None=None, 
@@ -610,12 +681,19 @@ def fcurve_scatter_comparison(data: list[numpy.ndarray], func: numpy.ndarray, x:
         List of symbols to use for scatter plots.
     figsize : (int, int), optional
         Specify the width and height of plot (default is (8,6))
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
    """
 
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
-    _, axis = pyplot.subplots(figsize=figsize)
+    fig, axis = pyplot.subplots(figsize=figsize)
     comp.fcurve_scatter_comparison(axis, data, func, x, fx, **kwargs)
+
+    if file_name is not None:
+        fig.savefig(file_name)
+        pyplot.close(fig)
 
 
 def fbar(y: numpy.ndarray, fy: numpy.ndarray, x: numpy.ndarray, fx: numpy.ndarray, **kwargs):
@@ -652,12 +730,19 @@ def fbar(y: numpy.ndarray, fy: numpy.ndarray, x: numpy.ndarray, fx: numpy.ndarra
         Specify the limits for the y axis. (default None)
     figsize : (int, int), optional
         Specify the width and height of plot (default is (8,6))
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
    """
 
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
-    _, axis = pyplot.subplots(figsize=figsize)
+    fig, axis = pyplot.subplots(figsize=figsize)
     comp.fbar(axis, y, fy, x=x, fx=fx, **kwargs)
+
+    if file_name is not None:
+        fig.savefig(file_name)
+        pyplot.close(fig)
 
 
 def scatter(y: numpy.ndarray, x: numpy.ndarray, **kwargs):
@@ -694,12 +779,19 @@ def scatter(y: numpy.ndarray, x: numpy.ndarray, **kwargs):
         Symbols used to mark data points. (default 'o')
     figsize : (int, int), optional
         Specify the width and height of plot (default is (8,6))
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
    """
     
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
-    _, axis = pyplot.subplots(figsize=figsize)
+    fig, axis = pyplot.subplots(figsize=figsize)
     comp.scatter(axis, y, x, **kwargs)
+
+    if file_name is not None:
+        fig.savefig(file_name)
+        pyplot.close(fig)
 
 
 def scatter_comparison(y: numpy.ndarray, x: numpy.ndarray, **kwargs):
@@ -742,12 +834,19 @@ def scatter_comparison(y: numpy.ndarray, x: numpy.ndarray, **kwargs):
         Specify legend title. (default None) 
     figsize : (int, int), optional
         Specify the width and height of plot (default is (8,6))
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
    """
     
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
-    _, axis = pyplot.subplots(figsize=figsize)
+    fig, axis = pyplot.subplots(figsize=figsize)
     comp.scatter(axis, y, x, **kwargs)
+
+    if file_name is not None:
+        fig.savefig(file_name)
+        pyplot.close(fig)
 
 
 def positive_negative_bar(y: numpy.ndarray, x: numpy.ndarray | None=None, **kwargs):
@@ -786,11 +885,18 @@ def positive_negative_bar(y: numpy.ndarray, x: numpy.ndarray | None=None, **kwar
         Bar colors
     figsize : (int, int), optional
         Specify the width and height of plot (default is (8,6))
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
    """
     
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
 
-    _, axis = pyplot.subplots(figsize=figsize)
+    fig, axis = pyplot.subplots(figsize=figsize)
     comp.positive_negative_bar(axis, y, x, **kwargs)
+
+    if file_name is not None:
+        fig.savefig(file_name)
+        pyplot.close(fig)
 
 
