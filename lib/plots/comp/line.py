@@ -50,7 +50,7 @@ def curve(axis: axes.Axes, y: NDArray, x: NDArray | None = None, **kwargs):
         Value plotted on x-axis (default is index values of y)
     title : string, optional
         Plot title (default is None)
-    title_offset : float (default is 0.0)
+    title_offset : float (default is 0.05)
         Plot title off set from top of plot.
     xlabel : string, optional
         Plot x-axis label (default is 'x')
@@ -73,7 +73,7 @@ def curve(axis: axes.Axes, y: NDArray, x: NDArray | None = None, **kwargs):
     """
 
     title: str | None     = get_param_default_if_missing("title", None, **kwargs)
-    title_offset: float   = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+    title_offset: float   = get_param_default_if_missing("title_offset", 0.05, **kwargs)
     npts: int | None      = get_param_default_if_missing("npts", None, **kwargs)
 
     if npts is None or npts > len(y):
@@ -104,7 +104,7 @@ def comparison(axis: axes.Axes, y: list[NDArray], x: NDArray | list[NDArray] | N
         same index (default is index values of y)
     title : string, optional
         Plot title (default is None)
-    title_offset : float (default is 0.0)
+    title_offset : float (default is 0.05)
         Plot title off set from top of plot.
     xlabel : string, optional
         Plot x-axis label (default is None)
@@ -133,7 +133,7 @@ def comparison(axis: axes.Axes, y: list[NDArray], x: NDArray | list[NDArray] | N
     """
     
     title           = get_param_default_if_missing("title", None, **kwargs)
-    title_offset    = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+    title_offset    = get_param_default_if_missing("title_offset", 0.05, **kwargs)
     labels          = get_param_default_if_missing("labels", None, **kwargs)
 
     ncurve = len(y)
@@ -196,7 +196,7 @@ def stack(axis: Sequence[axes.Axes], y: list[NDArray], x=None, **kwargs):
     """
 
     title: str | None                = get_param_default_if_missing("title", None, **kwargs)
-    title_offset: float              = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+    title_offset: float              = get_param_default_if_missing("title_offset", 0.05, **kwargs)
     xlabel: str | None               = get_param_default_if_missing("xlabel", None, **kwargs)
     ylabels: str | list[str] | None  = get_param_default_if_missing("ylabels", None, **kwargs)
     ylim: tuple[float, float] | None = get_param_default_if_missing("ylim", None, **kwargs)
@@ -281,7 +281,7 @@ def comparison_stack(axis: Sequence[axes.Axes], y: list[NDArray], x: list[numpy.
     """
 
     title            = get_param_default_if_missing("title", None, **kwargs)
-    title_offset     = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+    title_offset     = get_param_default_if_missing("title_offset", 0.05, **kwargs)
     xlabel           = get_param_default_if_missing("xlabel", "", **kwargs)
     ylabels          = get_param_default_if_missing("ylabels", None, **kwargs)
     curve_labels     = get_param_default_if_missing("labels", [], **kwargs)
@@ -344,7 +344,7 @@ def twinx(axis: axes.Axes, left: NDArray, right: NDArray, x=None, **kwargs):
         same index (default is index values of y)
     title : string, optional
         Plot title (default is None)
-    title_offset : float (default is 0.0)
+    title_offset : float (default is 0.05)
         Plot title off set from top of plot.
     xlabel : string, optional
         Plot x-axis label (default is None)
@@ -375,7 +375,7 @@ def twinx(axis: axes.Axes, left: NDArray, right: NDArray, x=None, **kwargs):
     """
 
     title           = get_param_default_if_missing("title", None, **kwargs)
-    title_offset    = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+    title_offset    = get_param_default_if_missing("title_offset", 0.05, **kwargs)
     xlabel          = get_param_default_if_missing("xlabel", None, **kwargs)
     left_ylabel     = get_param_default_if_missing("left_ylabel", None, **kwargs)
     right_ylabel    = get_param_default_if_missing("right_ylabel", None, **kwargs)
@@ -445,7 +445,7 @@ def twinx_comparison(axis: axes.Axes, left: list[NDArray], right: list[NDArray],
         same index (default is index values of y)
     title : string, optional
         Plot title (default is None)
-    title_offset : float (default is 0.0)
+    title_offset : float (default is 0.05)
         Plot title off set from top of plot.
     xlabel : string, optional
         Plot x-axis label (default is None)
@@ -476,7 +476,7 @@ def twinx_comparison(axis: axes.Axes, left: list[NDArray], right: list[NDArray],
     """
 
     title           = get_param_default_if_missing("title", None, **kwargs)
-    title_offset    = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+    title_offset    = get_param_default_if_missing("title_offset", 0.05, **kwargs)
     xlabel          = get_param_default_if_missing("xlabel", None, **kwargs)
     left_ylabel     = get_param_default_if_missing("left_ylabel", None, **kwargs)
     right_ylabel    = get_param_default_if_missing("right_ylabel", None, **kwargs)
@@ -555,7 +555,7 @@ def scatter(axis: axes.Axes, data: NDArray, x: NDArray, **kwargs):
         Value plotted on x-axis.
     title : string, optional
         Plot title (default is None)
-    title_offset : float (default is 0.0)
+    title_offset : float (default is 0.05)
         Plot title off set from top of plot.
     xlabel : string, optional
         Plot x-axis label (default is 'x')
@@ -580,7 +580,7 @@ def scatter(axis: axes.Axes, data: NDArray, x: NDArray, **kwargs):
     xlabel         = get_param_default_if_missing("xlabel", None, **kwargs)
     ylabel         = get_param_default_if_missing("ylabel", None, **kwargs)
     labels         = get_param_default_if_missing("labels", None, **kwargs)
-    title_offset   = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+    title_offset   = get_param_default_if_missing("title_offset", 0.05, **kwargs)
     ylim           = get_param_default_if_missing("ylim", None, **kwargs)
     xlim           = get_param_default_if_missing("xlim", None, **kwargs)
     scilimits      = get_param_default_if_missing("scilimits", (-4, 4), **kwargs)
@@ -644,7 +644,7 @@ def scatter_comparison(axis: axes.Axes, data: list[NDArray], x: NDArray, **kwarg
         Value plotted on x-axis.
     title : string, optional
         Plot title (default is None)
-    title_offset : float (default is 0.0)
+    title_offset : float (default is 0.05)
         Plot title off set from top of plot.
     xlabel : string, optional
         Plot x-axis label (default is 'x')
@@ -675,7 +675,7 @@ def scatter_comparison(axis: axes.Axes, data: list[NDArray], x: NDArray, **kwarg
     xlabel         = get_param_default_if_missing("xlabel", None, **kwargs)
     ylabel         = get_param_default_if_missing("ylabel", None, **kwargs)
     labels         = get_param_default_if_missing("labels", None, **kwargs)
-    title_offset   = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+    title_offset   = get_param_default_if_missing("title_offset", 0.05, **kwargs)
     ylim           = get_param_default_if_missing("ylim", None, **kwargs)
     xlim           = get_param_default_if_missing("xlim", None, **kwargs)
     scilimits      = get_param_default_if_missing("scilimits", (-4, 4), **kwargs)

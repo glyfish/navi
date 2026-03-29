@@ -29,7 +29,7 @@ def bar(axis: axes.Axes, y: NDArray, x: NDArray | None=None, **kwargs):
         Value plotted in x axis (default use y index)
     title : string, optional
         Plot title (default is None)
-    title_offset : float (default is 0.0)
+    title_offset : float (default is 0.05)
         Plot title off set from top of plot.
     xlabel : string, optional
         Plot x-axis label (default is 'x')
@@ -48,7 +48,7 @@ def bar(axis: axes.Axes, y: NDArray, x: NDArray | None=None, **kwargs):
     """
 
     title          = get_param_default_if_missing("title", None, **kwargs)
-    title_offset   = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+    title_offset   = get_param_default_if_missing("title_offset", 0.05, **kwargs)
 
     if title is not None:
         axis.set_title(title, y=title_offset + 1.0)
@@ -73,7 +73,7 @@ def multibar(axis: axes.Axes, y: list[NDArray], x: NDArray, **kwargs):
     title : string, optional
         Plot title (default is None)
     title_offset : float
-        Plot title offset from top of plot (default is 0.0)
+        Plot title offset from top of plot (default is 0.05)
     xlabel : string, optional
         Plot x-axis label (default is 'x')
     ylabel : string, optional
@@ -99,7 +99,7 @@ def multibar(axis: axes.Axes, y: list[NDArray], x: NDArray, **kwargs):
     """
 
     title        = get_param_default_if_missing("title", None, **kwargs)
-    title_offset = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+    title_offset = get_param_default_if_missing("title_offset", 0.05, **kwargs)
 
     if title is not None:
         axis.set_title(title, y=title_offset + 1.0)
@@ -126,14 +126,14 @@ def positive_negative_bar(axis: axes.Axes, y: NDArray, x: NDArray | None=None, *
         Value plotted in x axis for negative values (default use neg index)
     title : string, optional
         Plot title (default is None)
-    title_offset : float (default is 0.0)
+    title_offset : float (default is 0.05)
         Plot title off set from top of plot.
     xlabel : string, optional
         Plot x-axis label (default is 'x')
     ylabel : string, optional
         Plot y-axis label (default is 'y')
     alpha : float
-        Bar alpha (default 0.5)
+        Bar alpha (default 1.0)
     border_width : float
         Bar border width (default)
     bar_width : float
@@ -147,7 +147,7 @@ def positive_negative_bar(axis: axes.Axes, y: NDArray, x: NDArray | None=None, *
     """
 
     title          = get_param_default_if_missing("title", None, **kwargs)
-    title_offset   = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+    title_offset   = get_param_default_if_missing("title_offset", 0.05, **kwargs)
     colors         = get_param_default_if_missing("colors", ('#006600', '#990000'), **kwargs)
 
     if title is not None:
@@ -181,7 +181,7 @@ def twinx_bar_line(axis: axes.Axes, y_bar: NDArray, y_line: NDArray, x_bar: NDAr
         same index (default is index values of y)
     title : string, optional
         Plot title (default is None)
-    title_offset : float (default is 0.0)
+    title_offset : float (default is 0.05)
         Plot title off set from top of plot.
     xlabel : string, optional
         Plot x-axis label (default is None)
@@ -218,7 +218,7 @@ def twinx_bar_line(axis: axes.Axes, y_bar: NDArray, y_line: NDArray, x_bar: NDAr
     """
 
     title           = get_param_default_if_missing("title", None, **kwargs)
-    title_offset    = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+    title_offset    = get_param_default_if_missing("title_offset", 0.05, **kwargs)
     bar_ylabel      = get_param_default_if_missing("bar_ylabel", None, **kwargs)
     line_ylabel      = get_param_default_if_missing("line_ylabel", None, **kwargs)
     labels          = get_param_default_if_missing("labels", None, **kwargs)
@@ -271,7 +271,7 @@ def twinx_bar_line_comparison(axis: axes.Axes, y_bar: NDArray, y_line: NDArray, 
         same index (default is index values of y)
     title : string, optional
         Plot title (default is None)
-    title_offset : float (default is 0.0)
+    title_offset : float (default is 0.05)
         Plot title off set from top of plot.
     xlabel : string, optional
         Plot x-axis label (default is None)
@@ -310,7 +310,7 @@ def twinx_bar_line_comparison(axis: axes.Axes, y_bar: NDArray, y_line: NDArray, 
     """
 
     title           = get_param_default_if_missing("title", None, **kwargs)
-    title_offset    = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+    title_offset    = get_param_default_if_missing("title_offset", 0.05, **kwargs)
     bar_ylabel      = get_param_default_if_missing("bar_ylabel", None, **kwargs)
     line_ylabel      = get_param_default_if_missing("line_ylabel", None, **kwargs)
     labels          = get_param_default_if_missing("labels", None, **kwargs)
@@ -357,7 +357,7 @@ def hist(axis: axes.Axes, samples: NDArray, fx=None, **kwargs):
         Comparison function (default is None)
     title : string, optional
         Plot title (default is None)
-    title_offset : float (default is 0.0)
+    title_offset : float (default is 0.05)
         Plot title off set from top of plot.
     xlabel : string, optional
         Plot x-axis label (default is None)
@@ -381,7 +381,7 @@ def hist(axis: axes.Axes, samples: NDArray, fx=None, **kwargs):
     """
 
     title           = get_param_default_if_missing("title", None, **kwargs)
-    title_offset    = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+    title_offset    = get_param_default_if_missing("title_offset", 0.05, **kwargs)
     xlabel          = get_param_default_if_missing("xlabel", None, **kwargs)
     ylabel          = get_param_default_if_missing("ylabel", None, **kwargs)
     lw              = get_param_default_if_missing("lw", 2, **kwargs)

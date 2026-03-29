@@ -155,7 +155,7 @@ def __plot_symbol(axis, x, y, n, **kwargs):
     npts            = get_param_default_if_missing("npts", min(len(y), len(x)), **kwargs)
     marker          = get_param_default_if_missing("marker", 'o', **kwargs)
     marker_size     = get_param_default_if_missing("marker_size", 5.0, **kwargs)
-    alpha           = get_param_default_if_missing("alpha", 0.75, **kwargs)  
+    alpha           = get_param_default_if_missing("alpha", 1.0, **kwargs)  
 
     if isinstance(x[0], pandas.Timestamp) or isinstance(x[0], datetime) or isinstance(x[0], numpy.datetime64) or isinstance(x[0], date):
         converter = mdates.ConciseDateConverter()
@@ -196,7 +196,7 @@ def __plot_symbol(axis, x, y, n, **kwargs):
 
 
 def __plot_bar(axis, x, y, shared_cycler, n, zorder=10, **kwargs):
-    alpha            = get_param_default_if_missing("alpha", 0.5, **kwargs)
+    alpha            = get_param_default_if_missing("alpha", 1.0, **kwargs)
     border_width     = get_param_default_if_missing("border_width", 1, **kwargs)
     bar_width        = get_param_default_if_missing("bar_width", 1.0, **kwargs)
     labels           = get_param_default_if_missing("labels", None, **kwargs)
@@ -252,7 +252,7 @@ def __plot_bar(axis, x, y, shared_cycler, n, zorder=10, **kwargs):
 
 
 def __plot_multi_bar(axis, x, y, shared_cycler, zorder=10, **kwargs):
-    alpha            = get_param_default_if_missing("alpha", 0.5, **kwargs)
+    alpha            = get_param_default_if_missing("alpha", 1.0, **kwargs)
     border_width     = get_param_default_if_missing("border_width", 1, **kwargs)
     bar_width        = get_param_default_if_missing("bar_width", 0.8, **kwargs)
     labels           = get_param_default_if_missing("labels", None, **kwargs)
