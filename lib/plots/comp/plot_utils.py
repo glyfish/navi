@@ -251,6 +251,54 @@ def __plot_bar(axis, x, y, shared_cycler, n, zorder=10, **kwargs):
     return axis.bar(x, y, align='center', width=width, zorder=zorder, alpha=alpha_value, linewidth=border_width, label=label, color=color)
 
 
+def __plot_multi_bar(axis, x, y, shared_cycler, zorder=10, **kwargs):
+    alpha            = get_param_default_if_missing("alpha", 0.5, **kwargs)
+    border_width     = get_param_default_if_missing("border_width", 1, **kwargs)
+    bar_width        = get_param_default_if_missing("bar_width", 0.8, **kwargs)
+    labels           = get_param_default_if_missing("labels", None, **kwargs)
+    colors           = get_param_default_if_missing("colors", None, **kwargs)
+    scilimits        = get_param_default_if_missing("scilimits", (-3, 3), **kwargs)
+    xlabel           = get_param_default_if_missing("xlabel", "x", **kwargs)
+    xlabel_rotation  = get_param_default_if_missing("xlabel_rotation", None, **kwargs)
+    ylabel           = get_param_default_if_missing("ylabel", "y", **kwargs)
+    xlim             = get_param_default_if_missing("xlim", None, **kwargs)
+    ylim             = get_param_default_if_missing("ylim", None, **kwargs)
+    legend_loc       = get_param_default_if_missing("legend_loc", "best", **kwargs)
+
+    ndatasets = len(y)
+    ncategories = len(x)
+    positions = numpy.arange(ncategories)
+    slot_width = bar_width / ndatasets
+
+    axis.ticklabel_format(style='sci', axis='y', scilimits=scilimits, useMathText=True)
+
+    axis.set_ylabel(ylabel)
+    axis.set_xlabel(xlabel)
+
+    if xlim is not None:
+        axis.set_xlim(xlim)
+
+    if ylim is not None:
+        axis.set_ylim(ylim)
+
+    if xlabel_rotation is not None:
+        axis.tick_params("x", rotation=xlabel_rotation)
+
+    for i, yi in enumerate(y):
+        color = colors[i] if colors is not None and len(colors) > i else shared_cycler.get_next()['color']
+        alpha_value = alpha[i] if isinstance(alpha, list) else alpha
+        label = labels[i] if labels is not None and len(labels) > i else None
+        offsets = positions - bar_width / 2 + slot_width * i + slot_width / 2
+        axis.bar(offsets, yi, width=slot_width, align='center', zorder=zorder,
+                 alpha=alpha_value, linewidth=border_width, label=label, color=color)
+
+    axis.set_xticks(positions)
+    axis.set_xticklabels(x)
+
+    if labels is not None:
+        axis.legend(loc=legend_loc)
+
+
 def __axis_twinx(axis, **kwargs):
     ylabel      = get_param_default_if_missing("ylabel", None, **kwargs)
     scilimits   = get_param_default_if_missing("scilimits", (-3, 3), **kwargs)

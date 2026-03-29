@@ -1,4 +1,4 @@
-from lib.plots.dash import  (curve, comparison, stack, twinx, twinx_comparison, bar, 
+from lib.plots.dash import  (curve, comparison, stack, twinx, twinx_comparison, bar, multibar,
                              twinx_bar_line, hist, fcurve, fpoints, periodogram,
                              variance_agg, variance_ratio_test, fbar, contour, contour_hist,
                              ecm_beta, scatter, comparison_stack, training, prediction, mean_reversion_halflife,

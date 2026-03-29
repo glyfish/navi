@@ -348,6 +348,60 @@ def bar(y, x=None, **kwargs):
         pyplot.close(fig)
 
 
+def multibar(y: list[numpy.ndarray], x: numpy.ndarray, **kwargs):
+    """
+    Plot multiple datasets as grouped bars, one group per category.
+
+    Parameters
+    ----------
+    y : list[numpy.ndarray]
+        One array per dataset. Each array must have the same length as x.
+        Maximum 6 datasets recommended.
+    x : numpy.ndarray
+        Category labels for the x-axis.
+    title : string, optional
+        Plot title (default is None)
+    title_offset : float
+        Plot title offset from top of plot (default is 0.0)
+    xlabel : string, optional
+        Plot x-axis label (default is 'x')
+    ylabel : string, optional
+        Plot y-axis label (default is 'y')
+    labels : list[str], optional
+        Legend label for each dataset (default is None)
+    colors : list, optional
+        Bar color for each dataset. Default uses color cycler.
+    alpha : float or list[float]
+        Bar alpha (default 0.5)
+    border_width : float
+        Bar border width (default 1)
+    bar_width : float
+        Total width of the grouped bars as a fraction of category spacing (default 0.8)
+    xlabel_rotation : float, optional
+        Rotation angle for x-axis labels (default None)
+    xlim : (float, float)
+        Limits for the x axis (default None)
+    ylim : (float, float)
+        Limits for the y axis (default None)
+    legend_loc : string
+        Legend location (default 'best')
+    figsize : (int, int), optional
+        Specify the width and height of plot (default is (10, 6))
+    file_name : str, optional
+        Save generated plot to file if present (default is None)
+    """
+
+    figsize   = get_param_default_if_missing("figsize", (10, 6), **kwargs)
+    file_name = get_param_default_if_missing("file_name", None, **kwargs)
+
+    fig, axis = pyplot.subplots(figsize=figsize)
+    comp.multibar(axis, y, x, **kwargs)
+
+    if file_name is not None:
+        fig.savefig(file_name, bbox_inches='tight', dpi=300)
+        pyplot.close(fig)
+
+
 def twinx_bar_line(y_bar: numpy.ndarray, y_line: numpy.ndarray, x_bar: numpy.ndarray | None=None, x_line: numpy.ndarray| None=None, **kwargs):
     """
     Plot two curves with different scales on the y-axis that use the same scale on the

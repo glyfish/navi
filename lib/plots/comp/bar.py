@@ -6,12 +6,14 @@ from matplotlib import pyplot, rcParams, axes
 from datetime import datetime, date
 from numpy.typing import NDArray
 
-from lib.plots.comp.plot_utils import (__plot_curve, __plot_curves, __twinx_ticks, __plot_bar, __axis_twinx)
+from lib.plots.comp.plot_utils import (__plot_curve, __plot_curves, __twinx_ticks, __plot_bar, 
+                                       __plot_multi_bar, __axis_twinx)
 
 from lib.utils import get_param_default_if_missing
 
 from lib import config
 from lib.config import SharedCycler
+
 
 def bar(axis: axes.Axes, y: NDArray, x: NDArray | None=None, **kwargs):
     """
@@ -53,6 +55,57 @@ def bar(axis: axes.Axes, y: NDArray, x: NDArray | None=None, **kwargs):
 
     color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
     __plot_bar(axis, x, y, color_cycler, 0, **kwargs)
+
+
+def multibar(axis: axes.Axes, y: list[NDArray], x: NDArray, **kwargs):
+    """
+    Plot multiple datasets as grouped bars, one group per category.
+
+    Parameters
+    ----------
+    axis : matplotlib.axes.Axes
+        Axis used to draw plot.
+    y : list[numpy.ndarray]
+        One array per dataset. Each array must have the same length as x.
+        Maximum 6 datasets recommended.
+    x : numpy.ndarray
+        Category labels for the x-axis.
+    title : string, optional
+        Plot title (default is None)
+    title_offset : float
+        Plot title offset from top of plot (default is 0.0)
+    xlabel : string, optional
+        Plot x-axis label (default is 'x')
+    ylabel : string, optional
+        Plot y-axis label (default is 'y')
+    labels : list[str], optional
+        Legend label for each dataset (default is None)
+    colors : list, optional
+        Bar color for each dataset. Default uses color cycler.
+    alpha : float or list[float]
+        Bar alpha (default 0.5)
+    border_width : float
+        Bar border width (default 1)
+    bar_width : float
+        Total width of the grouped bars as a fraction of category spacing (default 0.8)
+    xlabel_rotation : float, optional
+        Rotation angle for x-axis labels (default None)
+    xlim : (float, float)
+        Limits for the x axis (default None)
+    ylim : (float, float)
+        Limits for the y axis (default None)
+    legend_loc : string
+        Legend location (default 'best')
+    """
+
+    title        = get_param_default_if_missing("title", None, **kwargs)
+    title_offset = get_param_default_if_missing("title_offset", 0.0, **kwargs)
+
+    if title is not None:
+        axis.set_title(title, y=title_offset + 1.0)
+
+    color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
+    __plot_multi_bar(axis, x, y, color_cycler, **kwargs)
 
 
 def positive_negative_bar(axis: axes.Axes, y: NDArray, x: NDArray | None=None, **kwargs):
