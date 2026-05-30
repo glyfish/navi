@@ -58,7 +58,9 @@ def __plot_curve(axis, x, y, n, shared_cycler, **kwargs):
 
     color = colors[n] if colors is not None else shared_cycler.get_next()['color']
 
-    axis.ticklabel_format(style='sci', axis='y', scilimits=scilimits, useMathText=True)
+    y_is_log = plot_axis_type.value in (PlotType.YLOG.value, PlotType.LOG.value)
+    if not y_is_log:
+        axis.ticklabel_format(style='sci', axis='y', scilimits=scilimits, useMathText=True)
 
     x = x[:npts]
     y = y[:npts]
