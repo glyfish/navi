@@ -231,10 +231,9 @@ def stack(axis: Sequence[axes.Axes], y: list[NDArray], x=None, **kwargs):
             ylabel=None
 
         if labels is not None:
-            npts_plot = len(y_plot) if npts is None else npts
             ylim_plot = ylim if ylim is not None else axis[i].get_ylim()
             ypos = 0.8*(ylim_plot[1] - ylim_plot[0]) + ylim_plot[0]
-            xpos = 0.8*(x_plot[npts_plot-1] - x_plot[0]) + x_plot[0]
+            xpos = 0.8*(x_plot[-1] - x_plot[0]) + x_plot[0]
             text = axis[i].text(xpos, ypos, labels[i])
             text.set_bbox(dict(facecolor='white', alpha=0.75, edgecolor='white'))
 
@@ -521,8 +520,11 @@ def twinx_comparison(axis: axes.Axes, left: list[NDArray], right: list[NDArray],
 
     list2 = [__plot_curve(axis2, x[i], right[i], len(left) + i, color_cycler, **kwargs)  for i in range(len(right))]
 
-    axis.ticklabel_format(style='sci', axis='y', scilimits=scilimits, useMathText=True)
-    axis2.ticklabel_format(style='sci', axis='y', scilimits=scilimits, useMathText=True)
+    plot_axis_type = get_param_default_if_missing("plot_axis_type", PlotType.LINEAR, **kwargs)
+    y_is_log = plot_axis_type.value in (PlotType.YLOG.value, PlotType.LOG.value)
+    if not y_is_log:
+        axis.ticklabel_format(style='sci', axis='y', scilimits=scilimits, useMathText=True)
+        axis2.ticklabel_format(style='sci', axis='y', scilimits=scilimits, useMathText=True)
 
     if left_ylim is not None:
         axis.set_ylim(left_ylim)
