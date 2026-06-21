@@ -15,6 +15,7 @@ _ENV_PATH = Path(os.getenv("NAVI_ENV_FILE") or _DEFAULT_ENV_PATH)
 DEFAULT_FRED_BASE_URL = "https://api.stlouisfed.org/fred"
 DEFAULT_BLS_BASE_URL = "https://api.bls.gov/publicAPI/v2"
 DEFAULT_MCP_URL = "http://localhost:8080/sse"
+DEFAULT_TIINGO_BASE_URL = "https://api.tiingo.com/tiingo"
 
 if _ENV_PATH.exists():
     load_dotenv(_ENV_PATH)
@@ -54,3 +55,14 @@ def get_bls_base_url() -> str:
 def get_mcp_url() -> str:
     """Return the base URL for MCP requests."""
     return os.getenv("MCP_URL", DEFAULT_MCP_URL)
+
+
+def get_tiingo_api_key() -> str:
+    """Return the configured Tiingo API key."""
+    # NOTE: env var is spelled TINGO_API_KEY (no second "i") to match .env.
+    return _get_env_var("TINGO_API_KEY")
+
+
+def get_tiingo_base_url() -> str:
+    """Return the base URL for Tiingo requests."""
+    return os.getenv("TINGO_BASE_URL", DEFAULT_TIINGO_BASE_URL)
