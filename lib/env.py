@@ -37,9 +37,15 @@ def get_fred_api_key() -> str:
     return _get_env_var("FRED_API_KEY")
 
 
-def get_bls_api_key() -> str:
-    """Return the configured Bureau of Labor Statistics API key."""
-    return _get_env_var("BLS_API_KEY")
+def get_bls_api_key(required: bool = True) -> str | None:
+    """Return the configured Bureau of Labor Statistics API key.
+
+    BLS (unlike FRED/Tiingo) works without a key at reduced limits, so callers
+    may pass ``required=False`` to get ``None`` instead of an error when unset.
+    """
+    if required:
+        return _get_env_var("BLS_API_KEY")
+    return os.getenv("BLS_API_KEY") or None
 
 
 def get_fred_base_url() -> str:
