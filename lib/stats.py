@@ -11,8 +11,13 @@ from pandas import DataFrame
 
 import statsmodels.api as sm
 from scipy.stats import multivariate_normal
-from typing import Any
+from typing import Any, Sequence
 from statsmodels.tsa.stattools import grangercausalitytests
+
+# An ensemble is nsim realizations of npts samples. create_ensemble() builds one
+# as a list of 1-D arrays, while the ensemble_* functions below index it in two
+# dimensions, so they accept either form and normalize with numpy.asarray.
+EnsembleSamples = NDArray[numpy.floating[Any]] | Sequence[NDArray[numpy.floating[Any]]]
 
 
 def to_noise(samples: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
@@ -128,14 +133,14 @@ def diff(samples: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
     return numpy.diff(samples)
 
 
-def ensemble_mean(samples: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
+def ensemble_mean(samples: EnsembleSamples) -> NDArray[numpy.floating[Any]]:
     """
     Compute the time varying mean of the sampled ensemble.
 
     Parameters
     ----------
-    samples: NDArray[tuple[int, int], float]
-        Ensemble of sampled data.
+    samples: NDArray[tuple[int, int], float] or list[NDArray[float]]
+        Ensemble of sampled data, as returned by create_ensemble().
 
     Returns
     -------
@@ -148,6 +153,7 @@ def ensemble_mean(samples: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floati
         Samples are not a two dimensional array.
     """
 
+    samples = numpy.asarray(samples)
     if len(samples) == 0:
         raise Exception(f"no data")
     if len(samples.shape) != 2:
@@ -162,7 +168,7 @@ def ensemble_mean(samples: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floati
     return mean
 
 
-def ensemble_var(samples: NDArray[numpy.floating[Any]], Δt: float=1.0) -> NDArray[numpy.floating[Any]]:
+def ensemble_var(samples: EnsembleSamples, Δt: float=1.0) -> NDArray[numpy.floating[Any]]:
     """
     Compute the time varying variance of the sampled ensemble.
 
@@ -184,6 +190,7 @@ def ensemble_var(samples: NDArray[numpy.floating[Any]], Δt: float=1.0) -> NDArr
         Samples are not a two dimensional array.
     """
 
+    samples = numpy.asarray(samples)
     if len(samples) == 0:
         raise Exception(f"no data")
     if len(samples.shape) != 2:
@@ -200,7 +207,7 @@ def ensemble_var(samples: NDArray[numpy.floating[Any]], Δt: float=1.0) -> NDArr
     return var/Δt
 
 
-def ensemble_sd(samples: NDArray[numpy.floating[Any]], Δt: float=1.0) -> NDArray[numpy.floating[Any]]:
+def ensemble_sd(samples: EnsembleSamples, Δt: float=1.0) -> NDArray[numpy.floating[Any]]:
     """
     Compute the time varying standard deviation of the sampled ensemble.
 
@@ -225,7 +232,7 @@ def ensemble_sd(samples: NDArray[numpy.floating[Any]], Δt: float=1.0) -> NDArra
     return numpy.sqrt(ensemble_var(samples, Δt))
 
 
-def ensemble_acf(samples: NDArray[numpy.floating[Any]], nlags: int | None=None) -> NDArray[numpy.floating[Any]]:
+def ensemble_acf(samples: EnsembleSamples, nlags: int | None=None) -> NDArray[numpy.floating[Any]]:
     """
     Compute the ensemble averaged autocorrelation function of the sampled ensemble.
 
@@ -247,6 +254,7 @@ def ensemble_acf(samples: NDArray[numpy.floating[Any]], nlags: int | None=None) 
         Samples are not a two dimensional array.
     """
 
+    samples = numpy.asarray(samples)
     if len(samples) == 0:
         raise Exception(f"no data")
 
@@ -265,7 +273,7 @@ def ensemble_acf(samples: NDArray[numpy.floating[Any]], nlags: int | None=None) 
     return ac_avg / float(nsim)
 
 
-def ensemble_cov(x: NDArray[numpy.floating[Any]], y: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
+def ensemble_cov(x: EnsembleSamples, y: EnsembleSamples) -> NDArray[numpy.floating[Any]]:
     """
     Compute the ensemble averaged covariance of the sampled ensemble.
 
@@ -282,6 +290,8 @@ def ensemble_cov(x: NDArray[numpy.floating[Any]], y: NDArray[numpy.floating[Any]
         Ensemble averaged auto correlation function.
     """
 
+    x = numpy.asarray(x)
+    y = numpy.asarray(y)
     x_nsim, x_npts = x.shape
     y_nsim, y_npts = y.shape
     npts = min(x_npts, y_npts)
@@ -296,7 +306,7 @@ def ensemble_cov(x: NDArray[numpy.floating[Any]], y: NDArray[numpy.floating[Any]
     return cov / float(nsim)
 
 
-def ensemble_correlation_coefficient(x: NDArray[numpy.floating[Any]], y: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
+def ensemble_correlation_coefficient(x: EnsembleSamples, y: EnsembleSamples) -> NDArray[numpy.floating[Any]]:
     """
     Compute the ensemble averaged correlation coefficient of the sampled ensemble.
 

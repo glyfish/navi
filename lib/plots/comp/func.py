@@ -15,7 +15,7 @@ from datetime import datetime, date
 from matplotlib import pyplot, rcParams, axes
 import matplotlib.dates as mdates
 import matplotlib.units as munits
-from typing import Callable
+from typing import Any, Callable, Sequence
 from numpy.typing import NDArray
 
 from lib.plots.comp.axis import (PlotType, logStyle, logXStyle, logYStyle)
@@ -25,7 +25,7 @@ from lib.plots.comp.plot_utils import (__plot_curve, __plot_curves, __twinx_tick
 from lib.config import SharedCycler
 from lib import config
 
-def fpoints(axis: axes.Axes, data: NDArray, func: NDArray, x: NDArray |None=None, fx: NDArray | None=None, **kwargs):
+def fpoints(axis: axes.Axes, data: NDArray, func: NDArray, x: Sequence[Any] | NDArray | None=None, fx: Sequence[Any] | NDArray | None=None, **kwargs):
     """"
     Compare data to a function by plotting the data as a curve
     and the function as points.

@@ -30,6 +30,6 @@ cp .env.example .env
 | --- | --- | --- |
 | `FRED_API_KEY` | Federal Reserve Economic Data | [fred.stlouisfed.org](https://fred.stlouisfed.org/docs/api/api_key.html) |
 | `BLS_API_KEY` | Bureau of Labor Statistics | [bls.gov/developers](https://data.bls.gov/registrationEngine/) |
-| `TINGO_API_KEY` | Tiingo EOD prices | [tiingo.com/account/api/token](https://www.tiingo.com/account/api/token) |
+| `TIINGO_API_KEY` | Tiingo EOD prices | [tiingo.com/account/api/token](https://www.tiingo.com/account/api/token) |
 
 Keys are loaded from `.env` at runtime via `python-dotenv`. You can also export them as shell environment variables instead.

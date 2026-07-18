@@ -2,7 +2,7 @@ import os
 import json
 import numpy
 from enum import Enum
-from typing import Callable, Any, TypeVar, overload
+from typing import Callable, Any, Sequence, TypeVar, overload
 from numpy.typing import NDArray
 import shortuuid
 
@@ -11,6 +11,12 @@ from pandas import read_csv, DataFrame
 _T = TypeVar("_T")
 _N = TypeVar("_N", int, float, str, bool)
 Ensemble = tuple[NDArray[numpy.floating[Any]], list[NDArray[numpy.floating[Any]]]]
+
+# create_parameter_scan returns one time array and one sample array per scan
+# point, so apply_to_parameter_scan receives lists rather than single arrays.
+# Both forms are accepted since scan data is sometimes stacked into an ndarray.
+ScanTimes = Sequence[NDArray] | NDArray
+ScanData = Sequence[NDArray] | NDArray
 
 @overload
 def get_param_throw_if_missing(param: str, expected_type: type[_T], **kwargs) -> _T: ...
@@ -44,9 +50,20 @@ def get_param_throw_if_missing(param: str, expected_type: type | None = None, **
         raise Exception(f"{param} parameter is required")
 
 
-def get_param_default_if_missing(param: str, default: _T, **kwargs) -> _T:
+@overload
+def get_param_default_if_missing(param: str, default: None, **kwargs) -> Any: ...
+@overload
+def get_param_default_if_missing(param: str, default: _T, **kwargs) -> _T: ...
+
+def get_param_default_if_missing(param: str, default: Any = None, **kwargs) -> Any:
     """
     Get parameter from kwargs and return specified default value if it is missing.
+
+    A default of None carries no type information — the real value, when supplied,
+    comes from untyped kwargs — so that case returns Any rather than None. Without
+    the overload the return type is inferred as exactly None, which both rejects
+    the value at typed call sites and makes `if x is not None:` guards unreachable
+    to the type checker.
 
     Parameters
     ----------
@@ -250,18 +267,22 @@ def apply_to_ensemble(func, t: NDArray, ensemble: list[NDArray], **kwargs) -> tu
     return result[0][0], numpy.array([data[1] for data in result])
 
 
-def apply_to_parameter_scan(func, t: NDArray, scan: NDArray,  **kwargs) -> tuple[NDArray, NDArray]:
+def apply_to_parameter_scan(func: Callable[..., tuple[NDArray, NDArray]],
+                            t: ScanTimes,
+                            scan: ScanData,
+                            **kwargs) -> tuple[NDArray, NDArray]:
     """
     Apply specified function to results of a parameter scan.
-    
+
     Parameters
     ----------
-    func: lambda(**kwargs) -> result
-        lambda calling source create.
-    t: numpy.ndarray[float]
-        Time
-    scan : list[numpy.ndarray[float]]
-        Parameter scan data.
+    func: lambda(t, data, **kwargs) -> (numpy.ndarray, numpy.ndarray)
+        lambda applied to each scan point. Receives t unchanged for every point,
+        so a func that varies with time should index it itself.
+    t: list[numpy.ndarray[float]] or numpy.ndarray[float]
+        Time, as returned by create_parameter_scan (one array per scan point).
+    scan : list[numpy.ndarray[float]] or numpy.ndarray[float]
+        Parameter scan data, as returned by create_parameter_scan.
     kwargs : **kwargs
        Function parameters.
 

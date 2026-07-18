@@ -89,7 +89,10 @@ def curve(axis: axes.Axes, y: NDArray, x: NDArray | None = None, **kwargs):
     __plot_curve(axis, x, y, 0, color_cycler, **kwargs)
 
 
-def comparison(axis: axes.Axes, y: list[NDArray], x: NDArray | list[NDArray] | None = None, **kwargs):
+# x is dispatched on isinstance(x, list) below: a list supplies one array per
+# curve, anything else is broadcast to every curve. A tuple would therefore be
+# treated as a single x value and fail, so list is the accurate type here.
+def comparison(axis: axes.Axes, y: Sequence[NDArray] | NDArray, x: list[NDArray] | NDArray | None = None, **kwargs):
     """
     Plot multiple curves on same scale.
 
@@ -163,7 +166,7 @@ def comparison(axis: axes.Axes, y: list[NDArray], x: NDArray | list[NDArray] | N
     __plot_curves(axis, x, y, **kwargs)
 
 
-def stack(axis: Sequence[axes.Axes], y: list[NDArray], x=None, **kwargs):
+def stack(axis: Sequence[axes.Axes] | NDArray, y: Sequence[NDArray] | NDArray, x: Sequence[NDArray] | NDArray | None=None, **kwargs):
     """
     Plot a horizontal stack of curves on the same x-scale.
 
@@ -241,7 +244,7 @@ def stack(axis: Sequence[axes.Axes], y: list[NDArray], x=None, **kwargs):
         __plot_curve(axis[i], x_plot, y_plot, i, color_cycler, ylabel=ylabel, **kwargs)
 
 
-def comparison_stack(axis: Sequence[axes.Axes], y: list[NDArray], x: list[numpy.ndarray] | numpy.ndarray | None=None, **kwargs):
+def comparison_stack(axis: Sequence[axes.Axes] | NDArray, y: Sequence[NDArray] | NDArray, x: Sequence[numpy.ndarray] | numpy.ndarray | None=None, **kwargs):
     """
     Plot a horizontal stack of multiple curves on the same x-scale.
 

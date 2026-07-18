@@ -3,7 +3,7 @@ import numpy
 
 from lib.utils import get_param_default_if_missing
 from lib.plots import comp
-from typing import Callable
+from typing import Any, Callable, Sequence
 
 
 def curve(y: numpy.ndarray, x: numpy.ndarray | None=None, **kwargs):
@@ -53,7 +53,7 @@ def curve(y: numpy.ndarray, x: numpy.ndarray | None=None, **kwargs):
         pyplot.close(fig)
 
 
-def comparison(y: list[numpy.ndarray], x: numpy.ndarray | None=None, **kwargs):
+def comparison(y: Sequence[numpy.ndarray] | numpy.ndarray, x: list[numpy.ndarray] | numpy.ndarray | None=None, **kwargs):
     """
     Plot multiple curves on same scale.
 
@@ -105,7 +105,7 @@ def comparison(y: list[numpy.ndarray], x: numpy.ndarray | None=None, **kwargs):
         pyplot.close(fig)
 
 
-def stack(y: list[numpy.ndarray], x: list[numpy.ndarray] | numpy.ndarray | None=None, **kwargs):
+def stack(y: Sequence[numpy.ndarray] | numpy.ndarray, x: Sequence[numpy.ndarray] | numpy.ndarray | None=None, **kwargs):
     """
     Plot a horizontal stack of curves on the same x-scale.
 
@@ -147,7 +147,7 @@ def stack(y: list[numpy.ndarray], x: list[numpy.ndarray] | numpy.ndarray | None=
         pyplot.close(fig)
 
 
-def comparison_stack(y: list[numpy.ndarray], x: list[numpy.ndarray] | numpy.ndarray | None=None, **kwargs):
+def comparison_stack(y: Sequence[numpy.ndarray] | numpy.ndarray, x: Sequence[numpy.ndarray] | numpy.ndarray | None=None, **kwargs):
     """
     Plot a horizontal stack of multiple curves on the same x-scale.
 
@@ -521,7 +521,7 @@ def hist(samples: numpy.ndarray, fx=None, **kwargs):
         pyplot.close(fig)
 
 
-def fpoints(data: numpy.ndarray, func: numpy.ndarray, x: numpy.ndarray | None=None, fx: numpy.ndarray | None=None, **kwargs):
+def fpoints(data: numpy.ndarray, func: numpy.ndarray, x: Sequence[Any] | numpy.ndarray | None=None, fx: Sequence[Any] | numpy.ndarray | None=None, **kwargs):
     """"
     Compare data to a function by plotting the data as a curve
     and the function as points.

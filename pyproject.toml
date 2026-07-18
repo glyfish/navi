@@ -14,3 +14,6 @@ dependencies = [
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["lib*"]
+
+[tool.setuptools.package-data]
+lib = ["*.mplstyle"]

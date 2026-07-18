@@ -2,32 +2,33 @@ import os
 import pathlib
 import matplotlib
 
+from importlib import resources
 from typing import Literal, Sequence
 from matplotlib import colors as mcolors
 
-from IPython.display import Image
+from IPython.core.display import Image
 from cycler import cycler
+
+# Style sheets ship inside the package, so lookup is anchored to the package
+# rather than to os.getcwd() and resolves identically from any working directory.
+#
+# Two display targets, differing only in font sizes:
+#   glyfish_style      notebooks and interactive display
+#   glyfish_web_style  plots rendered to PNG for embedding in web pages, where
+#                      text must stay legible at a fixed image size
+def _style(name: str) -> str:
+    return str(resources.files("lib") / name)
+
+glyfish_style = _style("gly.fish.mplstyle")
+glyfish_web_style = _style("gly.fish-web.mplstyle")
+
+# Output root for figures published as post assets. Relative to the working
+# directory, so notebooks write alongside the post they belong to.
+plot_asset_path = os.path.join(os.getcwd(), 'plots')
 
 def save_post_asset(figure, post, plot):
     path = os.path.join(plot_asset_path, post, plot) + ".png"
     figure.savefig(path, bbox_inches="tight")
-
-project_root = os.getcwd()
-style_file: str | None = None
-
-for _ in range(45):
-    candidate = os.path.join(os.path.abspath(project_root), "gly.fish.mplstyle")
-    if os.path.isfile(candidate):
-        style_file = candidate
-        break
-    project_root += "/.."
-
-if style_file is None:
-    raise FileNotFoundError("Unable to locate gly.fish.mplstyle in project hierarchy")
-
-glyfish_style = style_file
-
-plot_asset_path = os.path.join(os.getcwd(), 'plots')
 
 color = mcolors.ColorConverter().to_rgb
 

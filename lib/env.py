@@ -65,10 +65,9 @@ def get_mcp_url() -> str:
 
 def get_tiingo_api_key() -> str:
     """Return the configured Tiingo API key."""
-    # NOTE: env var is spelled TINGO_API_KEY (no second "i") to match .env.
-    return _get_env_var("TINGO_API_KEY")
+    return _get_env_var("TIINGO_API_KEY")
 
 
 def get_tiingo_base_url() -> str:
     """Return the base URL for Tiingo requests."""
-    return os.getenv("TINGO_BASE_URL", DEFAULT_TIINGO_BASE_URL)
+    return os.getenv("TIINGO_BASE_URL", DEFAULT_TIINGO_BASE_URL)

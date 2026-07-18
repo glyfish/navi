@@ -395,7 +395,7 @@ def hist(axis: axes.Axes, samples: NDArray, fx=None, **kwargs):
     if title is not None:
         axis.set_title(title, y=title_offset)
     if xlabel is not None:
-        axis.set_ylabel(xlabel)
+        axis.set_xlabel(xlabel)
     if ylabel is not None:
         axis.set_ylabel(ylabel)
 
