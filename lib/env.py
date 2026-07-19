@@ -14,6 +14,7 @@ _ENV_PATH = Path(os.getenv("NAVI_ENV_FILE") or _DEFAULT_ENV_PATH)
 
 DEFAULT_FRED_BASE_URL = "https://api.stlouisfed.org/fred"
 DEFAULT_BLS_BASE_URL = "https://api.bls.gov/publicAPI/v2"
+DEFAULT_BIS_BASE_URL = "https://stats.bis.org/api/v1"
 DEFAULT_MCP_URL = "http://localhost:8080/sse"
 DEFAULT_TIINGO_BASE_URL = "https://api.tiingo.com/tiingo"
 
@@ -56,6 +57,14 @@ def get_fred_base_url() -> str:
 def get_bls_base_url() -> str:
     """Return the base URL for BLS requests."""
     return os.getenv("BLS_BASE_URL", DEFAULT_BLS_BASE_URL)
+
+
+def get_bis_base_url() -> str:
+    """Return the base URL for BIS SDMX requests.
+
+    The BIS statistics API needs no credentials, so there is no key accessor.
+    """
+    return os.getenv("BIS_BASE_URL", DEFAULT_BIS_BASE_URL)
 
 
 def get_mcp_url() -> str:

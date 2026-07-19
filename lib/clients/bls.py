@@ -9,12 +9,19 @@ successful response may still carry advisory ``message`` entries.
 """
 from __future__ import annotations
 
-from typing import Any, Mapping, Optional, Sequence
+import asyncio
+from typing import Any, Awaitable, Callable, Mapping, Optional, Sequence
 
 import httpx
 
 from lib.env import get_bls_api_key, get_bls_base_url
+from lib.logger import get_logger
 from lib.clients.models.bls import BlsSeriesResponse, BlsSurveysResponse
+
+logger = get_logger("navi.clients.bls")
+
+DEFAULT_MAX_ATTEMPTS = 3
+DEFAULT_BACKOFF_SECONDS = 0.5
 
 
 class BlsAPIError(RuntimeError):
@@ -31,12 +38,16 @@ class BlsClient:
         base_url: Optional[str] = None,
         timeout: float = 30.0,
         client: Optional[httpx.AsyncClient] = None,
+        max_attempts: int = DEFAULT_MAX_ATTEMPTS,
+        backoff_seconds: float = DEFAULT_BACKOFF_SECONDS,
     ) -> None:
         # Key is optional: fall back to the environment, tolerating its absence.
         self.api_key = api_key if api_key is not None else get_bls_api_key(required=False)
         self.base_url = (base_url or get_bls_base_url()).rstrip("/")
         self._client = client or httpx.AsyncClient(base_url=self.base_url, timeout=timeout)
         self._owns_client = client is None
+        self.max_attempts = max(1, max_attempts)
+        self.backoff_seconds = backoff_seconds
 
     async def __aenter__(self) -> "BlsClient":
         return self
@@ -57,27 +68,63 @@ class BlsClient:
             raise BlsAPIError(f"BLS request failed: {messages}")
         return payload
 
+    async def _send_with_retry(
+        self,
+        send: Callable[[], Awaitable[httpx.Response]],
+        description: str,
+    ) -> Mapping[str, Any]:
+        """Send a request, retrying transient failures with increasing delay.
+
+        The BLS API fails intermittently, so connection errors, timeouts, HTTP
+        5xx, and malformed bodies are retried up to ``max_attempts`` with
+        exponential backoff. Permanent failures are *not* retried: HTTP 4xx
+        (bad key, bad request) and BLS's own ``REQUEST_NOT_PROCESSED`` raise
+        immediately, since repeating them cannot help.
+        """
+        last_error: Exception | None = None
+
+        for attempt in range(1, self.max_attempts + 1):
+            try:
+                response = await send()
+                response.raise_for_status()
+                return self._check_status(response.json())
+            except httpx.HTTPStatusError as exc:
+                if exc.response.status_code < 500:
+                    raise BlsAPIError(f"BLS request failed: {exc.response.text}") from exc
+                last_error = exc
+            except httpx.TransportError as exc:  # timeouts, connection/read errors
+                last_error = exc
+            except ValueError as exc:  # response body was not valid JSON
+                last_error = exc
+
+            if attempt < self.max_attempts:
+                delay = self.backoff_seconds * (2 ** (attempt - 1))
+                logger.warning(
+                    "BLS %s failed (attempt %s/%s): %s — retrying in %.1fs",
+                    description, attempt, self.max_attempts, last_error, delay,
+                )
+                await asyncio.sleep(delay)
+
+        raise BlsAPIError(
+            f"BLS request failed after {self.max_attempts} attempts: {last_error}"
+        ) from last_error
+
     async def _get(self, path: str, params: Optional[Mapping[str, Any]] = None) -> Mapping[str, Any]:
         query: dict[str, Any] = dict(params or {})
         if self.api_key:
             query["registrationkey"] = self.api_key
-        try:
-            response = await self._client.get(path, params=query)
-            response.raise_for_status()
-        except httpx.HTTPStatusError as exc:
-            raise BlsAPIError(f"BLS request failed: {exc.response.text}") from exc
-        return self._check_status(response.json())
+        return await self._send_with_retry(
+            lambda: self._client.get(path, params=query), f"GET {path}"
+        )
 
     async def _post_timeseries(self, body: Mapping[str, Any]) -> Mapping[str, Any]:
         payload: dict[str, Any] = dict(body)
         if self.api_key:
             payload["registrationkey"] = self.api_key
-        try:
-            response = await self._client.post("/timeseries/data/", json=payload)
-            response.raise_for_status()
-        except httpx.HTTPStatusError as exc:
-            raise BlsAPIError(f"BLS request failed: {exc.response.text}") from exc
-        return self._check_status(response.json())
+        return await self._send_with_retry(
+            lambda: self._client.post("/timeseries/data/", json=payload),
+            "POST /timeseries/data/",
+        )
 
     async def get_series_data(
         self,

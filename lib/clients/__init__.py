@@ -3,6 +3,7 @@
 from .fred import FredClient, FredAPIError
 from .tiingo import TiingoClient, TiingoAPIError
 from .bls import BlsClient, BlsAPIError
+from .bis import BisClient, BisAPIError
 
 __all__ = [
     "FredClient",
@@ -11,4 +12,6 @@ __all__ = [
     "TiingoAPIError",
     "BlsClient",
     "BlsAPIError",
+    "BisClient",
+    "BisAPIError",
 ]
