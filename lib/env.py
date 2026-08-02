@@ -17,6 +17,7 @@ DEFAULT_BLS_BASE_URL = "https://api.bls.gov/publicAPI/v2"
 DEFAULT_BIS_BASE_URL = "https://stats.bis.org/api/v1"
 DEFAULT_MCP_URL = "http://localhost:8080/sse"
 DEFAULT_TIINGO_BASE_URL = "https://api.tiingo.com/tiingo"
+DEFAULT_CDC_BASE_URL = "https://data.cdc.gov"
 
 if _ENV_PATH.exists():
     load_dotenv(_ENV_PATH)
@@ -80,3 +81,20 @@ def get_tiingo_api_key() -> str:
 def get_tiingo_base_url() -> str:
     """Return the base URL for Tiingo requests."""
     return os.getenv("TIINGO_BASE_URL", DEFAULT_TIINGO_BASE_URL)
+
+
+def get_cdc_api_key(required: bool = False) -> str | None:
+    """Return the CDC (Socrata) app token, or ``None`` if unset.
+
+    CDC's Socrata API needs no credentials to read public data; the token is
+    optional and only raises rate limits, so it defaults to not-required. The
+    client sends it in the ``X-App-Token`` header when present.
+    """
+    if required:
+        return _get_env_var("CDC_API_KEY")
+    return os.getenv("CDC_API_KEY") or None
+
+
+def get_cdc_base_url() -> str:
+    """Return the base URL for CDC Socrata requests."""
+    return os.getenv("CDC_BASE_URL", DEFAULT_CDC_BASE_URL)
