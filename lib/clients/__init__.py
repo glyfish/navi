@@ -5,6 +5,7 @@ from .tiingo import TiingoClient, TiingoAPIError
 from .bls import BlsClient, BlsAPIError
 from .bis import BisClient, BisAPIError
 from .cdc import CdcClient, CdcAPIError
+from .wonder import WonderClient, WonderAPIError
 
 __all__ = [
     "FredClient",
@@ -17,4 +18,6 @@ __all__ = [
     "BisAPIError",
     "CdcClient",
     "CdcAPIError",
+    "WonderClient",
+    "WonderAPIError",
 ]
