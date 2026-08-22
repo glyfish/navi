@@ -853,18 +853,24 @@ class OLS(Enum):
         """
         
         est_id = str(uuid.uuid4())
-        const = ParamEst.from_dict({"est": result.params[0], 
-                                    "err": result.bse[0],
+        # A formula fit returns params/bse as Series keyed by term name, an array fit
+        # returns plain ndarrays. Access is positional either way, and pandas>=3 no
+        # longer falls back from a label lookup to a positional one.
+        est = numpy.asarray(result.params)
+        err = numpy.asarray(result.bse)
+
+        const = ParamEst.from_dict({"est": est[0],
+                                    "err": err[0],
                                     "est_label": f"$\\beta$",
                                     "err_label": f"$\\sigma_{{\\beta}}$",
                                     "est_id": est_id,
                                     "param_type": OLSParamType.OLS_CONST.value})
 
-        nparams = len(result.params)
+        nparams = len(est)
         params = []
         for i in range(1, nparams):
-            params.append(ParamEst.from_dict({"est": result.params[i], 
-                                              "err": result.bse[i],
+            params.append(ParamEst.from_dict({"est": est[i],
+                                              "err": err[i],
                                               "est_label": f"$\\alpha_{i}$",
                                               "err_label": f"$\\sigma_{{\\alpha_{i}}}$",
                                               "column": i,

@@ -625,16 +625,19 @@ class JohansenCointTestEigenVector:
     ----------
     test_id: str
         Test identifier.
-    eigen_value: str
+    eigen_value: float
         Canonical variate eigen value.
     eigen_vector: numpy.ndarray[float]
         Canonical variate eigen vector.
     """
 
-    def __init__(self, test_id: str, eigen_value: str, eigen_vector: numpy.ndarray[float]):
+    def __init__(self, test_id: str, eigen_value: float, eigen_vector: numpy.ndarray[float]):
         self.test_id = test_id
-        self.eigen_value = eigen_value
-        self.eigen_vector = eigen_vector.tolist()
+        # numpy>=2 returns complex128 from linalg.eig even when every imaginary part is
+        # zero, and json cannot serialize it. statsmodels discards them the same way
+        # when it builds the trace and max-eigenvalue statistics.
+        self.eigen_value = float(numpy.real(eigen_value))
+        self.eigen_vector = numpy.real(eigen_vector).tolist()
 
     def __repr__(self):
         return f"JohansenCointTestEigenVector({self.__props()})"

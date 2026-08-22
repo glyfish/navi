@@ -6,84 +6,10 @@ Metrics in used in financial analysis.
 """
 
 import numpy
-from pandas import DataFrame
 
 from typing import Tuple
 
 from lib.utils import verify_condition
-
-def compute_sharpe_ratio(orders: numpy.ndarray[float], risk_free_return: float=0.0) -> float:
-    """
-    Calculate the Sharpe ratio for a time series using a rolling window. The order of the
-    time series is assumed oldest data to most recent data.
-
-    Parameters
-    ----------
-    orders : numpy.ndarray[float]
-        Orders DataFrame.
-    risk_free_return: float
-        The risk-free return.
-    Returns
-    -------
-    float
-        The Sharpe ratio.
-    """
-
-    completed_orders = orders.query('order_status == "Completed"')
-
-    pnl = completed_orders.pnl.to_numpy()
-    cost = numpy.abs(completed_orders['size'].to_numpy() * completed_orders.price.to_numpy())
-    daily_return = 100.0 * (pnl / cost) - risk_free_return
-
-    return numpy.mean(daily_return) / numpy.std(daily_return)
-
-
-def compute_rate_of_return(orders: numpy.ndarray[float]) -> float:
-    """
-    Calculate the rate of return.
-
-    Parameters
-    ----------
-    orders : numpy.ndarray[float]
-        Orders DataFrame.
-
-    Returns
-    -------
-    float
-        The Sharpe ratio.
-    """
-
-    completed_orders = orders.query('order_status == "Completed"')
-
-    pnl = completed_orders.pnl.to_numpy()
-    cost = numpy.abs(completed_orders['size'].to_numpy() * completed_orders.price.to_numpy())
-
-    return 100.0 * numpy.sum(pnl) / numpy.sum(cost)
-
-
-def compute_daily_rate_of_return(orders: numpy.ndarray[float]) -> float:
-    """
-    Calculate the rate of return.
-
-    Parameters
-    ----------
-    orders : numpy.ndarray[float]
-        Orders DataFrame.
-
-    Returns
-    -------
-    float
-        The Sharpe ratio.
-    """
-
-    completed_orders = orders.query('order_status == "Completed"')
-
-    pnl = completed_orders.pnl.to_numpy()
-    cost = numpy.abs(completed_orders['size'].to_numpy() * completed_orders.price.to_numpy())
-
-    daily_return = 100.0 * (pnl / cost)
-
-    return completed_orders.date.to_numpy(), daily_return
 
 
 def compute_zscore(time: numpy.ndarray[float], data: numpy.ndarray[float], window: int) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
@@ -177,6 +103,5 @@ def std(samples: numpy.ndarray[float]) -> float:
     """
 
     return numpy.std(samples)
-
 
 

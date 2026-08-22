@@ -60,7 +60,7 @@ def modified_chi_squared(x: numpy.ndarray[float]) -> numpy.ndarray[float]:
     return 2.0*numpy.exp(-(2.0*x+1.0)/2.0) / numpy.sqrt(2.0*numpy.pi*(2.0*x+1.0))
 
 def stochastic_integral_ensemble_1(n: int, nsample: int) -> numpy.ndarray[float]:
-    """
+    r"""
     Simulate the stochastic integral $\int_0^1{B(s)dB(s)}$ ensemble
 
     Parameters
@@ -82,7 +82,7 @@ def stochastic_integral_ensemble_1(n: int, nsample: int) -> numpy.ndarray[float]
     return vals
 
 def stochastic_integral_simulation_1(bn: numpy.ndarray[float]) -> float:
-    """
+    r"""
     Simulate a stochastic integral $\int_0^1{B(s)dB(s)}$ using the input brownian noise.
 
     Parameters
@@ -120,7 +120,7 @@ def stochastic_integral_solution_1(n: int) -> numpy.ndarray[float]:
     return 0.5*(numpy.random.normal(0.0, 1.0, n)**2 - 1.0)
 
 def stochastic_integral_ensemble_2(n: int, nsample: int) -> numpy.ndarray[float]:
-    """
+    r"""
     Simulation of stochastic integral \int_0^1{B^2(s)ds} ensemble.
 
     Parameters
@@ -143,7 +143,7 @@ def stochastic_integral_ensemble_2(n: int, nsample: int) -> numpy.ndarray[float]
     return vals
 
 def stochastic_integral_simulation_2(bn: numpy.ndarray[float]) -> float:
-    """
+    r"""
     Simulation of stochastic integral \int_0^1{B^2(s)ds} using the input brownian noise.
 
     Parameters
@@ -164,7 +164,7 @@ def stochastic_integral_simulation_2(bn: numpy.ndarray[float]) -> float:
     return val/n
 
 def stochastic_integral_ensemble_3(n: int, nsample: int) -> numpy.ndarray[float]:
-    """
+    r"""
     Simulation of stochastic integral sqrt{\int_0^1{B^2(s)ds}} ensemble.
 
     Parameters
@@ -187,7 +187,7 @@ def stochastic_integral_ensemble_3(n: int, nsample: int) -> numpy.ndarray[float]
     return vals
 
 def stochastic_integral_simulation_3(bn: numpy.ndarray[float]) -> numpy.ndarray[float]:
-    """
+    r"""
     Simulation of stochastic integral sqrt{\int_0^1{B^2(s)ds}} using the input brownian noise.
 
     Parameters
@@ -208,7 +208,7 @@ def stochastic_integral_simulation_3(bn: numpy.ndarray[float]) -> numpy.ndarray[
     return numpy.sqrt(val/n)
 
 def dist_ensemble(n: int, nsim: int) -> numpy.ndarray[float]:
-    """
+    r"""
     Simulation of the Dickey-Fuller test statistic \frac{\frac{1}{2}[B^2(1) - 1]}{\sqrt{\int_0^1{B^2(s)ds}}
     ensemble.
 

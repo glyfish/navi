@@ -5,7 +5,6 @@ Simulations and analysis of ARIMA(p,d,q) random process.
 """
 
 from typing import Any
-from astroid.nodes import Unknown
 import numpy
 from numpy.typing import NDArray
 
@@ -486,8 +485,7 @@ def yw(samples: NDArray[numpy.floating[Any]], order: int) -> NDArray[numpy.float
     pacf = sm.regression.yule_walker(samples, order=order, method='mle')
     return pacf[0]
 
-pacf_return_type = tuple[Unknown | NDArray[numpy.floating[Any]] | NDArray[Any], NDArray[Any]] | Unknown | NDArray[numpy.floating[Any]] | NDArray[Any]
-def pacf(samples: NDArray[numpy.floating[Any]], nlags: int) -> pacf_return_type:
+def pacf(samples: NDArray[numpy.floating[Any]], nlags: int) -> NDArray[numpy.floating[Any]]:
     """
     Compute the partial auto-correlation function using statsmodels.tsa.stattools.pacf.
 

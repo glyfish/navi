@@ -1,12 +1,11 @@
 # navi
 
-A quantitative finance library for economic and financial time series analysis, statistical modeling, and strategy backtesting.
+A quantitative finance library for economic and financial time series analysis and statistical modeling.
 
 ## Features
 
 - **API clients** — async clients for [FRED](https://fred.stlouisfed.org/docs/api/fred/), [Tiingo](https://api.tiingo.com/), and [BLS](https://www.bls.gov/developers/)
 - **Statistical models** — ADF, ARIMA, VAR, VECM, ECM, Brownian Motion, Fractional Brownian Motion, Ornstein-Uhlenbeck
-- **Backtesting** — [backtrader](https://www.backtrader.com/)-based strategy framework with PostgreSQL persistence
 - **Plots** — matplotlib visualizations for time series, forecasts, regressions, and hypothesis tests
 - **MCP client** — SSE-based [Model Context Protocol](https://modelcontextprotocol.io/) client for AI tool integration
 

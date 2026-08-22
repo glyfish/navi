@@ -249,11 +249,11 @@ class ARMAEstType(str, Enum):
 
     def set_param_labels(self, param, i):
         if self.value == ARMAEstType.AR.value or self.value == ARMAEstType.AR_OFFSET.value:
-            param.set_labels(est_label=f"$\hat{{\phi_{{{i}}}}}$",
-                             err_label=f"$\sigma_{{$\hat{{\phi_{{{i}}}}}}}$")
+            param.set_labels(est_label=rf"$\hat{{\phi_{{{i}}}}}$",
+                             err_label=rf"$\sigma_{{$\hat{{\phi_{{{i}}}}}}}$")
         elif self.value == ARMAEstType.MA.value or self.value == ARMAEstType.MA_OFFSET.value:
-            param.set_labels(est_label=f"$\hat{{\\theta_{{{i}}}}}$",
-                             err_label=f"$\sigma_{{$\hat{{\theta_{{{i}}}}}}}$")
+            param.set_labels(est_label=rf"$\hat{{\theta_{{{i}}}}}$",
+                             err_label=rf"$\sigma_{{$\hat{{\theta_{{{i}}}}}}}$")
         else:
             raise Exception(f"Estimate type is invalid: {self}")
 

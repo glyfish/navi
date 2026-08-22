@@ -305,7 +305,7 @@ def mean_reversion_halflife(data: numpy.ndarray[float], results: OLSResult, **kw
         x_result, y_result = 0.6, 0.6
     
     estimates = f"{transform.est_label}={transform.est: 1.2f}, {transform.err_label}={transform.err: 1.2e}\n" + \
-                f"$\lambda$={param.est: 1.2e}, $\sigma_\lambda$={param.err: 1.2e}\n" + \
+                f"$\\lambda$={param.est: 1.2e}, $\\sigma_\\lambda$={param.err: 1.2e}\n" + \
                 f"{const.est_label}={const.est: 1.2e}, {const.err_label}={const.err: 1.2e}\n" + \
                 f"$R^2$={results.r2: 1.2f}"
 
