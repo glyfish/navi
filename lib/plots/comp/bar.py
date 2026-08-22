@@ -4,6 +4,7 @@ import matplotlib.dates as mdates
 import matplotlib.units as munits
 from matplotlib import pyplot, rcParams, axes
 from datetime import datetime, date
+from typing import Sequence
 from numpy.typing import NDArray
 
 from lib.plots.comp.plot_utils import (__plot_curve, __plot_curves, __twinx_ticks, __plot_bar, 
@@ -249,8 +250,8 @@ def twinx_bar_line(axis: axes.Axes, y_bar: NDArray, y_line: NDArray, x_bar: NDAr
 
 
 
-def twinx_bar_line_comparison(axis: axes.Axes, y_bar: NDArray, y_line: NDArray, x_bar: NDArray |None=None,
-                              x_line: NDArray | None=None, **kwargs):
+def twinx_bar_line_comparison(axis: axes.Axes, y_bar: NDArray, y_line: Sequence[NDArray] | NDArray, x_bar: NDArray | None=None,
+                              x_line: Sequence[NDArray] | NDArray | None=None, **kwargs):
     """
     Bar plot and comparison line plot using same x-axis but different scales on y-axis. Bar plot is on left y-axis
     and line plot is on right y-axis.
