@@ -14,7 +14,7 @@ from statsmodels.tsa.arima.model import ARIMA, ARIMAResults
 from enum import Enum
 import statsmodels.api as sm
 import uuid
-from pandas import DataFrame
+from pandas import DataFrame, Index
 import statsmodels.formula.api as smf
 
 from lib import stats
@@ -507,14 +507,19 @@ def compute_pdf_hist(data: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDAr
     Returns
     -------
     tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
-        PDF histogram and bin values
+        Bin centres and PDF histogram, in the (x, values) order used by every
+        other compute_* function.
 
     """
 
     nbins = get_param_default_if_missing("nbins", 50, **kwargs)
-    pdf, bin_edges = stats.pdf_hist(data, None, nbins)
+    xmin = get_param_default_if_missing("xmin", None, **kwargs)
+    xmax = get_param_default_if_missing("xmax", None, **kwargs)
 
-    return pdf, bin_edges[:-1] + (bin_edges[:-1] - bin_edges[1:]) / 2
+    hist_range = None if xmin is None or xmax is None else (xmin, xmax)
+    pdf, bin_edges = stats.pdf_hist(data, hist_range, nbins)
+
+    return (bin_edges[:-1] + bin_edges[1:]) / 2, pdf
 
 
 def compute_cdf_hist(x: NDArray[numpy.floating[Any]], pdf: NDArray[numpy.floating[Any]]) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
@@ -788,7 +793,7 @@ class OLS(Enum):
         cols = ['y'] + x_cols
         data = numpy.concatenate((numpy.reshape(y, (1,len(y))), x), axis=0)
         formula = "y ~ " + " + ".join(x_cols)
-        result = self.__OLS_formula_fit(DataFrame(data.T, columns=cols), formula)
+        result = self.__OLS_formula_fit(DataFrame(data.T, columns=Index(cols)), formula)
         return result, self.__ols_estimate_from_result(result)
 
 
@@ -813,8 +818,8 @@ class OLS(Enum):
             x = numpy.log10(x)
             y = numpy.log10(y)
 
-        x = sm.add_constant(x)
-        return sm.OLS(y, x, missing='drop').fit()
+        exog = sm.add_constant(x)
+        return sm.OLS(y, exog, missing='drop').fit()
     
 
     def __OLS_formula_fit(self, data: DataFrame, formula: str) -> sm.regression.linear_model.RegressionResultsWrapper:

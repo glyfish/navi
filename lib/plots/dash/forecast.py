@@ -1,5 +1,6 @@
 import numpy
-from typing import Tuple
+from numpy.typing import NDArray
+from typing import Any, Tuple
 from matplotlib import pyplot
 
 from lib.utils import get_param_default_if_missing
@@ -7,8 +8,8 @@ from lib.plots import comp
 from lib.plots.comp.axis import PlotType
 from lib.data import OLSResult, stats
 
-def training(forecast_data: numpy.ndarray[float], observed_data: numpy.ndarray[float], upper_bound_error: numpy.ndarray[float], 
-             lower_bound_error: numpy.ndarray[float], x: numpy.ndarray[float]=None, title: str=None, title_offset: float=0.015,
+def training(forecast_data: NDArray[numpy.floating[Any]], observed_data: NDArray[numpy.floating[Any]], upper_bound_error: NDArray[numpy.floating[Any]], 
+             lower_bound_error: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]]=None, title: str=None, title_offset: float=0.015,
              figsize: Tuple[int, int]=(10, 6), alpha: float=0.05, ylabel=None):
     """"
     Plot the result of a training analysis.
@@ -23,7 +24,7 @@ def training(forecast_data: numpy.ndarray[float], observed_data: numpy.ndarray[f
         Observation data.
     lower_bound_error : numpy.ndarray
         Observation data.
-    x : numpy.ndarray[float], optional
+    x : NDArray[numpy.floating[Any]], optional
         Value plotted on x-axis (default is index values of data)
     ylabel : string, optional
         Plot y-axis label (default is None)
@@ -51,8 +52,8 @@ def training(forecast_data: numpy.ndarray[float], observed_data: numpy.ndarray[f
     axis.fill_between(x, lower_bound_error, upper_bound_error, alpha=0.3, color="lightgrey", edgecolor="black", zorder=10)
 
 
-def prediction(training_data: numpy.ndarray[float], forecast_data: numpy.ndarray[float], upper_bound_error: numpy.ndarray[float], 
-               lower_bound_error: numpy.ndarray[float], x: numpy.ndarray[float]=None, title: str=None, title_offset: float=0.0,
+def prediction(training_data: NDArray[numpy.floating[Any]], forecast_data: NDArray[numpy.floating[Any]], upper_bound_error: NDArray[numpy.floating[Any]], 
+               lower_bound_error: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]]=None, title: str=None, title_offset: float=0.0,
                figsize: Tuple[int, int]=(10, 6), alpha: float=0.05, ylabel=None):
     """"
     Plot the result of a training analysis.
@@ -67,7 +68,7 @@ def prediction(training_data: numpy.ndarray[float], forecast_data: numpy.ndarray
         Observation data.
     lower_bound_error : numpy.ndarray
         Observation data.
-    x : numpy.ndarray[float], optional
+    x : NDArray[numpy.floating[Any]], optional
         Value plotted on x-axis (default is index values of data)
     ylabel : string, optional
         Plot y-axis label (default is None)

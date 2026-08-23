@@ -54,7 +54,7 @@ class ParamEst:
         Parameter type.
     """
 
-    def __init__(self, est_id: str, est: float, err: float, est_label: str, err_label: str, 
+    def __init__(self, est_id: str, est: float, err: float, est_label: str | None, err_label: str | None, 
                  order: int, row: int, column: int, param_type: str):
             self.est = est
             self.err = err
@@ -93,16 +93,16 @@ class ParamEst:
 
     @staticmethod
     def from_dict(data):
-        est = data["est"] if "est" in data else None
+        est = data["est"]
         est_label = data["est_label"] if "est_label" in data else None
-        err = data["err"] if "err" in data else None
+        err = data["err"]
         err_label = data["err_label"] if "err_label" in data else None
         order = data["order"] if "order" in data else 0
         row = data["row"] if "row" in data else 0
         column = data["column"] if "column" in data else 0
         err_label = data["err_label"] if "err_label" in data else None
-        est_id = data["est_id"] if "est_id" in data else None
-        param_type = data["param_type"] if "param_type" in data else None
+        est_id = data["est_id"]
+        param_type = data["param_type"]
         return ParamEst(est_id, est, err, est_label, err_label, order, row, column, param_type)
     
 
@@ -181,8 +181,8 @@ class OLSResult:
         self.const = const
         self.params = params
         self.r2 = r2
-        self.param_transforms = None
-        self.const_transform = None
+        self.param_transforms: list[OLSTransform] | None = None
+        self.const_transform: OLSTransform | None = None
         self.est_id = est_id
         self.model = None
 
@@ -320,13 +320,13 @@ class ARMAEst:
         return self.__props()
 
     def __props(self):
-        return f"est_model=({self.__est_model}), " \
-               f"arma_est_type=({self.__arma_est_type}), " \
-               f"est_id={self.__est_id}, " \
-               f"const=({self.__const}), " \
-               f"order=({self.__order}), " \
-               f"params=({self.__params}), " \
-               f"sigma2=({self.__sigma2})"
+        return f"est_model=({self.est_model}), " \
+               f"arma_est_type=({self.arma_est_type}), " \
+               f"est_id={self.est_id}, " \
+               f"const=({self.const}), " \
+               f"order=({self.order}), " \
+               f"params=({self.params}), " \
+               f"sigma2=({self.sigma2})"
 
     def __set_const_labels(self):
         self.const.set_labels(est_label=r"$\hat{\mu^*}$",
@@ -372,13 +372,13 @@ class VAREst:
         Model order
     const: list[ParamEst]
         Estimate of model constant parameter.
-    params:  list[ParamEst, ParamEst, ParamEst]
+    params:  list[ParamEst]
         Estimate of model Parameters.
-    omega: list[ParamEst, ParamEst]
+    omega: list[ParamEst]
         Estimate of covariance matrix of model random component.
     """
 
-    def __init__(self, order: int, const: list[ParamEst], params: list[ParamEst, ParamEst, ParamEst], omega: list[ParamEst, ParamEst]):
+    def __init__(self, order: int, const: list[ParamEst], params: list[ParamEst], omega: list[ParamEst]):
         self.est_model = EstModel.VAR
         self.const = const
         self.order = order
@@ -393,7 +393,6 @@ class VAREst:
 
     def __props(self):
         return f"est_model=({self.est_model}), " \
-               f"arma_est_type=({self.arma_est_type}), " \
                f"const=({self.const}), " \
                f"order=({self.order}), " \
                f"params=({self.params}), " \
@@ -441,17 +440,17 @@ class VECMEst:
         Model rank.
     order: int
         Model order
-    lambda_est: list[ParamEst, ParamEst]
+    lambda_est: list[ParamEst]
         VECM lambda matrix estimate.
-    beta_est: list[ParamEst, ParamEst]
+    beta_est: list[ParamEst]
         VECM beta matrix estimate.
-    a_est: list[ParamEst, ParamEst]
+    a_est: list[ParamEst]
         Lag term coefficient matrices.
-    omega: list[ParamEst, ParamEst]
+    omega: list[ParamEst]
         Estimate of covariance matrix of model random component.
     """
 
-    def __init__(self, rank: int, order: int, const: list[ParamEst], lambda_est: list[ParamEst, ParamEst], beta_est: list[ParamEst, ParamEst], a_est: list[ParamEst, ParamEst, ParamEst], omega: list[ParamEst, ParamEst]):
+    def __init__(self, rank: int, order: int, const: list[ParamEst], lambda_est: list[ParamEst], beta_est: list[ParamEst], a_est: list[ParamEst], omega: list[ParamEst]):
         self.est_model = EstModel.VECM
         self.rank = rank
         self.const = const
@@ -471,10 +470,10 @@ class VECMEst:
         return f"est_model=({self.est_model}), " \
                 f"const=({self.const}), " \
                 f"order=({self.order}), " \
-                f"lambda=({self.lamb}), " \
-                f"beta=({self.beta}), " \
-                f"A=({self.a_matrices}), " \
-                f"omega=({self.__omega})"
+                f"lambda=({self.lambda_est}), " \
+                f"beta=({self.beta_est}), " \
+                f"A=({self.a_est}), " \
+                f"omega=({self.omega})"
 
     def to_json(self, pretty: bool=False):
         if pretty:

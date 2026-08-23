@@ -1,5 +1,6 @@
 import numpy
-from typing import Tuple
+from numpy.typing import NDArray
+from typing import Any, Tuple, cast
 import uuid
 
 from statsmodels.tsa.vector_ar.var_model import LagOrderResults
@@ -12,7 +13,7 @@ from lib.data.hyp_test import JohansenCointTestReport, JohansenCointTestStatisti
 from lib.data.reports import JohansenTestReport
 from lib.data.param_est import VECMEst, ParamEst, VECMParamType
 
-def compute_estimate(samples: numpy.ndarray[float, float], **kwargs) -> Tuple[VECMResults, VECMEst]:
+def compute_estimate(samples: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[VECMResults, VECMEst]:
     """
     Estimate the parameters for and assumed VECM(n) model.
 
@@ -37,7 +38,7 @@ def compute_estimate(samples: numpy.ndarray[float, float], **kwargs) -> Tuple[VE
         Analysis results.
     """
     
-    maxlags = get_param_default_if_missing("maxlags", '12', **kwargs)
+    maxlags = get_param_default_if_missing("maxlags", 12, **kwargs)
     trend = get_param_default_if_missing("trend", 'co', **kwargs)
     rank = get_param_default_if_missing("rank", 1, **kwargs)
 
@@ -45,13 +46,13 @@ def compute_estimate(samples: numpy.ndarray[float, float], **kwargs) -> Tuple[VE
 
     return result, __vecm_estimate_from_result(result)
 
-def compute_order(samples: numpy.ndarray[float, float], **kwargs) -> Tuple[LagOrderResults, VAROrderTestReport]:
+def compute_order(samples: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[LagOrderResults, VAROrderTestReport]:
     """
     Determine the order of a VAR process using the AIC criterion.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float, float]
+    samples: NDArray[numpy.floating[Any]]
         Samples analyzed.    
     maxlags: int
         Maximum number of lags.
@@ -75,13 +76,13 @@ def compute_order(samples: numpy.ndarray[float, float], **kwargs) -> Tuple[LagOr
     return result, __var_order_test_report_from_result(result)
 
 
-def compute_johansen_coint_test(samples: numpy.ndarray[float, float], max_lags: int, **kwargs) -> Tuple[JohansenTestReport, JohansenCointTestReport, JohansenTestResult]:
+def compute_johansen_coint_test(samples: NDArray[numpy.floating[Any]], max_lags: int, **kwargs) -> Tuple[JohansenTestReport, JohansenCointTestReport, JohansenTestResult]:
     """
     Compute the Johansen cointegration test.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float, float]
+    samples: NDArray[numpy.floating[Any]]
         Samples analyzed.
     max_lags: int
         maximum number of lags.
@@ -94,11 +95,11 @@ def compute_johansen_coint_test(samples: numpy.ndarray[float, float], max_lags: 
 
     Returns
     -------
-    numpy.ndarray[float, float]
+    NDArray[numpy.floating[Any]]
         Eigenvalues.
-    numpy.ndarray[float, float]
+    NDArray[numpy.floating[Any]]
         Eigenvectors.
-    numpy.ndarray[float, float]
+    NDArray[numpy.floating[Any]]
         Trace statistic.
     """
 
@@ -108,7 +109,7 @@ def compute_johansen_coint_test(samples: numpy.ndarray[float, float], max_lags: 
     return JohansenTestReport(result), __vecm_johansen_coint_test_report_from_result(result), result
 
 
-def compute_prediction(vecm_result: VECMResults, steps: int, **kwargs) -> Tuple[numpy.ndarray[float, float], numpy.ndarray[float, float], numpy.ndarray[float, float]]:
+def compute_prediction(vecm_result: VECMResults, steps: int, **kwargs) -> Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Predict values for the specified number of steps.
 
@@ -123,34 +124,36 @@ def compute_prediction(vecm_result: VECMResults, steps: int, **kwargs) -> Tuple[
 
     Returns
     -------
-    Tuple[numpy.ndarray[float, float], numpy.ndarray[float, float], numpy.ndarray[float, float]]
+    Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Predicted values.
     """
 
     alpha = get_param_default_if_missing("alpha", 0.05, **kwargs)
-    return vecm_result.predict(steps, alpha=alpha)
+    # alpha is always supplied, so statsmodels returns the (forecast, lower, upper) tuple
+    return cast(Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]],
+                vecm_result.predict(steps, alpha=alpha))
 
 
-def create_vecm1_source(λ: numpy.ndarray[float, float], β: numpy.ndarray[float, float], a: numpy.ndarray[float, float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float, float]]:
+def create_vecm1_source(λ: NDArray[numpy.floating[Any]], β: NDArray[numpy.floating[Any]], a: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Simulate a first order Vector Error Correction Model (VECM) process with the specified parameters.
 
     Parameters
     ----------
-    λ: numpy.ndarray[float, float]
+    λ: NDArray[numpy.floating[Any]]
         Damping matrix.
-    β: numpy.ndarray[float, float]
+    β: NDArray[numpy.floating[Any]]
         Transpose of cointegration vector.
-    a: numpy.ndarray[float, float]
+    a: NDArray[numpy.floating[Any]]
         Coefficient matrix.
-    Ω: numpy.ndarray[float, float]
+    Ω: NDArray[numpy.floating[Any]]
         Noise covariance matrix. (default identity matrix)
     npts: int
         Number of samples generated (default 1000).
 
     Returns
     -------
-    numpy.ndarray[float, float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
@@ -162,26 +165,26 @@ def create_vecm1_source(λ: numpy.ndarray[float, float], β: numpy.ndarray[float
     return create_space(npts=npts), numpy.array(vecm.vecm1(λ, β, a, Ω, npts))
 
 
-def create_vecm_source(λ: numpy.ndarray[float, float], β: numpy.ndarray[float, float], a: numpy.ndarray[float, float], **kwargs) -> Tuple[numpy.ndarray[float], numpy.ndarray[float, float]]:
+def create_vecm_source(λ: NDArray[numpy.floating[Any]], β: NDArray[numpy.floating[Any]], a: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Simulate a first order Vector Error Correction Model (VECM) process with the specified parameters.
 
     Parameters
     ----------
-    λ: numpy.ndarray[float, float]
+    λ: NDArray[numpy.floating[Any]]
         Damping matrix.
-    β: numpy.ndarray[float, float]
+    β: NDArray[numpy.floating[Any]]
         Transpose of cointegration vector.
-    a: numpy.ndarray[float, float, float]
+    a: NDArray[numpy.floating[Any]]
         Coefficient matrix.
-    Ω: numpy.ndarray[float, float]
+    Ω: NDArray[numpy.floating[Any]]
         Noise covariance matrix. (default identity matrix)
     npts: int
         Number of samples generated (default 1000).
 
     Returns
     -------
-    numpy.ndarray[float, float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
@@ -235,7 +238,7 @@ def __vecm_johansen_coint_test_report_from_result(result: JohansenTestResult) ->
     return JohansenCointTestReport(test_id, trace_statistic_report, eigen_value_statistic_report, rank_report, eigen_value_report)
 
 
-def __vecm_estimate_from_result(result: VECMResults) -> VECMResults:
+def __vecm_estimate_from_result(result: VECMResults) -> VECMEst:
     rank = result.coint_rank
     order = result.k_ar - 1
     neq, _ = result.alpha.shape

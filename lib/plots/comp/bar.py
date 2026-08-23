@@ -4,7 +4,7 @@ import matplotlib.dates as mdates
 import matplotlib.units as munits
 from matplotlib import pyplot, rcParams, axes
 from datetime import datetime, date
-from typing import Sequence
+from typing import Any, Sequence
 from numpy.typing import NDArray
 
 from lib.plots.comp.plot_utils import (__plot_curve, __plot_curves, __twinx_ticks, __plot_bar, 
@@ -24,7 +24,7 @@ def bar(axis: axes.Axes, y: NDArray, x: NDArray | None=None, **kwargs):
     ----------
     axis : matplotlib.axes.Axes
         Axis used to draw plot.
-    y : numpy.ndarray[float]
+    y : NDArray[numpy.floating[Any]]
         Value plotted on y-axis.
     x : numpy.ndarray
         Value plotted in x axis (default use y index)

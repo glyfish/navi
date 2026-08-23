@@ -1,5 +1,7 @@
 from tabulate import tabulate
+from typing import Any
 import numpy
+from numpy.typing import NDArray
 from statsmodels.tsa.vector_ar.vecm import JohansenTestResult
 
 from lib.data.hyp_test import HypothesisTestType, HypothesisType
@@ -16,11 +18,11 @@ class VarianceRatioTestReport:
         Test hypothesis type. Possible values (BM, FBM_AUTO_CORR, FBM_NEG_AUTO_CORR)
     s_vals: list[int]
         Lag values used in used in test.
-    stats: list[float]
+    stats: NDArray[numpy.floating[Any]]
         Test statistic values.
     p_vals: list[float]
         Probability values of test statistics.
-    critical_values: list[float]
+    critical_values: list[float | None]
         Critical values used in test. Index 0 is the lower tail critical value and 
         index 1 the upper tail critical value.
     status_vals: list[bool]
@@ -28,7 +30,7 @@ class VarianceRatioTestReport:
     """
 
     def __init__(self, sig_level: float, hyp_type: HypothesisType, hyp_test_type: HypothesisTestType, s_vals: list[int], 
-                 stats: list[float], p_vals: list[float], critical_values: list[float]):
+                 stats: NDArray[numpy.floating[Any]], p_vals: list[float], critical_values: list[float | None]):
         self.sig_level = sig_level
         self.hyp_type = hyp_type
         self.hyp_test_type = hyp_test_type
@@ -74,10 +76,7 @@ class VarianceRatioTestReport:
         s_result = [int(s_val) for s_val in self.s_vals]
         stat_result = [format(stat, '1.3f') for stat in self.stats]
         pval_result = [format(pval, '1.3f') for pval in self.p_vals]
-        results = [s_result]
-        results.append(stat_result)
-        results.append(pval_result)
-        results.append(status_result)
+        results = [s_result, stat_result, pval_result, status_result]
         results = numpy.transpose(numpy.array(results))
         return tabulate(results, headers=["s", "Z(s)", "pvalue", "Result"], tablefmt=tablefmt)
 

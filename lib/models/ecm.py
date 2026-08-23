@@ -5,13 +5,14 @@ Simulation and analysis if ECM random process.
 """
 
 import numpy
+from numpy.typing import NDArray
 import statsmodels.api as sm
 import statsmodels.tsa as tsa
-from typing import Tuple
+from typing import Any, Tuple
 
 from lib.models import arima
 
-def xt_var(φ: float, σ: float, t_vals: numpy.ndarray[float]) -> numpy.ndarray[float]:
+def xt_var(φ: float, σ: float, t_vals: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
     """
     Compute the variance of x(t) ARIMA process in the ECM.
 
@@ -21,12 +22,12 @@ def xt_var(φ: float, σ: float, t_vals: numpy.ndarray[float]) -> numpy.ndarray[
         AR(1) parameter satisfying |φ| < 1.
     σ: float
         Residual variance (default 1.0).
-    t_vals: numpy.ndarray[float]
+    t_vals: NDArray[numpy.floating[Any]]
         Time values desired.
     
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         variance calculation.
     """
 
@@ -38,7 +39,7 @@ def xt_var(φ: float, σ: float, t_vals: numpy.ndarray[float]) -> numpy.ndarray[
     
     return numpy.array([xt_var_t(int(t)) for t in t_vals])
 
-def yt_var(φ: float, σ: float, β: float, t_vals: numpy.ndarray[float]) -> numpy.ndarray[float]:
+def yt_var(φ: float, σ: float, β: float, t_vals: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
     """
     Compute the variance of the y(t) ECM process.
 
@@ -50,18 +51,18 @@ def yt_var(φ: float, σ: float, β: float, t_vals: numpy.ndarray[float]) -> num
         Residual variance (default 1.0).
     β: float
         ECM correlation parameter.
-    t_vals: numpy.ndarray[float]
+    t_vals: NDArray[numpy.floating[Any]]
         Time values desired.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         variance calculation.
     """
 
     return xt_var(φ, σ, t_vals) * β**2
 
-def cov(φ: float, σ: float, β: float, t_vals: numpy.ndarray[float]) -> numpy.ndarray[float]:
+def cov(φ: float, σ: float, β: float, t_vals: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
     """
     Compute the covariance of the two process for the ECM process.
 
@@ -73,18 +74,18 @@ def cov(φ: float, σ: float, β: float, t_vals: numpy.ndarray[float]) -> numpy.
         ECM correlation parameter.
     σ: float
         Residual variance (default 1.0).
-    t_vals: numpy.ndarray[float]
+    t_vals: NDArray[numpy.floating[Any]]
         Time values desired.
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         variance calculation.
     """
 
     return xt_var(φ, σ, t_vals) * β
 
-def ecm(φ: float, δ: float, α: float, β: float, γ: float, λ: float, npts: int, σ: float=1.0) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def ecm(φ: float, δ: float, α: float, β: float, γ: float, λ: float, npts: int, σ: float=1.0) -> Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Generate an ECM time series from an AR(1) process using the specified parameters.
 
@@ -109,7 +110,7 @@ def ecm(φ: float, δ: float, α: float, β: float, γ: float, λ: float, npts: 
 
     Returns
     -------
-    Tuple[numpy.ndarray[float], numpy.ndarray[float]]
+    Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Generated x(t) and y(t) ECM time series.
     """
 

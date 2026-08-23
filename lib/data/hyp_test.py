@@ -1,8 +1,11 @@
 from enum import Enum
 import json
 import uuid
+from typing import Any
 import numpy
+from numpy.typing import NDArray
 from statsmodels.tsa.vector_ar.vecm import JohansenTestResult
+from statsmodels.tsa.vector_ar.var_model import LagOrderResults
 
 class HypothesisTestStatus(str, Enum):
     """
@@ -66,7 +69,7 @@ class HypothesisTestType(str, Enum):
     FBM_AUTO_CORR = "AUTO_CORR"
     FBM_NEG_AUTO_CORR = "NEG_AUTO_CORR"
 
-    def status(self, status: bool) -> HypothesisTestStatus:
+    def status(self, status: list[bool]) -> HypothesisTestStatus:
         if self.value == HypothesisTestType.STATIONARITY.value:
             return HypothesisTestStatus.from_bool(not status[2])
         elif self.value == HypothesisTestType.STATIONARITY_OFFSET.value:
@@ -195,11 +198,11 @@ class StatisticalTestData:
     def __init__(self, 
                  test_id: str,
                  status: HypothesisTestStatus, 
-                 stat: StatisticalTestParam, 
-                 pval: StatisticalTestParam, 
+                 stat: StatisticalTestParam | None, 
+                 pval: StatisticalTestParam | None, 
                  params: list[StatisticalTestParam], 
-                 sig: StatisticalTestParam, 
-                 lower: StatisticalTestParam, 
+                 sig: StatisticalTestParam | None, 
+                 lower: StatisticalTestParam | None, 
                  upper: StatisticalTestParam | None):
         self.status = status
         self.stat = stat
@@ -236,11 +239,11 @@ class StatisticalTestData:
         status = data["status"] if "status" in data else HypothesisTestStatus.FAILED
         stat = StatisticalTestParam.from_dict(data["stat"]) if "stat" in data else None
         pval = StatisticalTestParam.from_dict(data["pval"]) if "pval" in data else None
-        params = [StatisticalTestParam.from_dict(param) for param in dict["params"]]
+        params = [StatisticalTestParam.from_dict(param) for param in data["params"]]
         sig = StatisticalTestParam.from_dict(data["sig"]) if "sig" in data else None
         lower = StatisticalTestParam.from_dict(data["lower"]) if "lower" in data else None
         upper = StatisticalTestParam.from_dict(data["upper"]) if "upper" in data else None
-        test_id = data["test_id"] if "test_id" in data else None
+        test_id = data["test_id"]
 
         return StatisticalTestData(status=status, stat=stat, pval=pval, params=params, sig=sig,
                                    lower=lower,upper=upper, test_id=test_id)
@@ -298,10 +301,10 @@ class StatisticalTestReport:
     @staticmethod
     def from_dict(data):
         status = data["status"] if "status" in data else HypothesisTestStatus.FAILED
-        hyp_type = data["hyp_type"] if "hyp_type" in data else None
-        hyp_test_type = data["hyp_test_type"] if "hyp_test_type" in data else None
+        hyp_type = data["hyp_type"]
+        hyp_test_type = data["hyp_test_type"]
         test_data = [StatisticalTestData.from_dict(test_data) for test_data in data["test_data"]]
-        test_id = data["test_id"] if "test_id" in data else None
+        test_id = data["test_id"]
 
         return StatisticalTestReport(status=status, hyp_type=hyp_type, hyp_test_type=hyp_test_type, test_data=test_data,
                                      test_id=test_id)
@@ -423,7 +426,7 @@ class VAROrderTestReport:
             return json.dumps(self, default=lambda o: o.__dict__)
 
 
-def __var_order_test_report_from_result(result: LagOrderTestResult) -> VAROrderTestReport:
+def __var_order_test_report_from_result(result: LagOrderResults) -> VAROrderTestReport:
     test_id = str(uuid.uuid4())
 
     order = StatisticalTestParam(test_id, r"$\tau_{AIC}$", int(result.aic))
@@ -431,15 +434,15 @@ def __var_order_test_report_from_result(result: LagOrderTestResult) -> VAROrderT
     aic_test = LagOrderTestResult(test_id, order, ErrorMetric.AIC, metric_value)
 
     order = StatisticalTestParam(test_id, r"$\tau_{BIC}$", int(result.bic))
-    metric_value = StatisticalTestParam(test_id, r"$\varepsilon_{BIC}$", result.ics['bic'][result.aic])
+    metric_value = StatisticalTestParam(test_id, r"$\varepsilon_{BIC}$", result.ics['bic'][result.bic])
     bic_test = LagOrderTestResult(test_id, order, ErrorMetric.BIC, metric_value)
 
     order = StatisticalTestParam(test_id, r"$\tau_{FPE}$", int(result.fpe))
-    metric_value = StatisticalTestParam(test_id, r"$\varepsilon_{FPE}$", result.ics['fpe'][result.aic])
+    metric_value = StatisticalTestParam(test_id, r"$\varepsilon_{FPE}$", result.ics['fpe'][result.fpe])
     fpe_test = LagOrderTestResult(test_id, order, ErrorMetric.FPE, metric_value)
 
     order = StatisticalTestParam(test_id, r"$\tau_{HQIC}$", int(result.hqic))
-    metric_value = StatisticalTestParam(test_id, r"$\varepsilon_{HQIC}$", result.ics['hqic'][result.aic])
+    metric_value = StatisticalTestParam(test_id, r"$\varepsilon_{HQIC}$", result.ics['hqic'][result.hqic])
     hqic_test = LagOrderTestResult(test_id, order, ErrorMetric.HQIC, metric_value)
 
     order_results = numpy.bincount([result.aic, result.bic, result.hqic])
@@ -494,11 +497,11 @@ class GrangerCausalityTestResult:
     
     @staticmethod
     def from_dict(data, est_id):
-        dependent_var = data["dependent_var"] if "dependent_var" in data else None
-        causal_var = data["causal_var"] if "causal_var" in data else None
-        pvalue = data["pvalue"] if "pvalue" in data else None
-        critical_value = data["critical_value"] if "critical_value" in data else None
-        result = data["result"] if "result" in data else None
+        dependent_var = data["dependent_var"]
+        causal_var = data["causal_var"]
+        pvalue = data["pvalue"]
+        critical_value = data["critical_value"]
+        result = data["result"]
         return GrangerCausalityTestResult(est_id, dependent_var, causal_var, pvalue, critical_value, result)
 
 
@@ -555,7 +558,7 @@ class JohansenCointTestStatistic:
         Test rank.
     test_stat: float
         Test statistic.
-    critical_values: numpy.ndarray[float]
+    critical_values: NDArray[numpy.floating[Any]]
         Test critical values.
     significance_levels: list[str]
         Test significance levels.
@@ -563,7 +566,7 @@ class JohansenCointTestStatistic:
         test result.
     """
 
-    def __init__(self, test_id: str, test_rank: int, test_stat: float, critical_values: list[float]):
+    def __init__(self, test_id: str, test_rank: int, test_stat: float, critical_values: NDArray[numpy.floating[Any]]):
         self.test_id = test_id
         self.test_rank = test_rank
         self.null_hypothesis = f"r<={test_rank}"
@@ -595,13 +598,13 @@ class JohansenCointTestRank:
     ----------
     test_id: str
         Test identifier.
-    test_ranks: list[float]
+    test_ranks: list[int]
         Rank values for each significance level.
     significance_levels: list[str]
         Test significance levels.
     """
 
-    def __init__(self, test_id: str, test_ranks: list[float]):
+    def __init__(self, test_id: str, test_ranks: list[int]):
         self.test_id = test_id
         self.test_ranks = test_ranks
         self.significance_levels = ["Critical Value 90%", "Critical Value 95%", "Critical Value 99%"]
@@ -627,11 +630,11 @@ class JohansenCointTestEigenVector:
         Test identifier.
     eigen_value: float
         Canonical variate eigen value.
-    eigen_vector: numpy.ndarray[float]
+    eigen_vector: NDArray[numpy.floating[Any]]
         Canonical variate eigen vector.
     """
 
-    def __init__(self, test_id: str, eigen_value: float, eigen_vector: numpy.ndarray[float]):
+    def __init__(self, test_id: str, eigen_value: float, eigen_vector: NDArray[numpy.floating[Any]]):
         self.test_id = test_id
         # numpy>=2 returns complex128 from linalg.eig even when every imaginary part is
         # zero, and json cannot serialize it. statsmodels discards them the same way

@@ -1,4 +1,6 @@
+from typing import Any
 import numpy
+from numpy.typing import NDArray
 from matplotlib import pyplot
 
 from lib.utils import get_param_default_if_missing
@@ -6,7 +8,7 @@ from lib.plots import comp
 from lib.plots.comp.axis import PlotType
 from lib.data import OLSResult
 
-def periodogram(data: numpy.ndarray[float], results: OLSResult, x: numpy.ndarray[float]=None, **kwargs):
+def periodogram(data: NDArray[numpy.floating[Any]], results: OLSResult, x: NDArray[numpy.floating[Any]]=None, **kwargs):
     """"
     Plot the results of an FBM periodogram analysis used to estimate the Hurst parameter.
 
@@ -16,7 +18,7 @@ def periodogram(data: numpy.ndarray[float], results: OLSResult, x: numpy.ndarray
         Data compared to function.
     results : OLSResult
         OLS results.
-    x : numpy.ndarray[float], optional
+    x : NDArray[numpy.floating[Any]], optional
         Value plotted on x-axis (default is index values of data)
     title : string, optional
         Plot title (default is None)
@@ -77,7 +79,7 @@ def periodogram(data: numpy.ndarray[float], results: OLSResult, x: numpy.ndarray
                   ylabel=ylabel, xlabel=xlabel, **kwargs)
     
 
-def variance_agg(data: numpy.ndarray[float], results: OLSResult, x: numpy.ndarray[float]=None, **kwargs):
+def variance_agg(data: NDArray[numpy.floating[Any]], results: OLSResult, x: NDArray[numpy.floating[Any]]=None, **kwargs):
     """"
     Plot the results of an FBM variance aggregation analysis used to estimate the Hurst parameter.
 
@@ -87,7 +89,7 @@ def variance_agg(data: numpy.ndarray[float], results: OLSResult, x: numpy.ndarra
         Data compared to function.
     results : OLSResult
         OLS results.
-    x : numpy.ndarray[float], optional
+    x : NDArray[numpy.floating[Any]], optional
         Value plotted on x-axis (default is index values of data)
     title : string, optional
         Plot title (default is None)
@@ -148,7 +150,7 @@ def variance_agg(data: numpy.ndarray[float], results: OLSResult, x: numpy.ndarra
                   ylabel=ylabel, xlabel=xlabel, **kwargs)
 
 
-def ecm_beta(data: numpy.ndarray[float], results: OLSResult, x: numpy.ndarray[float]=None, **kwargs):
+def ecm_beta(data: NDArray[numpy.floating[Any]], results: OLSResult, x: NDArray[numpy.floating[Any]]=None, **kwargs):
     """"
     Plot the results OLS analysis that computes ECM beta parameter.
 
@@ -158,7 +160,7 @@ def ecm_beta(data: numpy.ndarray[float], results: OLSResult, x: numpy.ndarray[fl
         Data compared to function.
     results : OLSResult
         OLS results.
-    x : numpy.ndarray[float], optional
+    x : NDArray[numpy.floating[Any]], optional
         Value plotted on x-axis (default is index values of data)
     title : string, optional
         Plot title (default is None)
@@ -232,7 +234,7 @@ def ecm_beta(data: numpy.ndarray[float], results: OLSResult, x: numpy.ndarray[fl
                   ylabel=ylabel, xlabel=xlabel, **kwargs)
 
 
-def mean_reversion_halflife(data: numpy.ndarray[float], results: OLSResult, **kwargs):
+def mean_reversion_halflife(data: NDArray[numpy.floating[Any]], results: OLSResult, **kwargs):
     """"
     Plot the results of an FBM periodogram analysis used to estimate the Hurst parameter.
 
@@ -242,7 +244,7 @@ def mean_reversion_halflife(data: numpy.ndarray[float], results: OLSResult, **kw
         Data compared to function.
     results : OLSResult
         OLS results.
-    x : numpy.ndarray[float], optional
+    x : NDArray[numpy.floating[Any]], optional
         Value plotted on x-axis (default is index values of data)
     title : string, optional
         Plot title (default is None)

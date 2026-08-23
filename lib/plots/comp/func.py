@@ -273,7 +273,7 @@ def fscatter(axis: axes.Axes, data: NDArray, func: Callable[[NDArray], NDArray],
         Data compared to function.
     func : Callable[[float], float]
         Function plotted as a function of x.
-    x : numpy.ndarray[float], optional
+    x : NDArray[numpy.floating[Any]], optional
         Value plotted on x-axis (default is index values of data)
     title : string, optional
         Plot title (default is None)
@@ -379,9 +379,9 @@ def fcurve_scatter_comparison(axis: axes.Axes, data: list[NDArray], func: NDArra
         Data compared to function.
     func : Callable[[float], float]
         Function plotted as a function of x.
-    x : list[numpy.ndarray[float]], optional
+    x : list[NDArray[numpy.floating[Any]]], optional
         Value plotted on x-axis (default is index values of data)
-    fx : numpy.ndarray[float], optional
+    fx : NDArray[numpy.floating[Any]], optional
         Value plotted on x-axis for f (default is index values of data)
     title : string, optional
         Plot title (default is None)

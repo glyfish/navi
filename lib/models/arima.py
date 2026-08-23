@@ -502,7 +502,7 @@ def pacf(samples: NDArray[numpy.floating[Any]], nlags: int) -> NDArray[numpy.flo
         The of AR(p) partial autocorrelation function.
     """
 
-    return sm.tsa.stattools.pacf(samples, nlags=nlags)
+    return numpy.asarray(sm.tsa.stattools.pacf(samples, nlags=nlags))
 
 
 def ___ar_model(samples: NDArray[numpy.floating[Any]], order: int) -> ARIMA:

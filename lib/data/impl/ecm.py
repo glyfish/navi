@@ -7,7 +7,7 @@ Interface to models.ecm.py
 import numpy
 
 from numpy.typing import NDArray
-from typing import Any
+from typing import Any, cast
 
 from lib.models import ecm
 import statsmodels.tsa as tsa
@@ -20,7 +20,7 @@ from lib.data.impl.stats import OLS
 from lib.stats import diff
 
 
-def compute_xt_mean(**kwargs) -> tuple[NDArray[numpy.float64], NDArray[numpy.float64]]:
+def compute_xt_mean(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute the ARIMA process mean value.
 
@@ -40,7 +40,7 @@ def compute_xt_mean(**kwargs) -> tuple[NDArray[numpy.float64], NDArray[numpy.flo
     npts = get_param_throw_if_missing("npts", **kwargs)
     Δt = get_param_default_if_missing("Δt", 1.0, **kwargs)
 
-    return create_space(xmax=npts - 1, npts=npts, Δx=Δt), numpy.full(npts, 0.0)
+    return create_space(xmax=npts - 1, npts=npts, Δx=Δt), cast(NDArray[numpy.floating[Any]], numpy.full(npts, 0.0))
 
 
 def compute_yt_mean(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
@@ -63,7 +63,7 @@ def compute_yt_mean(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[num
     npts = get_param_throw_if_missing("npts", **kwargs)
     Δt = get_param_default_if_missing("Δt", 1.0, **kwargs)
 
-    return create_space(xmax=npts - 1, npts=npts, Δx=Δt), numpy.full(npts, 0.0)
+    return create_space(xmax=npts - 1, npts=npts, Δx=Δt), cast(NDArray[numpy.floating[Any]], numpy.full(npts, 0.0))
 
 
 def compute_xt_var(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
@@ -167,7 +167,7 @@ def compute_cov(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.f
     return t_vals, ecm.cov(φ, σ, β, t_vals)
 
 
-def compute_beta_estimate(yt: NDArray[numpy.floating[Any]], xt: NDArray[numpy.floating[Any]]) -> tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
+def compute_beta_estimate(yt: NDArray[numpy.floating[Any]], xt: NDArray[numpy.floating[Any]]) -> tuple[sm.regression.linear_model.RegressionResultsWrapper, OLSResult]:
     """
     Compute OLS estimate of Error Correction Model (ECM) β parameter.
 
@@ -180,7 +180,7 @@ def compute_beta_estimate(yt: NDArray[numpy.floating[Any]], xt: NDArray[numpy.fl
 
     Returns
     -------
-    tuple[sm.regression.linear_model.RegressionResults, OLSResult]
+    tuple[sm.regression.linear_model.RegressionResultsWrapper, OLSResult]
         Ols report and result model.
     """
 
@@ -189,7 +189,7 @@ def compute_beta_estimate(yt: NDArray[numpy.floating[Any]], xt: NDArray[numpy.fl
     return report, result
 
 
-def compute_gamma_lambda_estimate(yt: NDArray[numpy.floating[Any]], xt: NDArray[numpy.floating[Any]], est_beta: float) -> tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
+def compute_gamma_lambda_estimate(yt: NDArray[numpy.floating[Any]], xt: NDArray[numpy.floating[Any]], est_beta: float) -> tuple[sm.regression.linear_model.RegressionResultsWrapper, OLSResult]:
     """
     Compute OLS estimate of Error Correction Model (ECM) β parameter.
 
@@ -204,7 +204,7 @@ def compute_gamma_lambda_estimate(yt: NDArray[numpy.floating[Any]], xt: NDArray[
 
     Returns
     -------
-    tuple[sm.regression.linear_model.RegressionResults, OLSResult]
+    tuple[sm.regression.linear_model.RegressionResultsWrapper, OLSResult]
         Ols report and result model.
     """
 

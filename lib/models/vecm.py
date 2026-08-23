@@ -1,6 +1,7 @@
 
-from typing import Tuple
+from typing import Any, Tuple, cast
 import numpy
+from numpy.typing import NDArray
 from statsmodels.tsa.vector_ar.var_model import LagOrderResults
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
@@ -9,7 +10,7 @@ from statsmodels.tsa.vector_ar.vecm import VECM, coint_johansen, select_order, J
 
 from lib import stats
 
-def fit(endog: numpy.ndarray[float, float], maxlags: int, rank: int, trend: str="co") -> VECMResults:
+def fit(endog: NDArray[numpy.floating[Any]], maxlags: int, rank: int, trend: str="co") -> VECMResults:
     """
     Estimate the parameters for and assumed VECM(n) model.
 
@@ -36,13 +37,13 @@ def fit(endog: numpy.ndarray[float, float], maxlags: int, rank: int, trend: str=
 
     return __vecm_model(endog, maxlags=maxlags, rank=rank, trend=trend).fit()
 
-def order_estimate(samples: numpy.ndarray[float, float], maxlags: int=12, deterministic='n') -> LagOrderResults:
+def order_estimate(samples: NDArray[numpy.floating[Any]], maxlags: int=12, deterministic='n') -> LagOrderResults:
     """
     Estimate order of VECM samples.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float, float]
+    samples: NDArray[numpy.floating[Any]]
         Samples analyzed.    
     maxlags: int
         Maximum number of lags.
@@ -60,27 +61,27 @@ def order_estimate(samples: numpy.ndarray[float, float], maxlags: int=12, determ
     return select_order(samples, maxlags=maxlags, deterministic=deterministic)
 
 
-def vecm1(λ: numpy.ndarray[float, float], β: numpy.ndarray[float, float], a: numpy.ndarray[float, float], 
-          Ω: numpy.ndarray[float, float], nsamp: int) -> numpy.ndarray[float, float]:
+def vecm1(λ: NDArray[numpy.floating[Any]], β: NDArray[numpy.floating[Any]], a: NDArray[numpy.floating[Any]], 
+          Ω: NDArray[numpy.floating[Any]], nsamp: int) -> NDArray[numpy.floating[Any]]:
     """
     Simulate a first order Vector Error Correction Model (VECM) process with the specified parameters.
 
     Parameters
     ----------
-    λ: numpy.ndarray[float, float]
+    λ: NDArray[numpy.floating[Any]]
         Damping matrix.
-    β: numpy.ndarray[float, float]
+    β: NDArray[numpy.floating[Any]]
         Transpose of cointegration vector.
-    a: numpy.ndarray[float, float]
+    a: NDArray[numpy.floating[Any]]
         Coefficient matrix.
-    Ω: numpy.ndarray[float, float]
+    Ω: NDArray[numpy.floating[Any]]
         Noise covariance matrix.
     nsamp: int
         Number of samples generated.
 
     Returns
     -------
-    numpy.ndarray[float, float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
@@ -94,26 +95,26 @@ def vecm1(λ: numpy.ndarray[float, float], β: numpy.ndarray[float, float], a: n
     return xt
 
 
-def vecm(λ: numpy.ndarray[float, float], β: numpy.ndarray[float, float], a: numpy.ndarray[float, float], Ω: numpy.ndarray[float, float], nsamp: int) -> numpy.ndarray[float, float]:
+def vecm(λ: NDArray[numpy.floating[Any]], β: NDArray[numpy.floating[Any]], a: NDArray[numpy.floating[Any]], Ω: NDArray[numpy.floating[Any]], nsamp: int) -> NDArray[numpy.floating[Any]]:
     """
     Simulate a first order Vector Error Correction Model (VECM) process with the specified parameters.
 
     Parameters
     ----------
-    λ: numpy.ndarray[float, float]
+    λ: NDArray[numpy.floating[Any]]
         Damping matrix.
-    β: numpy.ndarray[float, float]
+    β: NDArray[numpy.floating[Any]]
         Transpose of cointegration vector.
-    a: numpy.ndarray[float, float, float]
+    a: NDArray[numpy.floating[Any]]
         Coefficient matrices.
-    Ω: numpy.ndarray[float, float]
+    Ω: NDArray[numpy.floating[Any]]
         Noise covariance matrix.
     nsamp: int
         Number of samples generated.
 
     Returns
     -------
-    numpy.ndarray[float, float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
@@ -136,7 +137,7 @@ def johansen_test_coint(samples, max_lags, trend: int=0) -> JohansenTestResult:
 
     Parameters
     ----------
-    samples: numpy.ndarray[float, float]
+    samples: NDArray[numpy.floating[Any]]
         Samples analyzed.
     max_lags: int
         maximum number of lags.
@@ -155,7 +156,7 @@ def johansen_test_coint(samples, max_lags, trend: int=0) -> JohansenTestResult:
     return coint_johansen(samples, trend, max_lags)
 
 
-def predict(vecm: VECMResults, steps: int, alpha: float=0.05) -> Tuple[numpy.ndarray[float, float], numpy.ndarray[float, float], numpy.ndarray[float, float]]:
+def predict(vecm: VECMResults, steps: int, alpha: float=0.05) -> Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Predict values for the specified number of steps.
 
@@ -170,13 +171,15 @@ def predict(vecm: VECMResults, steps: int, alpha: float=0.05) -> Tuple[numpy.nda
 
     Returns
     -------
-    Tuple[numpy.ndarray[float, float], numpy.ndarray[float, float], numpy.ndarray[float, float]]
+    Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
         Predicted values.
     """
 
-    return vecm.predict(steps, alpha=alpha)
+    # alpha is always supplied, so statsmodels returns the (forecast, lower, upper) tuple
+    return cast(Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]],
+                vecm.predict(steps, alpha=alpha))
 
-def __vecm_model(endog: numpy.ndarray[float, float], maxlags: int, rank: int, trend: str = "n") -> VECM:
+def __vecm_model(endog: NDArray[numpy.floating[Any]], maxlags: int, rank: int, trend: str = "n") -> VECM:
     """
     Estimate the parameters for and assumed VAR(n) model.
 

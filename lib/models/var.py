@@ -1,23 +1,25 @@
 
+from typing import Any
 import numpy
-from statsmodels.tsa.vector_ar.var_model import VAR, VARResults, LagOrderResults
+from numpy.typing import NDArray
+from statsmodels.tsa.vector_ar.var_model import VAR, VARResults, VARResultsWrapper, LagOrderResults
 
 from lib.stats import multivariate_normal_samples
 
-def mean(φ: list[numpy.ndarray[float, float]], μ: numpy.ndarray[float]) -> numpy.ndarray[float, float]:
+def mean(φ: NDArray[numpy.floating[Any]], μ: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
     """
     Compute the stationary mean matrix for a VAR(n) process with the given parameters.
 
     Parameters
     ----------
-    φ: list[numpy.ndarray[float, float]]
+    φ: NDArray[numpy.floating[Any]]
         VAR(n) process coefficient matrix.
-    μ: numpy.ndarray[float]
+    μ: NDArray[numpy.floating[Any]]
         VAR(n) process offset matrix.
 
     Returns
     -------
-    numpy.matrix[float]
+    numpy.matrix
         Stationary mean matrix.
     """
 
@@ -28,21 +30,21 @@ def mean(φ: list[numpy.ndarray[float, float]], μ: numpy.ndarray[float]) -> num
     return numpy.linalg.inv(tmp)*Μ
 
 
-def cov(φ: numpy.matrix[float], ω: numpy.ndarray[float, float]) -> numpy.ndarray[float, float]:
+def cov(φ: NDArray[numpy.floating[Any]], ω: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
     """
     Compute the stationary covariance matrix for the given VAR(n) process
     parameters.
 
     Parameters
     ----------
-    φ: list[numpy.ndarray[float, float]]
+    φ: NDArray[numpy.floating[Any]]
         VAR(n) process coefficient matrix.
-    ω: numpy.matrix[float]
+    ω: NDArray[numpy.floating[Any]]
         VAR(n) process gaussian noise autocovariance matrix.
 
     Returns
     -------
-    numpy.matrix[float]
+    numpy.matrix
         Stationary covariance matrix.
     """
 
@@ -57,23 +59,23 @@ def cov(φ: numpy.matrix[float], ω: numpy.ndarray[float, float]) -> numpy.ndarr
     return unvec(vec_var)
 
 
-def acov(φ: list[numpy.ndarray[float, float]], ω: numpy.ndarray[float, float], n: int) -> numpy.ndarray[float, float]:
+def acov(φ: NDArray[numpy.floating[Any]], ω: NDArray[numpy.floating[Any]], n: int) -> NDArray[numpy.floating[Any]]:
     """
     Compute the stationary auto covariance matrix for the given VAR(n)
     parameters.
 
     Parameters
     ----------
-    φ: list[numpy.ndarray[float, float]]
+    φ: NDArray[numpy.floating[Any]]
         VAR(n) process coefficient matrix.
-    ω: numpy.ndarray[float, float]
+    ω: NDArray[numpy.floating[Any]]
         VAR(n) process gaussian noise autocovariance matrix.
     n: int
         Maximum lag.
 
     Returns
     -------
-    numpy.matrix[float]
+    numpy.matrix
         Stationary mean matrix.
     """
 
@@ -89,19 +91,19 @@ def acov(φ: list[numpy.ndarray[float, float]], ω: numpy.ndarray[float, float],
     return γ
 
 
-def eig(φ: list[numpy.ndarray[float, float]]) -> numpy.ndarray[float]:
+def eig(φ: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
     """
     Compute eigen values of VAR(n) parameter matrix transformed to VAR(1) companion form. 
     Stationarity requires that |λ| < 1.
 
     Parameters
     ----------
-    φ: list[numpy.ndarray[float, float]]
+    φ: NDArray[numpy.floating[Any]]
        VAR(n) coefficient matrix in companion form.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Array of eigen values.
     """
 
@@ -110,13 +112,13 @@ def eig(φ: list[numpy.ndarray[float, float]]) -> numpy.ndarray[float]:
     return λ
 
 
-def is_stationary(φ: list[numpy.ndarray[float, float]]) -> bool:
+def is_stationary(φ: NDArray[numpy.floating[Any]]) -> bool:
     """
     Return True if the VAR(n) parameter matrix is stationary.
 
     Parameters
     ----------
-    φ: list[numpy.ndarray[float, float]]
+    φ: NDArray[numpy.floating[Any]]
         VAR(n) covariance matrix.
 
     Returns
@@ -131,18 +133,18 @@ def is_stationary(φ: list[numpy.ndarray[float, float]]) -> bool:
     return True
 
 
-def phi_comp(φ: list[numpy.matrix[float]]) -> numpy.ndarray[float, float]:
+def phi_comp(φ: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
     """
     Convert the VAR(n) coefficient matrix to the VAR(1) companion form used for calculations. 
 
     Parameters
     ----------
-   φ: list[numpy.matrix[float]]
+   φ: NDArray[numpy.floating[Any]]
          VAR(n) coefficient matrix
 
     Returns
     -------
-    numpy.ndarray[float, float]
+    NDArray[numpy.floating[Any]]
         Companion form of noise covariance matrix.
     """
 
@@ -165,20 +167,20 @@ def phi_comp(φ: list[numpy.matrix[float]]) -> numpy.ndarray[float, float]:
     return numpy.matrix(p)
 
 
-def mean_comp(Μ: numpy.matrix[float], n: int) -> numpy.ndarray[float, float]:
+def mean_comp(Μ: NDArray[numpy.floating[Any]], n: int) -> NDArray[numpy.floating[Any]]:
     """
     Convert the VAR(n) offset matrix the VAR(1) companion form used for calculations.
 
     Parameters
     ----------
-    Μ: numpy.matrix[float]
+    Μ: NDArray[numpy.floating[Any]]
         VAR(n) offset matrix.
     n: int
         Order of VAR process.
 
     Returns
     -------
-    numpy.ndarray[float, float]
+    NDArray[numpy.floating[Any]]
         Companion form of VAR(n) offset matrix.
     """
 
@@ -188,20 +190,20 @@ def mean_comp(Μ: numpy.matrix[float], n: int) -> numpy.ndarray[float, float]:
     return numpy.matrix([p]).T
 
 
-def omega_comp(ω: numpy.ndarray[float, float], n: int) -> numpy.ndarray[float, float]:
+def omega_comp(ω: NDArray[numpy.floating[Any]], n: int) -> NDArray[numpy.floating[Any]]:
     """
     Convert VAR(n) gaussian noise covariance matrix to companion form.
 
     Parameters
     ----------
-    ω: numpy.ndarray[float, float]
+    ω: NDArray[numpy.floating[Any]]
         VAR(n) noise covariance matrix.
     n: int
         Order of VAR process.
 
     Returns
     -------
-    numpy.ndarray[float, float]
+    NDArray[numpy.floating[Any]]
         Companion form of noise covariance matrix.
     """
 
@@ -213,7 +215,7 @@ def omega_comp(ω: numpy.ndarray[float, float], n: int) -> numpy.ndarray[float, 
     return numpy.matrix(p)
 
 
-def vec(m: numpy.ndarray[float, float]) -> numpy.ndarray[float, float]:
+def vec(m: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
     """
     Apply the vec operator to the given matrix. The vec operation 
     applied to the matrix,
@@ -230,12 +232,12 @@ def vec(m: numpy.ndarray[float, float]) -> numpy.ndarray[float, float]:
 
     Parameters
     ----------
-    m: numpy.ndarray[float, float]
+    m: NDArray[numpy.floating[Any]]
         Matrix to be converted to vec form.
 
     Returns
     -------
-    numpy.ndarray[float, float]
+    NDArray[numpy.floating[Any]]
         Input vector converted to vec form.
     """
 
@@ -247,7 +249,7 @@ def vec(m: numpy.ndarray[float, float]) -> numpy.ndarray[float, float]:
     return v
 
 
-def unvec(v: numpy.ndarray[float, float]) -> numpy.ndarray[float, float]:
+def unvec(v: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
     """
     Apply the inverse of the vec operation to the given matrix. For the following
     matrix in vec form,
@@ -264,12 +266,12 @@ def unvec(v: numpy.ndarray[float, float]) -> numpy.ndarray[float, float]:
 
     Parameters
     ----------
-    m: numpy.ndarray[float, float]
+    m: NDArray[numpy.floating[Any]]
         Matrix to be converted to unvec form.
 
     Returns
     -------
-    numpy.ndarray[float, float]
+    NDArray[numpy.floating[Any]]
         Input vector in unvec form.
     """
 
@@ -282,26 +284,26 @@ def unvec(v: numpy.ndarray[float, float]) -> numpy.ndarray[float, float]:
     return m
 
 
-def var(x0: numpy.ndarray[float, float], μ: numpy.ndarray[float], φ: list[numpy.ndarray[float, float]], ω: numpy.ndarray[float, float], npts: int) -> numpy.ndarray[float, float]:
+def var(x0: NDArray[numpy.floating[Any]], μ: NDArray[numpy.floating[Any]], φ: NDArray[numpy.floating[Any]], ω: NDArray[numpy.floating[Any]], npts: int) -> NDArray[numpy.floating[Any]]:
     """
     Simulate a VAR(n) process using the provided parameters.
     
     Parameters
     ----------
-    x0: numpy.ndarray[float, float]
+    x0: NDArray[numpy.floating[Any]]
         VAR(n) process initial value matrix.
-    μ: numpy.ndarray[float, float]
+    μ: NDArray[numpy.floating[Any]]
         VAR(n) process offset matrix.
-    φ:  list[numpy.ndarray[float, float]]
+    φ:  list[NDArray[numpy.floating[Any]]]
         VAR(n) process coefficient matrix.
-    ω: numpy.ndarray[float, float]
+    ω: NDArray[numpy.floating[Any]]
         VAR(n) process gaussian noise autocovariance function.
     npts: int
         Number of samples.
 
     Returns
     -------
-    numpy.matrix[float]
+    numpy.matrix
         Simulation results.
     """
 
@@ -317,7 +319,7 @@ def var(x0: numpy.ndarray[float, float], μ: numpy.ndarray[float], φ: list[nump
             xt[i] += numpy.squeeze(numpy.array(t1), axis=1)
     return numpy.transpose(xt)
     
-def fit(endog: numpy.ndarray[float, float], maxlags: int=12, trend: str="c") -> VARResults:
+def fit(endog: NDArray[numpy.floating[Any]], maxlags: int=12, trend: str="c") -> VARResultsWrapper:
     """
     Estimate the parameters for and assumed VAR(n) model.
 
@@ -339,13 +341,13 @@ def fit(endog: numpy.ndarray[float, float], maxlags: int=12, trend: str="c") -> 
 
     return __var_model(endog).fit(maxlags=maxlags, trend=trend)
     
-def order_estimate(samples: numpy.ndarray[float, float], maxlags: int=12, trend: str="c") -> LagOrderResults:
+def order_estimate(samples: NDArray[numpy.floating[Any]], maxlags: int=12, trend: str="c") -> LagOrderResults:
     """
     Estimate order of VAR samples.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float, float]
+    samples: NDArray[numpy.floating[Any]]
         Samples analyzed.    
     maxlags: int
         Maximum number of lags.
@@ -361,7 +363,7 @@ def order_estimate(samples: numpy.ndarray[float, float], maxlags: int=12, trend:
 
     return __var_model(samples).select_order(maxlags=maxlags)
         
-def __var_model(endog: numpy.ndarray[float, float]) -> VAR:
+def __var_model(endog: NDArray[numpy.floating[Any]]) -> VAR:
     """
     Estimate the parameters for and assumed VAR(n) model.
 

@@ -4,10 +4,12 @@ lib.data.models.ou.py
 Simulation and analysis of the Ornstein-Uhlenbeck process.
 """
 
+from typing import Any
 import numpy
+from numpy.typing import NDArray
 from scipy.stats import norm
 
-def mean(μ: float, λ: float, t: numpy.ndarray[float], x0: float=0.0) -> numpy.ndarray[float]:
+def mean(μ: float, λ: float, t: NDArray[numpy.floating[Any]], x0: float=0.0) -> NDArray[numpy.floating[Any]]:
     """
     Mean value of Ornstein-Uhlenbeck process.
 
@@ -17,20 +19,20 @@ def mean(μ: float, λ: float, t: numpy.ndarray[float], x0: float=0.0) -> numpy.
         Drift coefficient.
     λ: float
         Mean reversion rate.
-    t: numpy.ndarray[float]
+    t: NDArray[numpy.floating[Any]]
         Time.
     x0: float
         Initial value.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Mean as a function of time for given parameters.
     """
 
     return x0*numpy.exp(-λ*t) + μ*(1.0 - numpy.exp(-λ*t))
 
-def var(λ: float, t: numpy.ndarray[float], σ: float=1.0) -> numpy.ndarray[float]:
+def var(λ: float, t: NDArray[numpy.floating[Any]], σ: float=1.0) -> NDArray[numpy.floating[Any]]:
     """
     Variance of Ornstein-Uhlenbeck process.
 
@@ -38,14 +40,14 @@ def var(λ: float, t: numpy.ndarray[float], σ: float=1.0) -> numpy.ndarray[floa
     ----------
     λ: float
         Mean reversion rate.
-    t: numpy.ndarray[float]
+    t: NDArray[numpy.floating[Any]]
         Time
     σ: float
         Standard deviation of random component.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         variance as a function of time for given parameters.
     """
 
@@ -70,7 +72,7 @@ def var_limit(λ: float, σ: float=1.0) -> float:
 
     return  σ**2/(2.0 * λ)
 
-def cov(λ: float, s: float, t: numpy.ndarray[float], σ: float=1.0) -> numpy.ndarray[float]:
+def cov(λ: float, s: float, t: NDArray[numpy.floating[Any]], σ: float=1.0) -> NDArray[numpy.floating[Any]]:
     """
     Covariance of Ornstein-Uhlenbeck process.
 
@@ -80,27 +82,27 @@ def cov(λ: float, s: float, t: numpy.ndarray[float], σ: float=1.0) -> numpy.nd
         Mean reversion rate.
     s: float
         Time offset.
-    t: numpy.ndarray[float]
+    t: NDArray[numpy.floating[Any]]
         Time
     σ: float
         Standard deviation of random component.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Covariance as a function of time for given parameters.
     """
 
     c = numpy.exp(-λ*(t - s)) - numpy.exp(-λ*(t + s))
     return σ**2*c/(2.0*λ)
 
-def pdf(x: numpy.ndarray[float], μ: float, λ: float, t: float, σ: float=1.0, x0: float=0.0) -> numpy.ndarray[float]:
+def pdf(x: NDArray[numpy.floating[Any]], μ: float, λ: float, t: float, σ: float=1.0, x0: float=0.0) -> NDArray[numpy.floating[Any]]:
     """
     Ornstein-Uhlenbeck process PDF for a specified time.
 
     Parameters
     ----------
-    x: numpy.ndarray[float]
+    x: NDArray[numpy.floating[Any]]
         Modeled variable.
     μ: float
         Drift coefficient.
@@ -115,7 +117,7 @@ def pdf(x: numpy.ndarray[float], μ: float, λ: float, t: float, σ: float=1.0, 
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         PDF of modeled variable for specified time.
     """
 
@@ -123,13 +125,13 @@ def pdf(x: numpy.ndarray[float], μ: float, λ: float, t: float, σ: float=1.0, 
     σt = numpy.sqrt(__var(λ, t, σ))
     return norm.pdf(x, loc=μt, scale=σt)
 
-def cdf(x: numpy.ndarray[float], μ: float, λ: float, t: float, σ: float=1.0, x0: float=0.0) -> numpy.ndarray[float]:
+def cdf(x: NDArray[numpy.floating[Any]], μ: float, λ: float, t: float, σ: float=1.0, x0: float=0.0) -> NDArray[numpy.floating[Any]]:
     """
     Ornstein-Uhlenbeck process CDF for a specified time.
 
     Parameters
     ----------
-    x: numpy.ndarray[float]
+    x: NDArray[numpy.floating[Any]]
         Modeled variable.
     μ: float
         Drift coefficient.
@@ -144,7 +146,7 @@ def cdf(x: numpy.ndarray[float], μ: float, λ: float, t: float, σ: float=1.0, 
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         CDF of modeled variable for specified time.
     """
 
@@ -152,13 +154,13 @@ def cdf(x: numpy.ndarray[float], μ: float, λ: float, t: float, σ: float=1.0, 
     σt = numpy.sqrt(__var(λ, t, σ))
     return norm.cdf(x, loc=μt, scale=σt)
 
-def pdf_limit(x: numpy.ndarray[float], μ: float, λ: float, σ: float=1.0) -> numpy.ndarray[float]:
+def pdf_limit(x: NDArray[numpy.floating[Any]], μ: float, λ: float, σ: float=1.0) -> NDArray[numpy.floating[Any]]:
     """
     Ornstein-Uhlenbeck process PDF for t -> infinity.
 
     Parameters
     ----------
-    x: numpy.ndarray[float]
+    x: NDArray[numpy.floating[Any]]
         Modeled variable.
     μ: float
         Drift coefficient.
@@ -169,20 +171,20 @@ def pdf_limit(x: numpy.ndarray[float], μ: float, λ: float, σ: float=1.0) -> n
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Limiting PDF of modeled variable.
     """
 
     σl = numpy.sqrt(var_limit(λ, σ))
     return norm.pdf(x, loc=μ, scale=σl)
 
-def cdf_limit(x: numpy.ndarray[float], μ: float, λ: float, σ: float=1.0, x0: float=0) -> numpy.ndarray[float]:
+def cdf_limit(x: NDArray[numpy.floating[Any]], μ: float, λ: float, σ: float=1.0, x0: float=0) -> NDArray[numpy.floating[Any]]:
     """
     Ornstein-Uhlenbeck process CDF for t -> infinity.
 
     Parameters
     ----------
-    x: numpy.ndarray[float]
+    x: NDArray[numpy.floating[Any]]
         Modeled variable.
     μ: float
         Drift coefficient.
@@ -193,7 +195,7 @@ def cdf_limit(x: numpy.ndarray[float], μ: float, λ: float, σ: float=1.0, x0: 
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Limiting CDF of modeled variable.
     """
 
@@ -217,7 +219,7 @@ def mean_halflife(λ: float) -> float:
 
     return numpy.log(2)/λ
 
-def xt(μ: float, λ: float, t: float, σ: float=1.0, x0: float=0, n: int=1) -> numpy.ndarray[float]:
+def xt(μ: float, λ: float, t: float, σ: float=1.0, x0: float=0, n: int=1) -> NDArray[numpy.floating[Any]]:
     """
     Simulation of modeled variable at a specified time with the specified parameters.
 
@@ -238,7 +240,7 @@ def xt(μ: float, λ: float, t: float, σ: float=1.0, x0: float=0, n: int=1) -> 
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation of modeled variable at specified time using given parameters.
     """
 
@@ -247,7 +249,7 @@ def xt(μ: float, λ: float, t: float, σ: float=1.0, x0: float=0, n: int=1) -> 
     ε = numpy.random.normal(0.0, 1.0, n)
     return μt + σt*ε
 
-def ou(μ: float, λ: float, Δt: float, n: int, σ: float=1.0, x0: float=0) -> numpy.ndarray[float]:
+def ou(μ: float, λ: float, Δt: float, n: int, σ: float=1.0, x0: float=0) -> NDArray[numpy.floating[Any]]:
     """
     Simulation of Ornstein-Uhlenbeck process using provide parameters.
 
@@ -268,7 +270,7 @@ def ou(μ: float, λ: float, Δt: float, n: int, σ: float=1.0, x0: float=0) -> 
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation of Ornstein-Uhlenbeck process using provide parameters.
     """
 
@@ -294,7 +296,7 @@ def __var(λ: float, t: float, σ: float=1.0) -> float:
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         variance as a function of time for given parameters.
     """
 

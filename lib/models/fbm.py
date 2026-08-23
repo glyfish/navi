@@ -4,7 +4,9 @@ data.models.fbm.py
 Simulation and analysis of Fractional brownian motion.
 """
 
+from typing import Any
 import numpy
+from numpy.typing import NDArray
 from scipy.stats import norm
 
 from lib.models import bm
@@ -12,7 +14,7 @@ from lib import stats
 from lib.data.reports import VarianceRatioTestReport
 from lib.data.hyp_test import HypothesisType, HypothesisTestType
 
-def var(H: float, t: numpy.ndarray[float]) -> numpy.ndarray[float]:
+def var(H: float, t: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
     """
     Fractional brownian motion variance.
 
@@ -20,18 +22,18 @@ def var(H: float, t: numpy.ndarray[float]) -> numpy.ndarray[float]:
     ----------
     H: float
         Hurst parameter.
-    t: numpy.ndarray[float]
+    t: NDArray[numpy.floating[Any]]
         Time
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Variance as a function of time.
     """
     
     return t**(2.0*H)
 
-def cov(H: float, s: float, t: numpy.ndarray[float]) -> numpy.ndarray[float]:
+def cov(H: float, s: float, t: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
     """
     Fractional brownian motion covariance.
 
@@ -41,18 +43,18 @@ def cov(H: float, s: float, t: numpy.ndarray[float]) -> numpy.ndarray[float]:
         Hurst parameter.
     s: float
         Time offset
-    t: numpy.ndarray[float]
+    t: NDArray[numpy.floating[Any]]
         Time
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Variance as a function of time.
     """
 
     return 0.5*(t**(2.0*H) + s**(2.0*H) - numpy.abs(t - s)**(2.0*H))
 
-def acf(H: float, t: numpy.ndarray[float]) ->  numpy.ndarray[float]:
+def acf(H: float, t: NDArray[numpy.floating[Any]] | float) ->  NDArray[numpy.floating[Any]]:
     """
     Fractional brownian noise autocorrelation function.
 
@@ -65,7 +67,7 @@ def acf(H: float, t: numpy.ndarray[float]) ->  numpy.ndarray[float]:
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Autocorrelation value at time step t.
     """
 
@@ -102,7 +104,7 @@ def cholesky_decompose(H: float, n: int):
                 l[i,j] = (acf(H, i - j) - numpy.sum(l[i,0:j]*l[j,0:j].T)) / l[j,j]
     return l
 
-def cholesky_noise(H: float, n: int, dB: numpy.ndarray[float]=None, L=None) ->  numpy.ndarray[float]:
+def cholesky_noise(H: float, n: int, dB: NDArray[numpy.floating[Any]] | None=None, L=None) ->  NDArray[numpy.floating[Any]]:
     """
     Generate fractional brownian noise using the Cholesky method and the provided 
     parameters.
@@ -113,14 +115,14 @@ def cholesky_noise(H: float, n: int, dB: numpy.ndarray[float]=None, L=None) ->  
         Hurst parameter.
     n: int
         Number of time steps.
-    dB: numpy.ndarray[float]
+    dB: NDArray[numpy.floating[Any]]
         Column vector of brownian noise.
-    L: numpy.matrix[float]
+    L: numpy.matrix
         Lower diagonal Cholesky decomposition of FBM covariance matrix.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Fractional brownian noise as a function of time.
     """
 
@@ -136,7 +138,7 @@ def cholesky_noise(H: float, n: int, dB: numpy.ndarray[float]=None, L=None) ->  
         raise Exception(f"L should have length {n + 1}")
     return numpy.squeeze(numpy.asarray(L*dB.T))
 
-def generate_cholesky(H: float, n: int, dB: numpy.ndarray[float]=None, L=None) ->  numpy.ndarray[float]:
+def generate_cholesky(H: float, n: int, dB: NDArray[numpy.floating[Any]] | None=None, L=None) ->  NDArray[numpy.floating[Any]]:
     """
     Generate fractional brownian motion using the Cholesky method and the provided 
     parameters.
@@ -147,15 +149,15 @@ def generate_cholesky(H: float, n: int, dB: numpy.ndarray[float]=None, L=None) -
         Hurst parameter.
     n: int
         Number of time steps.
-    dB: numpy.ndarray[float]
+    dB: NDArray[numpy.floating[Any]]
         Column vector of brownian noise. If value is none the brownian noise is generated.
-    L: numpy.matrix[float]
+    L: numpy.matrix
         Lower diagonal Cholesky decomposition of FBM covariance matrix. If value is None
         The Cholesky method is used to compute L from the ACF matrix.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Fractional brownian motion as a function of time..
     """
 
@@ -172,7 +174,7 @@ def generate_cholesky(H: float, n: int, dB: numpy.ndarray[float]=None, L=None) -
         Z[i] = Z[i - 1] + dZ[i]
     return Z
 
-def fft_noise(H: float, n: int, dB: numpy.ndarray[float]=None) ->  numpy.ndarray[float]:
+def fft_noise(H: float, n: int, dB: NDArray[numpy.floating[Any]] | None=None) ->  NDArray[numpy.floating[Any]]:
     """
     Generate fractional brownian noise using the FFT method and the provided 
     parameters.
@@ -183,12 +185,12 @@ def fft_noise(H: float, n: int, dB: numpy.ndarray[float]=None) ->  numpy.ndarray
         Hurst parameter.
     n: int
         Number of time steps.
-    dB: numpy.ndarray[float]
+    dB: NDArray[numpy.floating[Any]]
         Column vector of brownian noise. If value is none the brownian noise is generated.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Fractional brownian noise as a function of time.
     """
 
@@ -227,7 +229,7 @@ def fft_noise(H: float, n: int, dB: numpy.ndarray[float]=None) ->  numpy.ndarray
 
     return Z[:n].real
 
-def generate_fft(H: float, n:int, dB: numpy.ndarray[float]=None) ->  numpy.ndarray[float]:
+def generate_fft(H: float, n:int, dB: NDArray[numpy.floating[Any]] | None=None) ->  NDArray[numpy.floating[Any]]:
     """
     Generate fractional brownian motion using the FFT method with the provided 
     parameters.
@@ -238,12 +240,12 @@ def generate_fft(H: float, n:int, dB: numpy.ndarray[float]=None) ->  numpy.ndarr
         Hurst parameter.
     n: int
         Number of time steps.
-    dB: numpy.ndarray[float]
+    dB: NDArray[numpy.floating[Any]]
         Column vector of brownian noise. If value is None the brownian noise is generated.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Fractional brownian motion as a function of time.
     """
 
@@ -257,13 +259,13 @@ def generate_fft(H: float, n:int, dB: numpy.ndarray[float]=None) ->  numpy.ndarr
         Z[i] = Z[i - 1] + dZ[i]
     return Z
 
-def vr_homo_test(samples: numpy.ndarray[float], s_vals: list[int]=[4, 6, 10, 16, 24], sig_level: float=0.1, hyp_type: HypothesisType=HypothesisType.TWO_TAIL) -> VarianceRatioTestReport:
+def vr_homo_test(samples: NDArray[numpy.floating[Any]], s_vals: list[int]=[4, 6, 10, 16, 24], sig_level: float=0.1, hyp_type: HypothesisType=HypothesisType.TWO_TAIL) -> VarianceRatioTestReport:
     """
     Perform homoscedasticity variance ratio test on given samples using provided parameters.
 
     Parameters
     ----------
-    Samples: numpy.ndarray[float]
+    Samples: NDArray[numpy.floating[Any]]
         samples to be tested.
     sig_level: float
         Significance level used in test (default 0.1).
@@ -281,13 +283,13 @@ def vr_homo_test(samples: numpy.ndarray[float], s_vals: list[int]=[4, 6, 10, 16,
     test_stats = vr_stat_homo_scan(samples, s_vals)
     return __vr_test(test_stats, s_vals, sig_level, hyp_type)
 
-def vr_hetero_test(samples: numpy.ndarray[float], s_vals: list[int]=[4, 6, 10, 16, 24], sig_level: float=0.1, hyp_type: HypothesisType=HypothesisType.TWO_TAIL) -> VarianceRatioTestReport:
+def vr_hetero_test(samples: NDArray[numpy.floating[Any]], s_vals: list[int]=[4, 6, 10, 16, 24], sig_level: float=0.1, hyp_type: HypothesisType=HypothesisType.TWO_TAIL) -> VarianceRatioTestReport:
     """
     Perform heteroscedasticity variance ratio test on given samples using provided parameters.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Samples to be tested.
     sig_level: float
         Significance level used in test (default 0.1).
@@ -305,13 +307,13 @@ def vr_hetero_test(samples: numpy.ndarray[float], s_vals: list[int]=[4, 6, 10, 1
     test_stats = vr_stat_hetero_scan(samples, s_vals)
     return __vr_test(test_stats, s_vals, sig_level, hyp_type)
 
-def __vr_test(test_stats: numpy.ndarray[float], s_vals: list[int]=[4, 6, 10, 16, 24], sig_level: float=0.1, hyp_type: HypothesisType=HypothesisType.TWO_TAIL) -> VarianceRatioTestReport:    
+def __vr_test(test_stats: NDArray[numpy.floating[Any]], s_vals: list[int]=[4, 6, 10, 16, 24], sig_level: float=0.1, hyp_type: HypothesisType=HypothesisType.TWO_TAIL) -> VarianceRatioTestReport:    
     """
     Perform variance ratio test analysis on provided test statistics using given parameters.
 
     Parameters
     ----------
-    test_stats: numpy.ndarray[float]
+    test_stats: NDArray[numpy.floating[Any]]
         samples to be tested.
     s_vals: list[int]
         Lag values used in analysis (default [4, 6, 10, 16, 24]).
@@ -335,13 +337,13 @@ def __vr_test(test_stats: numpy.ndarray[float], s_vals: list[int]=[4, 6, 10, 16,
     else:
         raise Exception(f"Hypothesis test type is invalid: {hyp_type}")
 
-def __var_test_two_tail(test_stats: list[float], s_vals: list[int], sig_level: float, hyp_type: HypothesisType) -> VarianceRatioTestReport:
+def __var_test_two_tail(test_stats: NDArray[numpy.floating[Any]], s_vals: list[int], sig_level: float, hyp_type: HypothesisType) -> VarianceRatioTestReport:
     """
     Perform two tailed variance ratio test analysis on provided test statistics using given parameters.
 
     Parameters
     ----------
-    test_stats: numpy.ndarray[float]
+    test_stats: NDArray[numpy.floating[Any]]
         samples to be tested.
     s_vals: list[int]
         Lag values used in analysis.
@@ -357,9 +359,9 @@ def __var_test_two_tail(test_stats: list[float], s_vals: list[int], sig_level: f
     """
 
     sig_level = sig_level/2.0
-    lower_critical_value = norm.ppf(sig_level)
-    upper_critical_value = norm.ppf(1.0 - sig_level)
-    p_values = [2.0*(1.0 - norm.cdf(numpy.abs(stat))) for stat in test_stats]
+    lower_critical_value = float(norm.ppf(sig_level))
+    upper_critical_value = float(norm.ppf(1.0 - sig_level))
+    p_values = [float(2.0*(1.0 - norm.cdf(numpy.abs(stat)))) for stat in test_stats]
     return VarianceRatioTestReport(2.0*sig_level, 
                                    hyp_type,
                                    HypothesisTestType.BM, 
@@ -368,13 +370,13 @@ def __var_test_two_tail(test_stats: list[float], s_vals: list[int], sig_level: f
                                    p_values, 
                                    [lower_critical_value, upper_critical_value])
 
-def __var_test_upper_tail(test_stats: list[float], s_vals: list[int], sig_level: float, hyp_type: HypothesisType) -> VarianceRatioTestReport:
+def __var_test_upper_tail(test_stats: NDArray[numpy.floating[Any]], s_vals: list[int], sig_level: float, hyp_type: HypothesisType) -> VarianceRatioTestReport:
     """
     Perform upper tailed variance ratio test analysis on provided test statistics using given parameters.
 
     Parameters
     ----------
-    test_stats: numpy.ndarray[float]
+    test_stats: NDArray[numpy.floating[Any]]
         samples to be tested.
     s_vals: list[int]
         Lag values used in analysis.
@@ -389,8 +391,8 @@ def __var_test_upper_tail(test_stats: list[float], s_vals: list[int], sig_level:
         Test report.
     """
 
-    upper_critical_value = norm.ppf(1.0 - sig_level)
-    p_values = [1.0 - norm.cdf(stat) for stat in test_stats]
+    upper_critical_value = float(norm.ppf(1.0 - sig_level))
+    p_values = [float(1.0 - norm.cdf(stat)) for stat in test_stats]
     return VarianceRatioTestReport(sig_level, 
                                    hyp_type, 
                                    HypothesisTestType.FBM_AUTO_CORR, 
@@ -399,13 +401,13 @@ def __var_test_upper_tail(test_stats: list[float], s_vals: list[int], sig_level:
                                    p_values,
                                    [None, upper_critical_value])
 
-def __var_test_lower_tail(test_stats: list[float], s_vals: list[int], sig_level: float, hyp_type: HypothesisType) -> VarianceRatioTestReport:
+def __var_test_lower_tail(test_stats: NDArray[numpy.floating[Any]], s_vals: list[int], sig_level: float, hyp_type: HypothesisType) -> VarianceRatioTestReport:
     """
     Perform lower tailed variance ratio test analysis on provided test statistics using given parameters.
 
     Parameters
     ----------
-    test_stats: numpy.ndarray[float]
+    test_stats: NDArray[numpy.floating[Any]]
         samples to be tested.
     s_vals: list[int]
         Lag values used in analysis.
@@ -420,8 +422,8 @@ def __var_test_lower_tail(test_stats: list[float], s_vals: list[int], sig_level:
         Test report.
     """
 
-    lower_critical_value = norm.ppf(sig_level)
-    p_values = [norm.cdf(stat) for stat in test_stats]
+    lower_critical_value = float(norm.ppf(sig_level))
+    p_values = [float(norm.cdf(stat)) for stat in test_stats]
     return VarianceRatioTestReport(sig_level, 
                                    hyp_type, 
                                    HypothesisTestType.FBM_NEG_AUTO_CORR, 
@@ -430,77 +432,77 @@ def __var_test_lower_tail(test_stats: list[float], s_vals: list[int], sig_level:
                                    p_values, 
                                    [lower_critical_value, None])
 
-def vr_scan(samples: numpy.ndarray[float], s_vals: list[int]) -> numpy.ndarray[float]:
+def vr_scan(samples: NDArray[numpy.floating[Any]], s_vals: list[int]) -> NDArray[numpy.floating[Any]]:
     """
     Compute the variance ratio using the provided samples and the lags.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Test samples.
     s_vals: list[int]
         Lags
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Variance ratios as a function of lag.
     """
 
     return numpy.array([__vr(samples, s) for s in s_vals])
 
-def vr_stat_homo_scan(samples: numpy.ndarray[float], s_vals: list[int]) -> numpy.ndarray[float]:
+def vr_stat_homo_scan(samples: NDArray[numpy.floating[Any]], s_vals: list[int]) -> NDArray[numpy.floating[Any]]:
     """
     Compute the variance ratio homoscedastic test statistics using the provided samples and lags.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Test samples.
     s_vals: list[int]
         Lags.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
          Homoscedastic variance ratio test statistics as a function of lag.
     """
 
     return numpy.array([__vr_stat_homo(samples, s) for s in s_vals])
 
-def vr_stat_hetero_scan(samples: numpy.ndarray[float], s_vals: list[int]) -> numpy.ndarray[float]:
+def vr_stat_hetero_scan(samples: NDArray[numpy.floating[Any]], s_vals: list[int]) -> NDArray[numpy.floating[Any]]:
     """
     Compute the variance ratio heteroscedastic test statistics using the provided samples and lags.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Test samples.
     s_vals: list[int]
         Lags.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Heteroscedastic variance ratio test statistics as a function of lag.
     """
 
     return numpy.array([__vr_stat_hetero(samples, s) for s in s_vals])
 
-def __vr_stat_homo(samples: numpy.ndarray[float], s: int) -> float:
+def __vr_stat_homo(samples: NDArray[numpy.floating[Any]], s: int) -> float:
     """
     Compute the variance ratio homoscedastic test statistic using the provided samples and lag.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Test samples.
     s: int
         Lag.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Homoscedastic variance ratio test statistic.
     """
 
@@ -512,13 +514,13 @@ def __vr_stat_homo(samples: numpy.ndarray[float], s: int) -> float:
     return (r - 1.0)/numpy.sqrt(θ)
 
 
-def __vr_stat_hetero(samples: numpy.ndarray[float], s: int) -> float:
+def __vr_stat_hetero(samples: NDArray[numpy.floating[Any]], s: int) -> float:
     """
     Compute the variance ratio heteroscedastic test statistic using the provided samples and lag.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Test samples.
     s: int
         Lag.
@@ -533,13 +535,13 @@ def __vr_stat_hetero(samples: numpy.ndarray[float], s: int) -> float:
     θ = __theta_factor(samples, s)
     return (r - 1.0)/numpy.sqrt(θ)
 
-def __delta_factor(samples: numpy.ndarray[float], j: int) -> float:
+def __delta_factor(samples: NDArray[numpy.floating[Any]], j: int) -> float:
     """
     Compute the delta factor used in calculation of the variance ratio heteroscedastic test statistic.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Test samples.
     j: int
         Iteration index.
@@ -559,13 +561,13 @@ def __delta_factor(samples: numpy.ndarray[float], j: int) -> float:
         factor += f1*f2
     return factor / stats.lag_var(samples, 1)**2
 
-def __theta_factor(samples: numpy.ndarray[float], s: int) -> float:
+def __theta_factor(samples: NDArray[numpy.floating[Any]], s: int) -> float:
     """
     Compute the delta factor used in calculation of the variance ratio heteroscedastic test statistic.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Test samples.
     s: int
         Lag.
@@ -583,14 +585,14 @@ def __theta_factor(samples: numpy.ndarray[float], s: int) -> float:
         factor += delta*(2.0*(s-j)/s)**2
     return factor/t**2
 
-def __vr(samples: numpy.ndarray[float], s: int) -> float:
+def __vr(samples: NDArray[numpy.floating[Any]], s: int) -> float:
     """
     Compute the variance ratio using the specified samples and lag.
 
     
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Test samples.
     s: int
         Lag.
@@ -618,7 +620,7 @@ def __acf_matrix(H: float, n: int):
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Autocorrelation as a matrix.
     """
 

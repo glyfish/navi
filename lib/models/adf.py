@@ -4,11 +4,13 @@ data.models.adf.py
 Simulation of Dickey-Fuller distribution
 """
 
+from typing import Any
 import numpy
+from numpy.typing import NDArray
 from lib.data.reports import ADFTestReport
 import statsmodels.api as sm
 
-def scaled_brownian_noise(n: int) -> numpy.ndarray[float]:
+def scaled_brownian_noise(n: int) -> NDArray[numpy.floating[Any]]:
     """
     Simulate scaled Brownian noise. Scaled Brownian noise has mean of zero and
     variance given by sqrt(1.0/n) where n is the number of simulated values.
@@ -20,7 +22,7 @@ def scaled_brownian_noise(n: int) -> numpy.ndarray[float]:
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
@@ -41,7 +43,7 @@ def brownian_motion(bn: numpy.ndarray, t: int) -> float:
 
     return sum(bn[:t])
 
-def modified_chi_squared(x: numpy.ndarray[float]) -> numpy.ndarray[float]:
+def modified_chi_squared(x: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
     """
     Compute the PDF of the modified chi-squared distribution using the
     specified values.
@@ -53,13 +55,13 @@ def modified_chi_squared(x: numpy.ndarray[float]) -> numpy.ndarray[float]:
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Computed modified chi-squared distribution PDF.
     """
 
     return 2.0*numpy.exp(-(2.0*x+1.0)/2.0) / numpy.sqrt(2.0*numpy.pi*(2.0*x+1.0))
 
-def stochastic_integral_ensemble_1(n: int, nsample: int) -> numpy.ndarray[float]:
+def stochastic_integral_ensemble_1(n: int, nsample: int) -> NDArray[numpy.floating[Any]]:
     r"""
     Simulate the stochastic integral $\int_0^1{B(s)dB(s)}$ ensemble
 
@@ -72,7 +74,7 @@ def stochastic_integral_ensemble_1(n: int, nsample: int) -> numpy.ndarray[float]
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation ensemble.
     """
 
@@ -81,13 +83,13 @@ def stochastic_integral_ensemble_1(n: int, nsample: int) -> numpy.ndarray[float]
         vals[i] = stochastic_integral_simulation_1(scaled_brownian_noise(n))
     return vals
 
-def stochastic_integral_simulation_1(bn: numpy.ndarray[float]) -> float:
+def stochastic_integral_simulation_1(bn: NDArray[numpy.floating[Any]]) -> float:
     r"""
     Simulate a stochastic integral $\int_0^1{B(s)dB(s)}$ using the input brownian noise.
 
     Parameters
     ----------
-    bn: numpy.ndarray[float]
+    bn: NDArray[numpy.floating[Any]]
         Scaled brownian noise.
 
     Returns
@@ -102,7 +104,7 @@ def stochastic_integral_simulation_1(bn: numpy.ndarray[float]) -> float:
         val += brownian_motion(bn, i-1)*bn[i]
     return val
 
-def stochastic_integral_solution_1(n: int) -> numpy.ndarray[float]:
+def stochastic_integral_solution_1(n: int) -> NDArray[numpy.floating[Any]]:
     """
     Simulation of the random process defined by \frac{1}{2}[B^2(1) - 1].
 
@@ -113,13 +115,13 @@ def stochastic_integral_solution_1(n: int) -> numpy.ndarray[float]:
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
     return 0.5*(numpy.random.normal(0.0, 1.0, n)**2 - 1.0)
 
-def stochastic_integral_ensemble_2(n: int, nsample: int) -> numpy.ndarray[float]:
+def stochastic_integral_ensemble_2(n: int, nsample: int) -> NDArray[numpy.floating[Any]]:
     r"""
     Simulation of stochastic integral \int_0^1{B^2(s)ds} ensemble.
 
@@ -133,7 +135,7 @@ def stochastic_integral_ensemble_2(n: int, nsample: int) -> numpy.ndarray[float]
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
@@ -142,13 +144,13 @@ def stochastic_integral_ensemble_2(n: int, nsample: int) -> numpy.ndarray[float]
         vals[i] = stochastic_integral_simulation_2(scaled_brownian_noise(n))
     return vals
 
-def stochastic_integral_simulation_2(bn: numpy.ndarray[float]) -> float:
+def stochastic_integral_simulation_2(bn: NDArray[numpy.floating[Any]]) -> float:
     r"""
     Simulation of stochastic integral \int_0^1{B^2(s)ds} using the input brownian noise.
 
     Parameters
     ----------
-    bn: numpy.ndarray[float]
+    bn: NDArray[numpy.floating[Any]]
         Scaled brownian noise.
 
     Returns
@@ -163,7 +165,7 @@ def stochastic_integral_simulation_2(bn: numpy.ndarray[float]) -> float:
         val += brownian_motion(bn, i-1)**2
     return val/n
 
-def stochastic_integral_ensemble_3(n: int, nsample: int) -> numpy.ndarray[float]:
+def stochastic_integral_ensemble_3(n: int, nsample: int) -> NDArray[numpy.floating[Any]]:
     r"""
     Simulation of stochastic integral sqrt{\int_0^1{B^2(s)ds}} ensemble.
 
@@ -177,7 +179,7 @@ def stochastic_integral_ensemble_3(n: int, nsample: int) -> numpy.ndarray[float]
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
@@ -186,13 +188,13 @@ def stochastic_integral_ensemble_3(n: int, nsample: int) -> numpy.ndarray[float]
         vals[i] = stochastic_integral_simulation_3(scaled_brownian_noise(n))
     return vals
 
-def stochastic_integral_simulation_3(bn: numpy.ndarray[float]) -> numpy.ndarray[float]:
+def stochastic_integral_simulation_3(bn: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
     r"""
     Simulation of stochastic integral sqrt{\int_0^1{B^2(s)ds}} using the input brownian noise.
 
     Parameters
     ----------
-    bn: numpy.ndarray[float]
+    bn: NDArray[numpy.floating[Any]]
         Scaled brownian noise.
 
     Returns
@@ -207,7 +209,7 @@ def stochastic_integral_simulation_3(bn: numpy.ndarray[float]) -> numpy.ndarray[
         val += brownian_motion(bn, i-1)**2
     return numpy.sqrt(val/n)
 
-def dist_ensemble(n: int, nsim: int) -> numpy.ndarray[float]:
+def dist_ensemble(n: int, nsim: int) -> NDArray[numpy.floating[Any]]:
     r"""
     Simulation of the Dickey-Fuller test statistic \frac{\frac{1}{2}[B^2(1) - 1]}{\sqrt{\int_0^1{B^2(s)ds}}
     ensemble.
@@ -221,23 +223,27 @@ def dist_ensemble(n: int, nsim: int) -> numpy.ndarray[float]:
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation ensemble.
     """
 
     vals = numpy.zeros(nsim)
-    numerator = stochastic_integral_solution_1(nsim)
     for i in range(nsim):
-        vals[i] = numerator[i] / stochastic_integral_simulation_3(scaled_brownian_noise(n))
+        # Numerator and denominator are functionals of the SAME Brownian path — drawing
+        # them independently gives each the right marginal but the wrong ratio. Using the
+        # Riemann sum for the numerator (rather than the closed form ½[B²(1)-1]) keeps its
+        # discretisation matched to the denominator's.
+        bn = scaled_brownian_noise(n)
+        vals[i] = stochastic_integral_simulation_1(bn) / stochastic_integral_simulation_3(bn)
     return vals
 
-def statistic(samples: numpy.ndarray[float], σ: float=1.0) -> float:
+def statistic(samples: NDArray[numpy.floating[Any]], σ: float=1.0) -> float:
     """
     Compute the Dickey-Duller test statistic from the given samples.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         Samples used to compute test statistic.
 
     Returns
@@ -255,14 +261,14 @@ def statistic(samples: numpy.ndarray[float], σ: float=1.0) -> float:
         var += samples[i-1]**2
     return delta_numerator / (numpy.sqrt(var)*σ**2)
 
-def adf_test(samples: numpy.ndarray[float], max_lag: int=12) -> ADFTestReport:
+def adf_test(samples: NDArray[numpy.floating[Any]], max_lag: int=12) -> ADFTestReport:
     """
     Perform the ADF test assuming no trend on the specified samples. If the ADF
     test passes the samples are brownian motion.
 
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         AR(p) processes samples
     max_lag : {None, int}
         Maximum lag which is included in test, default value of
@@ -276,14 +282,14 @@ def adf_test(samples: numpy.ndarray[float], max_lag: int=12) -> ADFTestReport:
 
     return __adfuller_test(samples, 'n', max_lag)
 
-def adf_test_offset(samples: numpy.ndarray[float], max_lag: int=12) -> ADFTestReport:
+def adf_test_offset(samples: NDArray[numpy.floating[Any]], max_lag: int=12) -> ADFTestReport:
     """
     Perform the ADF test assuming a constant offset in the samples. If the ADF
     test passes the samples are brownian motion.
     
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         AR(p) processes samples
     max_lag : {None, int}
         Maximum lag which is included in test, default value of
@@ -297,18 +303,18 @@ def adf_test_offset(samples: numpy.ndarray[float], max_lag: int=12) -> ADFTestRe
 
     return __adfuller_test(samples, 'c', max_lag)
 
-def adf_test_drift(samples: numpy.ndarray[float], max_lag: int=12) -> ADFTestReport:
+def adf_test_drift(samples: NDArray[numpy.floating[Any]], max_lag: int=12) -> ADFTestReport:
     """
     Perform the ADF test assuming a linear drift terms. If the ADF
     test passes the samples are brownian motion.
     
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         AR(p) processes samples
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         AR(p) processes samples
     max_lag : {None, int}
         Maximum lag which is included in test, default value of
@@ -322,14 +328,14 @@ def adf_test_drift(samples: numpy.ndarray[float], max_lag: int=12) -> ADFTestRep
 
     return __adfuller_test(samples, 'ct', max_lag)
 
-def __adfuller_test(samples: numpy.ndarray[float], test_type: str, max_lag: int=12) -> ADFTestReport:
+def __adfuller_test(samples: NDArray[numpy.floating[Any]], test_type: str, max_lag: int=12) -> ADFTestReport:
     """
     Perform the ADF test assuming no trend on the specified samples. If the ADF
     test passes the samples are brownian motion.
     
     Parameters
     ----------
-    samples: numpy.ndarray[float]
+    samples: NDArray[numpy.floating[Any]]
         AR(p) processes samples
     test_type : {"c","ct","ctt","n"}
         Constant and trend order to include in regression.

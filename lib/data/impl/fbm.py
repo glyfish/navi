@@ -66,7 +66,7 @@ def compute_sd(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.fl
     return t, numpy.sqrt(var)
 
 
-def compute_var(t: NDArray[numpy.floating[Any]]=None, **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
+def compute_var(t: NDArray[numpy.floating[Any]] | None=None, **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute theoretical FBM motion variance.
 
@@ -161,7 +161,7 @@ def compute_cov(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.f
     return t, fbm.cov(H, s, t)
 
 
-def compute_vr(t: NDArray[numpy.floating[Any]]=None, **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
+def compute_vr(t: NDArray[numpy.floating[Any]] | None=None, **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute FBM variance ratio for zero lag. For brownian motion the variance ration is 1. If the 
     variance ration is less than one the samples are anticorrelated in time and if it 
@@ -195,7 +195,7 @@ def compute_vr(t: NDArray[numpy.floating[Any]]=None, **kwargs) -> tuple[NDArray[
     return t, t**(2*H - 1.0)
 
 
-def compute_vr_scan(samples: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
+def compute_vr_scan(samples: NDArray[numpy.floating[Any]], **kwargs) -> tuple[list[int], NDArray[numpy.floating[Any]]]:
     """
     Compute FBM variance ratio for specified lags. The lag values, s, can be
     entered or generated. Use the svals keyword to specify values and linear, smin,
@@ -217,7 +217,7 @@ def compute_vr_scan(samples: NDArray[numpy.floating[Any]], **kwargs) -> tuple[ND
 
     Returns
     -------
-    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
+    tuple[list[int], NDArray[numpy.floating[Any]]]
         Lags and variance ratio values.
     """
 
@@ -225,7 +225,7 @@ def compute_vr_scan(samples: NDArray[numpy.floating[Any]], **kwargs) -> tuple[ND
     return s_vals, fbm.vr_scan(samples, s_vals)
 
 
-def compute_homo_vr_stat_scan(samples: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
+def compute_homo_vr_stat_scan(samples: NDArray[numpy.floating[Any]], **kwargs) -> tuple[list[int], NDArray[numpy.floating[Any]]]:
     """
     Compute FBM homoscedastic variance ratio test statistic for specified lags. 
     The lag values, s, can be entered or generated. Use the svals keyword to specify 
@@ -247,7 +247,7 @@ def compute_homo_vr_stat_scan(samples: NDArray[numpy.floating[Any]], **kwargs) -
 
             Returns
     -------
-    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
+    tuple[list[int], NDArray[numpy.floating[Any]]]
         Lags and variance ratio values.
     """
 
@@ -255,7 +255,7 @@ def compute_homo_vr_stat_scan(samples: NDArray[numpy.floating[Any]], **kwargs) -
     return s_vals, fbm.vr_stat_homo_scan(samples, s_vals)
 
 
-def compute_hetero_vr_stat_scan(samples: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
+def compute_hetero_vr_stat_scan(samples: NDArray[numpy.floating[Any]], **kwargs) -> tuple[list[int], NDArray[numpy.floating[Any]]]:
     """
     Compute FBM heteroscedastic variance ratio test statistic for specified lags. 
     The lag values, s, can be entered or generated. Use the svals keyword to specify 
@@ -277,7 +277,7 @@ def compute_hetero_vr_stat_scan(samples: NDArray[numpy.floating[Any]], **kwargs)
 
     Returns
     -------
-    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
+    tuple[list[int], NDArray[numpy.floating[Any]]]
         Lags and variance ratio values.
     """
 
@@ -300,7 +300,7 @@ def create_noise_cholesky_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]]
         Width of time step. (default 1.0)
     dB: NDArray[numpy.floating[Any]]
         Column vector of brownian noise.
-    L: numpy.matrix[float]
+    L: numpy.matrix
         Lower diagonal Cholesky decomposition of FBM covariance matrix.
 
     Returns
@@ -361,7 +361,7 @@ def create_cholesky_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDAr
         Number of points.  (default 1024)
     dB: NDArray[numpy.floating[Any]]
         Column vector of brownian noise. If value is none the brownian noise is generated.
-    L: numpy.matrix[float]
+    L: numpy.matrix
         Lower diagonal Cholesky decomposition of FBM covariance matrix. If value is None
         The Cholesky method is used to compute L from the ACF matrix.
 
@@ -408,7 +408,7 @@ def create_fft_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[n
     return Δt * create_space(xmin=0, npts=npts), fbm.generate_fft(H, npts, dB)
     
 
-def compute_H_estimate_periodogram(freq: NDArray[numpy.floating[Any]], pspec: NDArray[numpy.floating[Any]]) -> tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
+def compute_H_estimate_periodogram(freq: NDArray[numpy.floating[Any]], pspec: NDArray[numpy.floating[Any]]) -> tuple[sm.regression.linear_model.RegressionResultsWrapper, OLSResult]:
     """
     Estimate Hurst parameter using OLS on the periodogram assuming a power law.
 
@@ -421,7 +421,7 @@ def compute_H_estimate_periodogram(freq: NDArray[numpy.floating[Any]], pspec: ND
 
     Returns
     -------
-    tuple[sm.regression.linear_model.RegressionResults, OLSResult]
+    tuple[sm.regression.linear_model.RegressionResultsWrapper, OLSResult]
         Ols report and result model.
     """
 
@@ -465,7 +465,7 @@ def __add_pergram_transform(result: OLSResult):
     result.set_transforms(model, [OLSTransform(param)], OLSTransform(const))
 
 
-def compute_H_estimate_variance_aggregation(m_vals: NDArray[numpy.floating[Any]], agg_var: NDArray[numpy.floating[Any]]) -> tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
+def compute_H_estimate_variance_aggregation(m_vals: NDArray[numpy.floating[Any]], agg_var: NDArray[numpy.floating[Any]]) -> tuple[sm.regression.linear_model.RegressionResultsWrapper, OLSResult]:
     """
     Estimate Hurst parameter using OLS on the aggregated variance.
 
@@ -478,7 +478,7 @@ def compute_H_estimate_variance_aggregation(m_vals: NDArray[numpy.floating[Any]]
 
     Returns
     -------
-    tuple[sm.regression.linear_model.RegressionResults, OLSResult]
+    tuple[sm.regression.linear_model.RegressionResultsWrapper, OLSResult]
         Ols report and result model.
     """
 

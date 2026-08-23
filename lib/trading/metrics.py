@@ -6,29 +6,30 @@ Metrics in used in financial analysis.
 """
 
 import numpy
+from numpy.typing import NDArray
 
-from typing import Tuple
+from typing import Any, Tuple
 
 from lib.utils import verify_condition
 
 
-def compute_zscore(time: numpy.ndarray[float], data: numpy.ndarray[float], window: int) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_zscore(time: NDArray[numpy.floating[Any]], data: NDArray[numpy.floating[Any]], window: int) -> Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Calculate the z-score for a time series using a rolling window. The order of the
     time series is assumed oldest data to most recent data.
 
     Parameters
     ----------
-    data : numpy.ndarray[float]
+    data : NDArray[numpy.floating[Any]]
         The time series.
-    time : numpy.ndarray[float]
+    time : NDArray[numpy.floating[Any]]
         The time series time.
     window : int
         The lookback window.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         The z-score series.
     """
 
@@ -37,23 +38,23 @@ def compute_zscore(time: numpy.ndarray[float], data: numpy.ndarray[float], windo
     return time[window - 1:], numpy.array(zscores)
 
 
-def compute_std(time: numpy.ndarray[float], data: numpy.ndarray[float], window: int) -> Tuple[numpy.ndarray[float], numpy.ndarray[float]]:
+def compute_std(time: NDArray[numpy.floating[Any]], data: NDArray[numpy.floating[Any]], window: int) -> Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Calculate the standard deviation for a time series using a rolling window. The order of the
     time series is assumed oldest data to most recent data.
 
     Parameters
     ----------
-    data : numpy.ndarray[float]
+    data : NDArray[numpy.floating[Any]]
         The time series.
-    time : numpy.ndarray[float]
+    time : NDArray[numpy.floating[Any]]
         The time series time.
     window : int
         The lookback window.
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         The standard deviation series.
     """
 
@@ -62,7 +63,7 @@ def compute_std(time: numpy.ndarray[float], data: numpy.ndarray[float], window: 
     return time[window - 1:], numpy.array(stds)
 
 
-def zscore(samples: numpy.ndarray[float]) -> float:
+def zscore(samples: NDArray[numpy.floating[Any]]) -> float:
     """
     Calculate the z-score using samples to compute the mean and standard deviation
     and use the last value in samples as the test value.
@@ -87,13 +88,13 @@ def zscore(samples: numpy.ndarray[float]) -> float:
     return (val - mean) / std if std > 0 else 0.0
 
 
-def std(samples: numpy.ndarray[float]) -> float:    
+def std(samples: NDArray[numpy.floating[Any]]) -> float:    
     """
     Calculate the standard deviation of the samples.
 
     Parameters
     ----------
-    samples : numpy.ndarray[float]
+    samples : NDArray[numpy.floating[Any]]
         The time series.
 
     Returns
@@ -102,6 +103,6 @@ def std(samples: numpy.ndarray[float]) -> float:
         The standard deviation.
     """
 
-    return numpy.std(samples)
+    return float(numpy.std(samples))
 
 

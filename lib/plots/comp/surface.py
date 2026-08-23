@@ -1,4 +1,6 @@
+from typing import Any
 import numpy
+from numpy.typing import NDArray
 from matplotlib import pyplot, figure, colors, axes
 from labellines import labelLines, labelLine
 
@@ -7,8 +9,8 @@ from lib.utils import get_param_default_if_missing
 from lib import config
 
 
-def contour(axis: axes.Axes,  f: numpy.ndarray[float, float], x: numpy.ndarray[float, float],  y: numpy.ndarray[float, float], 
-            values: numpy.ndarray[float], **kwargs):
+def contour(axis: axes.Axes,  f: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]],  y: NDArray[numpy.floating[Any]], 
+            values: NDArray[numpy.floating[Any]], **kwargs):
     """
     Contour plot for f(x,y)
 
@@ -16,13 +18,13 @@ def contour(axis: axes.Axes,  f: numpy.ndarray[float, float], x: numpy.ndarray[f
     ----------
     axis : matplotlib.axes.Axes
         Axis used to draw plot.
-    y : numpy.ndarray[float, float]
+    y : NDArray[numpy.floating[Any]]
         Value plotted on y-axis.
-    x : numpy.ndarray[float, float]
+    x : NDArray[numpy.floating[Any]]
         Value plotted in x axis
-    f : numpy.ndarray[float, float]
+    f : NDArray[numpy.floating[Any]]
         Function contoured.
-    values : numpy.ndarray[float]
+    values : NDArray[numpy.floating[Any]]
         Values of contours plotted.
     title : string, optional
         Plot title (default is None)
@@ -62,8 +64,8 @@ def contour(axis: axes.Axes,  f: numpy.ndarray[float, float], x: numpy.ndarray[f
     axis.clabel(contour, contour.levels, fmt="%.3f", inline=True, fontsize=contour_font_size)
 
 
-def contour_hist(axis: axes.Axes, figure: figure.Figure, samples: numpy.ndarray[float, float], f: numpy.ndarray[float, float], x: numpy.ndarray[float, float], 
-                 y: numpy.ndarray[float, float], values: numpy.ndarray[float], **kwargs):
+def contour_hist(axis: axes.Axes, figure: figure.Figure, samples: NDArray[numpy.floating[Any]], f: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]], 
+                 y: NDArray[numpy.floating[Any]], values: NDArray[numpy.floating[Any]], **kwargs):
     """
     Overlay data shown in a contour plot with samples shown in a histogram.
 
@@ -73,15 +75,15 @@ def contour_hist(axis: axes.Axes, figure: figure.Figure, samples: numpy.ndarray[
         Axis used to draw plot.
     figure: matplotlib.figure.Figure
         Plot figure which is needed to add histogram scale.
-    samples : numpy.ndarray[float, float]
+    samples : NDArray[numpy.floating[Any]]
         Two dimensional array containing sampled data plotted in histogram,
-    y : numpy.ndarray[float, float]
+    y : NDArray[numpy.floating[Any]]
         Value plotted on y-axis.
-    x : numpy.ndarray[float, float]
+    x : NDArray[numpy.floating[Any]]
         Value plotted in x axis
-    f : numpy.ndarray[float, float]
+    f : NDArray[numpy.floating[Any]]
         Function contoured.
-    values : numpy.ndarray[float]
+    values : NDArray[numpy.floating[Any]]
         Values of contours plotted.
     title : string, optional
         Plot title (default is None)
@@ -128,7 +130,7 @@ def contour_hist(axis: axes.Axes, figure: figure.Figure, samples: numpy.ndarray[
     axis.clabel(contour, contour.levels, fmt="%.3f", inline=True, fontsize=contour_font_size)
 
 
-def colored_scatter(axis: axes.Axes, figure: figure.Figure, y: numpy.ndarray[float], x: numpy.ndarray[float], color_values: numpy.ndarray[float], **kwargs):
+def colored_scatter(axis: axes.Axes, figure: figure.Figure, y: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]], color_values: NDArray[numpy.floating[Any]], **kwargs):
     """
     Make a scatter plot of the x and y data and color the scatter dots with value 
     specified in colors.
@@ -139,11 +141,11 @@ def colored_scatter(axis: axes.Axes, figure: figure.Figure, y: numpy.ndarray[flo
         Axis used to draw plot.
     figure: matplotlib.figure.Figure
         Plot figure which is needed to add histogram scale.
-    y : numpy.ndarray[float]
+    y : NDArray[numpy.floating[Any]]
         Data plotted in scatter plot y axis.
-    x : numpy.ndarray[float]
+    x : NDArray[numpy.floating[Any]]
         Data plotted in scatter plot x axis.
-    color_values : numpy.ndarray[float]
+    color_values : NDArray[numpy.floating[Any]]
         Data used to compute scatter point color.
     title : string, optional
         Plot title (default is None)

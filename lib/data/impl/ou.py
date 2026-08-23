@@ -375,7 +375,7 @@ def compute_mean_half_life(**kwargs) -> float:
     return ou.mean_halflife(λ)
 
 
-def compute_mean_half_life_estimate(xt: NDArray[numpy.floating[Any]], dt: float=1.0) -> tuple[sm.regression.linear_model.RegressionResults, OLSResult]:
+def compute_mean_half_life_estimate(xt: NDArray[numpy.floating[Any]], dt: float=1.0) -> tuple[sm.regression.linear_model.RegressionResultsWrapper, OLSResult]:
     """
     Estimate Ornstein-Uhlenbeck half life to limiting mean.
 
@@ -386,7 +386,7 @@ def compute_mean_half_life_estimate(xt: NDArray[numpy.floating[Any]], dt: float=
 
     Returns
     -------
-    tuple[sm.regression.linear_model.RegressionResults, OLSResult]
+    tuple[sm.regression.linear_model.RegressionResultsWrapper, OLSResult]
         OLS analysis results.
     """
 

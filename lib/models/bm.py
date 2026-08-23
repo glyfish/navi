@@ -4,9 +4,11 @@ data.models.bm.oy
 Simulation and analysis of Brownian motion.
 """
 
+from typing import Any
 import numpy
+from numpy.typing import NDArray
 
-def noise(n: int) -> numpy.ndarray[float]:
+def noise(n: int) -> NDArray[numpy.floating[Any]]:
     """
     Generate brownian noise with zero mean and unit variance.
 
@@ -17,12 +19,12 @@ def noise(n: int) -> numpy.ndarray[float]:
 
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
     return numpy.random.normal(0.0, 1.0, n)
 
-def bm(n: int, Δt: float=1.0) -> numpy.ndarray[float]:
+def bm(n: int, Δt: float=1.0) -> NDArray[numpy.floating[Any]]:
     """
     Generate brownian motion with zero mean and unit variance.
 
@@ -35,7 +37,7 @@ def bm(n: int, Δt: float=1.0) -> numpy.ndarray[float]:
     
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
@@ -46,7 +48,7 @@ def bm(n: int, Δt: float=1.0) -> numpy.ndarray[float]:
         samples[i] = samples[i-1] + σ * Δ
     return samples
 
-def bm_with_drift(μ: float, σ: float, n: int, Δt: float=1) -> numpy.ndarray[float]:
+def bm_with_drift(μ: float, σ: float, n: int, Δt: float=1) -> NDArray[numpy.floating[Any]]:
     """
     Generate brownian motion with drift.
 
@@ -64,7 +66,7 @@ def bm_with_drift(μ: float, σ: float, n: int, Δt: float=1) -> numpy.ndarray[f
     
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 
@@ -74,7 +76,7 @@ def bm_with_drift(μ: float, σ: float, n: int, Δt: float=1) -> numpy.ndarray[f
         samples[i] = samples[i-1] + (σ*Δ*numpy.sqrt(Δt)) + (μ*Δt)
     return samples
 
-def bm_geometric(μ: float, σ: float, S0: float, n: int, Δt: float=1) -> numpy.ndarray[float]:
+def bm_geometric(μ: float, σ: float, S0: float, n: int, Δt: float=1) -> NDArray[numpy.floating[Any]]:
     """
     Generate geometric brownian motion.
 
@@ -94,7 +96,7 @@ def bm_geometric(μ: float, σ: float, S0: float, n: int, Δt: float=1) -> numpy
     
     Returns
     -------
-    numpy.ndarray[float]
+    NDArray[numpy.floating[Any]]
         Simulation results.
     """
 

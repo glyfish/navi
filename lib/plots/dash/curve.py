@@ -1,5 +1,6 @@
 from matplotlib import pyplot
 import numpy
+from numpy.typing import NDArray
 
 from lib.utils import get_param_default_if_missing
 from lib.plots import comp
@@ -191,7 +192,7 @@ def comparison_stack(y: Sequence[numpy.ndarray] | numpy.ndarray, x: Sequence[num
         pyplot.close(fig)
 
 
-def twinx(left: numpy.ndarray, right: numpy.ndarray, x: numpy.ndarray | None=None, **kwargs):
+def twinx(left: numpy.ndarray, right: numpy.ndarray, x: numpy.ndarray | list[numpy.ndarray] | None=None, **kwargs):
     """
     Plot two curves with different scales on the y-axis that use the same scale on the
     x-axis.
@@ -644,7 +645,7 @@ def fscatter(data: numpy.ndarray, func: Callable[[numpy.ndarray], numpy.ndarray]
         Data compared to function.
     func : Callable[[float], float]
         Function plotted as a function of x.
-    x : numpy.ndarray[float], optional
+    x : NDArray[numpy.floating[Any]], optional
         Value plotted on x-axis (default is index values of data)
     title : string, optional
         Plot title (default is None)
@@ -701,11 +702,11 @@ def fcurve_scatter_comparison(data: list[numpy.ndarray], func: numpy.ndarray, x:
         Axis used to draw plot.
     data : numpy.ndarray
         Data compared to function.
-    func : numpy.ndarray[float]
+    func : NDArray[numpy.floating[Any]]
         Function plotted as a function of x.
-    x : numpy.ndarray[float], optional
+    x : NDArray[numpy.floating[Any]], optional
         Value plotted on x-axis (default is index values of data)
-    fx : numpy.ndarray[float], optional
+    fx : NDArray[numpy.floating[Any]], optional
         function x values (default is index values of data)
     title : string, optional
         Plot title (default is None)
@@ -809,7 +810,7 @@ def scatter(y: numpy.ndarray, x: numpy.ndarray, **kwargs):
         Axis used to draw plot.
     y : numpy.ndarray
         Data plotted on y-axis.
-    x : numpy.ndarray[float]
+    x : NDArray[numpy.floating[Any]]
         Value plotted on x-axis
     title : string, optional
         Plot title (default is None)
@@ -858,7 +859,7 @@ def scatter_comparison(y: numpy.ndarray, x: numpy.ndarray, **kwargs):
         Axis used to draw plot.
     y : numpy.ndarray
         Data plotted on y-axis.
-    x : numpy.ndarray[float]
+    x : NDArray[numpy.floating[Any]]
         Value plotted on x-axis
     title : string, optional
         Plot title (default is None)

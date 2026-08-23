@@ -26,7 +26,7 @@ import matplotlib.dates as mdates
 import matplotlib.units as munits
 from matplotlib import pyplot, rcParams, axes
 from numpy.typing import NDArray
-from typing import Sequence
+from typing import Any, Sequence
 
 
 from lib.plots.comp.axis import (PlotType, logStyle, logXStyle, logYStyle)
@@ -328,7 +328,7 @@ def comparison_stack(axis: Sequence[axes.Axes] | NDArray, y: Sequence[NDArray] |
         __plot_curves(axis[i], x_plot, y_plot, labels=labels, **kwargs)
 
 
-def twinx(axis: axes.Axes, left: NDArray, right: NDArray, x=None, **kwargs):
+def twinx(axis: axes.Axes, left: NDArray, right: NDArray, x: NDArray | list[NDArray] | None=None, **kwargs):
     """
     Plot two curves with different scales on the y-axis that use the same scale on the
     x-axis.
@@ -556,7 +556,7 @@ def scatter(axis: axes.Axes, data: NDArray, x: NDArray, **kwargs):
         Axis used to draw plot.
     data : numpy.ndarray
         Data compared to function.
-    x : numpy.ndarray[float]
+    x : NDArray[numpy.floating[Any]]
         Value plotted on x-axis.
     title : string, optional
         Plot title (default is None)
@@ -645,7 +645,7 @@ def scatter_comparison(axis: axes.Axes, data: list[NDArray], x: NDArray, **kwarg
         Axis used to draw plot.
     data : numpy.ndarray
         Data compared to function.
-    x : numpy.ndarray[float]
+    x : NDArray[numpy.floating[Any]]
         Value plotted on x-axis.
     title : string, optional
         Plot title (default is None)
