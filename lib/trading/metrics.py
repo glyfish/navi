@@ -33,6 +33,9 @@ def compute_zscore(time: NDArray[numpy.floating[Any]], data: NDArray[numpy.float
         The z-score series.
     """
 
+    verify_condition(time, len(time) == len(data), "len(time) == len(data)")
+    verify_condition(window, window > 0, "window > 0")
+
     npts = len(data) - window + 1
     zscores = [zscore(data[i:i + window]) for i in range(npts)]
     return time[window - 1:], numpy.array(zscores)
@@ -58,6 +61,9 @@ def compute_std(time: NDArray[numpy.floating[Any]], data: NDArray[numpy.floating
         The standard deviation series.
     """
 
+    verify_condition(time, len(time) == len(data), "len(time) == len(data)")
+    verify_condition(window, window > 0, "window > 0")
+
     npts = len(data) - window + 1
     stds = [std(numpy.flip(data[i:i + window])) for i in range(npts)]
     return time[window - 1:], numpy.array(stds)
@@ -81,11 +87,20 @@ def zscore(samples: NDArray[numpy.floating[Any]]) -> float:
 
     verify_condition(samples, len(samples) > 0, "No samples to compute z-score")
 
+    # asarray so a pandas Series indexes positionally: pandas>=3 reads
+    # samples[-1] as a label lookup and raises KeyError on a RangeIndex.
+    samples = numpy.asarray(samples)
+
     mean = numpy.mean(samples)
     std = numpy.std(samples)
     val = samples[-1]
 
-    return (val - mean) / std if std > 0 else 0.0
+    # A window holding inf or NaN makes std NaN, and `NaN > 0` is False -- the
+    # old `else 0.0` therefore reported "exactly on the rolling mean" for
+    # corrupt data. Only a genuinely flat window is 0.0; NaN propagates.
+    if std > 0:
+        return float((val - mean) / std)
+    return 0.0 if std == 0 else float("nan")
 
 
 def std(samples: NDArray[numpy.floating[Any]]) -> float:    

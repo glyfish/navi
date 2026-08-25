@@ -236,13 +236,16 @@ class StatisticalTestData:
 
     @staticmethod
     def from_dict(data):
-        status = data["status"] if "status" in data else HypothesisTestStatus.FAILED
-        stat = StatisticalTestParam.from_dict(data["stat"]) if "stat" in data else None
-        pval = StatisticalTestParam.from_dict(data["pval"]) if "pval" in data else None
+        # to_json writes absent optional params as JSON null, so the key IS
+        # present with a None value -- a presence test lets that through to
+        # StatisticalTestParam.from_dict(None). Test the value instead.
+        status = HypothesisTestStatus(data["status"]) if data.get("status") is not None else HypothesisTestStatus.FAILED
+        stat = StatisticalTestParam.from_dict(data["stat"]) if data.get("stat") is not None else None
+        pval = StatisticalTestParam.from_dict(data["pval"]) if data.get("pval") is not None else None
         params = [StatisticalTestParam.from_dict(param) for param in data["params"]]
-        sig = StatisticalTestParam.from_dict(data["sig"]) if "sig" in data else None
-        lower = StatisticalTestParam.from_dict(data["lower"]) if "lower" in data else None
-        upper = StatisticalTestParam.from_dict(data["upper"]) if "upper" in data else None
+        sig = StatisticalTestParam.from_dict(data["sig"]) if data.get("sig") is not None else None
+        lower = StatisticalTestParam.from_dict(data["lower"]) if data.get("lower") is not None else None
+        upper = StatisticalTestParam.from_dict(data["upper"]) if data.get("upper") is not None else None
         test_id = data["test_id"]
 
         return StatisticalTestData(status=status, stat=stat, pval=pval, params=params, sig=sig,
@@ -300,9 +303,11 @@ class StatisticalTestReport:
 
     @staticmethod
     def from_dict(data):
-        status = data["status"] if "status" in data else HypothesisTestStatus.FAILED
-        hyp_type = data["hyp_type"]
-        hyp_test_type = data["hyp_test_type"]
+        # json.dumps writes these str-Enums as their values; __init__ calls
+        # hyp_test_type.desc(), so they must come back as enum members.
+        status = HypothesisTestStatus(data["status"]) if data.get("status") is not None else HypothesisTestStatus.FAILED
+        hyp_type = HypothesisType(data["hyp_type"])
+        hyp_test_type = HypothesisTestType(data["hyp_test_type"])
         test_data = [StatisticalTestData.from_dict(test_data) for test_data in data["test_data"]]
         test_id = data["test_id"]
 

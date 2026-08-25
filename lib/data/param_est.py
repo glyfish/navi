@@ -1,9 +1,21 @@
 import numpy
 from enum import Enum
 from json import dumps
-import uuid
 
 from statsmodels.tsa.vector_ar.var_model import LagOrderResults
+
+def _json_default(o):
+    """json.dumps hook: unwrap numpy scalars, then fall back to __dict__.
+
+    numpy.float64 subclasses float so json handles it, but int64/int32/float32
+    do not and have no __dict__, so the bare `lambda o: o.__dict__` raised
+    AttributeError instead of producing a document.
+    """
+    if isinstance(o, numpy.generic):
+        return o.item()
+    return o.__dict__
+
+
 
 
 class EstModel(str, Enum):
@@ -72,7 +84,7 @@ class ParamEst:
 
     def to_json(self, pretty: bool=False):
         indent = 4 if pretty else None
-        return dumps(self, indent=indent, default=lambda o: o.__dict__)
+        return dumps(self, indent=indent, default=_json_default)
 
     def __repr__(self):
         return f"ParamEst({self.__props()})"
@@ -120,7 +132,7 @@ class OLSTransform:
 
     def to_json(self, pretty: bool=False):
         indent = 4 if pretty else None
-        return dumps(self, indent=indent, default=lambda o: o.__dict__)
+        return dumps(self, indent=indent, default=_json_default)
 
     def __repr__(self):
         return f"OLSTransform({self.__props()})"
@@ -203,9 +215,9 @@ class OLSResult:
     
     def to_json(self, pretty: bool=False):
         if pretty:
-            return dumps(self, indent=3, default=lambda o: o.__dict__)
+            return dumps(self, indent=3, default=_json_default)
         else:
-            return dumps(self, default=lambda o: o.__dict__)
+            return dumps(self, default=_json_default)
     
     def set_transforms(self, model: str, param_transforms: list[OLSTransform], const_transform: OLSTransform):
         self.param_transforms = param_transforms
@@ -308,9 +320,9 @@ class ARMAEst:
 
     def to_json(self, pretty: bool=False):
         if pretty:
-            return dumps(self, indent=3, default=lambda o: o.__dict__)
+            return dumps(self, indent=3, default=_json_default)
         else:
-            return dumps(self, default=lambda o: o.__dict__)
+            return dumps(self, default=_json_default)
 
     def __repr__(self):
         return f"ARMAEst({self.__props()})"
@@ -399,9 +411,9 @@ class VAREst:
 
     def to_json(self, pretty: bool=False):
         if pretty:
-            return dumps(self, indent=3, default=lambda o: o.__dict__)
+            return dumps(self, indent=3, default=_json_default)
         else:
-            return dumps(self, default=lambda o: o.__dict__)
+            return dumps(self, default=_json_default)
         
 
 class VECMParamType(str, Enum):
@@ -426,7 +438,7 @@ class VECMParamType(str, Enum):
     VECM_ALPHA = "VECM_ALPHA"
     VECM_LAMBDA = "VECM_LAMBDA"
     VECM_BETA = "VECM_BETA"
-    VECM_OMEGA = "VAR_OMEGA"
+    VECM_OMEGA = "VECM_OMEGA"
 
 
 class VECMEst:
@@ -476,7 +488,7 @@ class VECMEst:
 
     def to_json(self, pretty: bool=False):
         if pretty:
-            return dumps(self, indent=3, default=lambda o: o.__dict__)
+            return dumps(self, indent=3, default=_json_default)
         else:
-            return dumps(self, default=lambda o: o.__dict__)
+            return dumps(self, default=_json_default)
         
