@@ -14,7 +14,7 @@ from lib.data.param_est import (ParamEst, VAREst, VARParamType)
 from lib.data.hyp_test import VAROrderTestReport, __var_order_test_report_from_result
 
 
-def compute_mean(φ: NDArray[numpy.floating[Any]], μ: NDArray[numpy.floating[Any]] | None = None) -> NDArray[numpy.floating[Any]]:
+def compute_mean(φ: NDArray[numpy.floating[Any]], μ: NDArray[numpy.floating[Any]] | None = None) -> numpy.matrix:
     """
     Compute the stationary mean matrix for a VAR(n) process with the given parameters.
 
@@ -41,7 +41,7 @@ def compute_mean(φ: NDArray[numpy.floating[Any]], μ: NDArray[numpy.floating[An
     return var.mean(φ, μ)
 
 
-def compute_cov(φ: NDArray[numpy.floating[Any]], ω: NDArray[numpy.floating[Any]] | None = None) -> NDArray[numpy.floating[Any]]:
+def compute_cov(φ: NDArray[numpy.floating[Any]], ω: NDArray[numpy.floating[Any]] | None = None) -> numpy.matrix:
     """
     Compute the stationary covariance matrix for the given VAR(n) process
     parameters.
@@ -97,7 +97,7 @@ def compute_acov(φ: NDArray[numpy.floating[Any]], ω: NDArray[numpy.floating[An
 
     return  create_space(npts=nlag + 1), var.acov(φ, ω, nlag + 1)
 
-def compute_eig_values(Φ: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
+def compute_eig_values(Φ: NDArray[numpy.floating[Any]]) -> NDArray[numpy.complexfloating[Any, Any]]:
     """
     Compute eigen values of VAR(n) parameter matrix transformed to VAR(1) companion form. 
     Stationarity requires that |λ| < 1.
@@ -138,7 +138,7 @@ def compute_is_stationary(Φ: NDArray[numpy.floating[Any]]) -> bool:
     return var.is_stationary(Φ)
 
 
-def compute_phi_companion_form(Φ: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
+def compute_phi_companion_form(Φ: NDArray[numpy.floating[Any]]) -> numpy.matrix:
     """
     Convert the VAR(n) coefficient matrix to the VAR(1) companion form used for calculations. 
 
@@ -158,7 +158,7 @@ def compute_phi_companion_form(Φ: NDArray[numpy.floating[Any]]) -> NDArray[nump
     return var.phi_comp(Φ)
 
 
-def compute_mean_companion_form(Μ: NDArray[numpy.floating[Any]], n: int) -> NDArray[numpy.floating[Any]]:
+def compute_mean_companion_form(Μ: NDArray[numpy.floating[Any]], n: int) -> numpy.matrix:
     """
     Convert the VAR(n) offset matrix to 
 
@@ -182,7 +182,7 @@ def compute_mean_companion_form(Μ: NDArray[numpy.floating[Any]], n: int) -> NDA
     return var.mean_comp(Μ, n)
           
 
-def compute_omega_companion_form(Ω: NDArray[numpy.floating[Any]], n: int) -> NDArray[numpy.floating[Any]]:
+def compute_omega_companion_form(Ω: NDArray[numpy.floating[Any]], n: int) -> numpy.matrix:
     """
     Convert VAR(n) gaussian noise covariance matrix to companion form.
 
@@ -206,7 +206,7 @@ def compute_omega_companion_form(Ω: NDArray[numpy.floating[Any]], n: int) -> ND
     return var.omega_comp(Ω, n)
 
 
-def compute_vec(m: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
+def compute_vec(m: numpy.matrix) -> numpy.matrix:
     """
     Apply the vec operator to the given matrix. The vec operation 
     applied to the matrix,
@@ -234,7 +234,7 @@ def compute_vec(m: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]
 
     return var.vec(m)
 
-def compute_unvec(m: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
+def compute_unvec(m: NDArray[numpy.floating[Any]] | numpy.matrix) -> numpy.matrix:
     """
     Apply the inverse of the vec operation to the given matrix. For the following
     matrix in vec form,

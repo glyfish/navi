@@ -134,7 +134,7 @@ def compute_prediction(vecm_result: VECMResults, steps: int, **kwargs) -> Tuple[
                 vecm_result.predict(steps, alpha=alpha))
 
 
-def create_vecm1_source(λ: NDArray[numpy.floating[Any]], β: NDArray[numpy.floating[Any]], a: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
+def create_vecm1_source(λ: numpy.matrix, β: numpy.matrix, a: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Simulate a first order Vector Error Correction Model (VECM) process with the specified parameters.
 
@@ -165,7 +165,7 @@ def create_vecm1_source(λ: NDArray[numpy.floating[Any]], β: NDArray[numpy.floa
     return create_space(npts=npts), numpy.array(vecm.vecm1(λ, β, a, Ω, npts))
 
 
-def create_vecm_source(λ: NDArray[numpy.floating[Any]], β: NDArray[numpy.floating[Any]], a: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
+def create_vecm_source(λ: numpy.matrix, β: numpy.matrix, a: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Simulate a first order Vector Error Correction Model (VECM) process with the specified parameters.
 

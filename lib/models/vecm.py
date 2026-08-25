@@ -61,7 +61,7 @@ def order_estimate(samples: NDArray[numpy.floating[Any]], maxlags: int=12, deter
     return select_order(samples, maxlags=maxlags, deterministic=deterministic)
 
 
-def vecm1(λ: NDArray[numpy.floating[Any]], β: NDArray[numpy.floating[Any]], a: NDArray[numpy.floating[Any]], 
+def vecm1(λ: numpy.matrix, β: numpy.matrix, a: NDArray[numpy.floating[Any]], 
           Ω: NDArray[numpy.floating[Any]], nsamp: int) -> NDArray[numpy.floating[Any]]:
     """
     Simulate a first order Vector Error Correction Model (VECM) process with the specified parameters.
@@ -95,7 +95,7 @@ def vecm1(λ: NDArray[numpy.floating[Any]], β: NDArray[numpy.floating[Any]], a:
     return xt
 
 
-def vecm(λ: NDArray[numpy.floating[Any]], β: NDArray[numpy.floating[Any]], a: NDArray[numpy.floating[Any]], Ω: NDArray[numpy.floating[Any]], nsamp: int) -> NDArray[numpy.floating[Any]]:
+def vecm(λ: numpy.matrix, β: numpy.matrix, a: NDArray[numpy.floating[Any]], Ω: NDArray[numpy.floating[Any]], nsamp: int) -> NDArray[numpy.floating[Any]]:
     """
     Simulate a first order Vector Error Correction Model (VECM) process with the specified parameters.
 

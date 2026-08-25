@@ -14,7 +14,7 @@ from lib import stats
 from lib.data.reports import VarianceRatioTestReport
 from lib.data.hyp_test import HypothesisType, HypothesisTestType
 
-def var(H: float, t: NDArray[numpy.floating[Any]]) -> NDArray[numpy.floating[Any]]:
+def var(H: float, t: NDArray[numpy.floating[Any]] | float) -> NDArray[numpy.floating[Any]]:
     """
     Fractional brownian motion variance.
 
@@ -73,7 +73,7 @@ def acf(H: float, t: NDArray[numpy.floating[Any]] | float) ->  NDArray[numpy.flo
 
     return 0.5*(abs(t - 1.0)**(2.0*H) + (t + 1.0)**(2.0*H) - 2.0*t**(2.0*H))
 
-def cholesky_decompose(H: float, n: int):
+def cholesky_decompose(H: float, n: int) -> numpy.matrix:
     """
     Compute Cholesky decomposition of the fractional brownian motion
     autocorrelation matrix
@@ -609,7 +609,7 @@ def __vr(samples: NDArray[numpy.floating[Any]], s: int) -> float:
     var1 = stats.lag_var(samples, 1)
     return vars/(s*var1)
 
-def __acf_matrix(H: float, n: int):
+def __acf_matrix(H: float, n: int) -> numpy.matrix:
     """
     Fractional brownian motion autocorrelation function matrix.
 
