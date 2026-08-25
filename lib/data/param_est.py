@@ -82,7 +82,7 @@ class ParamEst:
 
     def __props(self):
         return f"est=({self.est}), " \
-               f"err=({self.err}, " \
+               f"err=({self.err}), " \
                f"est_label=({self.est_label}), " \
                f"err_label=({self.err_label}), " \
                f"order=({self.order}), " \
@@ -100,7 +100,6 @@ class ParamEst:
         order = data["order"] if "order" in data else 0
         row = data["row"] if "row" in data else 0
         column = data["column"] if "column" in data else 0
-        err_label = data["err_label"] if "err_label" in data else None
         est_id = data["est_id"]
         param_type = data["param_type"]
         return ParamEst(est_id, est, err, est_label, err_label, order, row, column, param_type)
@@ -124,7 +123,7 @@ class OLSTransform:
         return dumps(self, indent=indent, default=lambda o: o.__dict__)
 
     def __repr__(self):
-        return f"OLSEst({self.__props()})"
+        return f"OLSTransform({self.__props()})"
 
     def __str__(self):
         return self.__props()
@@ -187,7 +186,7 @@ class OLSResult:
         self.model = None
 
     def __repr__(self):
-        return f"OLSEst({self.__props()})"
+        return f"OLSResult({self.__props()})"
 
     def __str__(self):
         return self.__props()
@@ -196,7 +195,7 @@ class OLSResult:
         return f"est_id={self.est_id}, " \
                f"est_model=({self.est_model}), " \
                f"const=({self.const}), " \
-               f"params=({self.params}, "\
+               f"params=({self.params}), "\
                f"r2=({self.r2}), " \
                f"model=({self.model}), " \
                f"const_transform=({self.const_transform}), " \
@@ -241,19 +240,19 @@ class ARMAEstType(str, Enum):
         elif self.value == ARMAEstType.AR_OFFSET.value:
             return r"$X_t = \sum_{i=1}^p \varphi_i X_{t-i} + \mu^* + \varepsilon_{t}$"
         elif self.value == ARMAEstType.MA.value:
-            return r"$X_t = \sum_{i=1}^p \varphi_i X_{t-i} + \varepsilon_{t}$"
+            return r"$X_t = \sum_{i=1}^q \theta_i \varepsilon_{t-i} + \varepsilon_{t}$"
         elif self.value == ARMAEstType.MA_OFFSET.value:
-            return r"$X_t = \sum_{i=1}^p \varphi_i X_{t-i} + \mu^* + \varepsilon_{t}$"
+            return r"$X_t = \sum_{i=1}^q \theta_i \varepsilon_{t-i} + \mu^* + \varepsilon_{t}$"
         else:
             raise Exception(f"Estimate type is invalid: {self}")
 
     def set_param_labels(self, param, i):
         if self.value == ARMAEstType.AR.value or self.value == ARMAEstType.AR_OFFSET.value:
             param.set_labels(est_label=rf"$\hat{{\phi_{{{i}}}}}$",
-                             err_label=rf"$\sigma_{{$\hat{{\phi_{{{i}}}}}}}$")
+                             err_label=rf"$\sigma_{{\hat{{\phi_{{{i}}}}}}}$")
         elif self.value == ARMAEstType.MA.value or self.value == ARMAEstType.MA_OFFSET.value:
             param.set_labels(est_label=rf"$\hat{{\theta_{{{i}}}}}$",
-                             err_label=rf"$\sigma_{{$\hat{{\theta_{{{i}}}}}}}$")
+                             err_label=rf"$\sigma_{{\hat{{\theta_{{{i}}}}}}}$")
         else:
             raise Exception(f"Estimate type is invalid: {self}")
 

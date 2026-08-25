@@ -223,7 +223,7 @@ class StatisticalTestData:
         return f"test_id=({self.test_id}), " \
                f"status=({self.status}), " \
                f"stat=({self.stat}), " \
-               f"pval=({self.pval}, " \
+               f"pval=({self.pval}), " \
                f"params=({self.params}), " \
                f"sig=({self.sig}), " \
                f"lower=({self.lower}), " \
@@ -291,7 +291,7 @@ class StatisticalTestReport:
                f"status=({self.status}), " \
                f"hyp_type=({self.hyp_type}), " \
                f"hyp_test_type=({self.hyp_test_type}), " \
-               f"desc=({self.desc}, " \
+               f"desc=({self.desc}), " \
                f"test_data=({self.test_data})"
 
     def to_json(self, pretty: bool=False):
@@ -492,8 +492,7 @@ class GrangerCausalityTestResult:
                f"pvalue=({self.__pvalue}), " \
                f"est_id=({self.__est_id}), " \
                f"critical_value=({self.__critical_value}), " \
-               f"result=({self.__result}), " \
-               
+               f"result=({self.__result})"
     
     @staticmethod
     def from_dict(data, est_id):

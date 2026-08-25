@@ -182,7 +182,7 @@ def compute_bm_from_noise(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArr
     """
 
     dB = get_param_throw_if_missing("dB", **kwargs)
-    verify_type(dB, NDArray[numpy.floating[Any]])
+    verify_type(dB, numpy.ndarray)
 
     npts = len(dB)
 

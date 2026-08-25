@@ -441,9 +441,17 @@ def moving_var(samples: NDArray[numpy.floating[Any]], window: int) -> NDArray[nu
         Moving variance of samples as a function of time.
     """
 
-    result = numpy.cumsum(samples, dtype=float)
+    # E[x^2] - E[x]^2 over cumulative sums loses precision in proportion to the
+    # data's offset from zero: at a level of ~1e6 the relative error is already
+    # ~1e-1, and by ~1e7 the variance goes negative and moving_std returns NaN.
+    # Centring first bounds the cancellation by the series' own spread instead of
+    # its level, which holds the error at ~1e-10 for any offset, at no extra cost.
+    x = numpy.asarray(samples, dtype=float)
+    x = x - x.mean()
+
+    result = numpy.cumsum(x)
     result[window:] = result[window:] - result[:-window]
-    result2 = numpy.cumsum(samples**2, dtype=float)
+    result2 = numpy.cumsum(x**2)
     result2[window:] = result2[window:] - result2[:-window]
     return (result2[window - 1:] - result[window - 1:]**2 / window) / window
 
@@ -946,3 +954,28 @@ def zscore(samples: NDArray[numpy.floating[Any]], window: int) -> NDArray[numpy.
     """
 
     return (samples[window - 1:] - moving_avg(samples, window)) / moving_std(samples, window)
+
+
+def fractional_purchase(samples: NDArray[numpy.floating[Any]], window: int) -> NDArray[numpy.floating[Any]]:
+    """
+    Compute the one step ahead fractional price change used by the linear trading strategy.
+
+    The value at step t is (S_t - S_{t+1}) / S_{t+1}, the return realised by a short
+    position held for one step. The leading window - 1 samples are dropped so the result
+    aligns with moving_avg, moving_std and zscore computed over the same window.
+
+    Parameters
+    ----------
+    samples: NDArray[numpy.floating[Any]]
+        Samples.
+    window: int
+        Averaging window.
+
+    Returns
+    -------
+    NDArray[numpy.floating[Any]]
+        Fractional price change. Has len(samples) - window entries, one per
+        consecutive pair from index window - 1 onwards.
+    """
+
+    return (samples[window - 1:-1] - samples[window:]) / samples[window:]

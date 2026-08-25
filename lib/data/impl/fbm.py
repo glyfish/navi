@@ -123,7 +123,7 @@ def compute_acf(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.f
     Δt = get_param_default_if_missing("Δt", 1.0, **kwargs)
     nlags = get_param_default_if_missing("nlags", 11, **kwargs)
 
-    t = create_space(xmin=0, npts=nlags, Δx=Δt)
+    t = create_space(xmin=1, npts=nlags, Δx=Δt)
 
     return t, fbm.acf(H, t)
 
@@ -315,7 +315,7 @@ def create_noise_cholesky_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]]
     dB = get_param_default_if_missing("dB", None, **kwargs)
     L = get_param_default_if_missing("L", None, **kwargs)
 
-    return Δt * create_space(xmin=0, npts=npts), fbm.cholesky_noise(H, npts, dB, L)
+    return Δt * create_space(xmin=0, npts=npts + 1), fbm.cholesky_noise(H, npts, dB, L)
 
 
 def create_noise_fft_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
@@ -377,7 +377,7 @@ def create_cholesky_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDAr
     dB = get_param_default_if_missing("dB", None, **kwargs)
     L = get_param_default_if_missing("L", None, **kwargs)
 
-    return Δt * create_space(xmin=0, npts=npts), fbm.generate_cholesky(H, npts, dB, L)
+    return Δt * create_space(xmin=0, npts=npts + 1), fbm.generate_cholesky(H, npts, dB, L)
 
 
 def create_fft_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:

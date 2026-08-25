@@ -919,6 +919,29 @@ def compute_zscore(time: numpy.ndarray, samples: NDArray[numpy.floating[Any]], w
     return time[window - 1:], stats.zscore(samples, window)
 
 
+def compute_fractional_price_change(time: numpy.ndarray, samples: NDArray[numpy.floating[Any]], window: int) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
+    """
+    Compute fractional price change used in the linear trading strategy.
+
+    Parameters
+    ----------
+    time: numpy.ndarray
+        Time
+    samples: NDArray[numpy.floating[Any]]
+        Samples.
+    window: int
+        Averaging window.
+
+    Returns
+    -------
+    tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]
+        Time and fractional price change. Each value pairs samples[t] with
+        samples[t + 1], so the axis stops one short of the last sample.
+    """
+
+    return time[window - 1:-1], stats.fractional_purchase(samples, window)
+
+
 def compute_moving_std(time: numpy.ndarray, samples: NDArray[numpy.floating[Any]], window: int) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Moving standard deviation of samples.

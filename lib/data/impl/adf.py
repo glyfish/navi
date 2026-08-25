@@ -28,7 +28,7 @@ def create_df_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[nu
     nstep = get_param_default_if_missing("nstep", 100, **kwargs)
     nsim = get_param_default_if_missing("nsim", 1000, **kwargs)
 
-    return create_space(xmax=nsim, npts=nsim + 1), adf.dist_ensemble(nstep, nsim)
+    return create_space(xmax=nsim - 1, npts=nsim), adf.dist_ensemble(nstep, nsim)
 
 def compute_adf_test(samples: NDArray[numpy.floating[Any]], **kwargs) -> tuple[ADFTestReport, StatisticalTestReport]:
     """

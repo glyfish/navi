@@ -54,9 +54,12 @@ def maq_cov(θ: list[float], σ: float=1) -> NDArray[numpy.floating[Any]]:
     q = len(θ)
     c = numpy.zeros(q)
     s = numpy.zeros(q)
-    for n in range(1,q):
-        for i in range(q-n):
-            c[n] += θ[i]*θ[i+n]
+    # index n holds lag n+1 (maq_acf shifts these into ac_eq[1:]), so the cross
+    # terms at that lag are sum_i θ_i·θ_{i+n+1}. θ_0 = 1 contributes the θ[n]
+    # term held in s.
+    for n in range(q - 1):
+        for i in range(q - n - 1):
+            c[n] += θ[i]*θ[i+n+1]
     for n in range(q):
         s[n] = θ[n]
     return σ**2 * (c + s)

@@ -259,7 +259,7 @@ def statistic(samples: NDArray[numpy.floating[Any]], σ: float=1.0) -> float:
         delta = samples[i] - samples[i-1]
         delta_numerator += samples[i-1] * delta
         var += samples[i-1]**2
-    return delta_numerator / (numpy.sqrt(var)*σ**2)
+    return delta_numerator / (numpy.sqrt(var)*σ)
 
 def adf_test(samples: NDArray[numpy.floating[Any]], max_lag: int=12) -> ADFTestReport:
     """

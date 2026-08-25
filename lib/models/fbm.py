@@ -204,8 +204,8 @@ def fft_noise(H: float, n: int, dB: NDArray[numpy.floating[Any]] | None=None) ->
     for i in range(2*n):
         if i == 0:
             C[i] = 1.0
-        if i == n:
-            C[i] = 0.0
+        elif i == n:
+            C[i] = acf(H, n)
         elif i < n:
             C[i] = acf(H, i)
         else:
@@ -531,6 +531,8 @@ def __vr_stat_hetero(samples: NDArray[numpy.floating[Any]], s: int) -> float:
         Heteroscedastic variance ratio test statistic.
     """
 
+    if s == 1:
+        return 0
     r = __vr(samples, s)
     θ = __theta_factor(samples, s)
     return (r - 1.0)/numpy.sqrt(θ)
