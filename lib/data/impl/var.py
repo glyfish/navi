@@ -64,6 +64,8 @@ def compute_cov(φ: NDArray[numpy.floating[Any]], ω: NDArray[numpy.floating[Any
 
     ω = numpy.matrix(numpy.eye(m)) if ω is None else ω
     verify_type(ω, numpy.ndarray)
+    m0, n0 = ω.shape
+    verify_condition("Ω", m0 == m and n0 == m, f"should have shape({m},{m})")
 
     return var.cov(φ, ω)
 
@@ -93,6 +95,8 @@ def compute_acov(φ: NDArray[numpy.floating[Any]], ω: NDArray[numpy.floating[An
 
     ω = numpy.matrix(numpy.eye(m)) if ω is None else ω
     verify_type(ω, numpy.ndarray)
+    m0, n0 = ω.shape
+    verify_condition("Ω", m0 == m and n0 == m, f"should have shape({m},{m})")
     nlag = get_param_default_if_missing("nlag", 25, **kwargs)
 
     return  create_space(npts=nlag + 1), var.acov(φ, ω, nlag + 1)
@@ -202,6 +206,7 @@ def compute_omega_companion_form(Ω: NDArray[numpy.floating[Any]], n: int) -> nu
     verify_type(Ω, numpy.ndarray)
     m, l = Ω.shape
     verify_condition("Φ", m == l, "Ω should be square")
+    verify_condition("n", n > 0, f"should be positive")
 
     return var.omega_comp(Ω, n)
 
@@ -260,8 +265,10 @@ def compute_unvec(m: NDArray[numpy.floating[Any]] | numpy.matrix) -> numpy.matri
         Input vector in unvec form.
     """
 
-    _, n = m.shape
+    n2, n = m.shape
     verify_condition("Input", n == 1, f"should be a column vector")
+    # unvec sizes its output as int(sqrt(len)), which silently drops the tail
+    verify_condition("Input", int(numpy.sqrt(n2))**2 == n2, f"length should be a perfect square")
 
     return var.unvec(m)
 
@@ -300,17 +307,19 @@ def create_source(Φ: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[NDArray[n
     μ = get_param_default_if_missing("μ", μ_default, **kwargs)
     x0 = get_param_default_if_missing("x0", x0_default, **kwargs)
 
+    # type first: the shape checks below need .shape, which a list does not have
+    verify_type(x0, numpy.ndarray)
+    verify_type(Ω, numpy.ndarray)
+    verify_type(μ, numpy.ndarray)
+
     m0, n0 = Ω.shape
     verify_condition("Ω", m0 == m and n0 == m, f"should have shape({m},{m})")
     n0, m0 = x0.shape
     verify_condition("x0", m0 == m and n0 == n, f"should have shape ({n},{m})")
     verify_condition("μ", len(μ) == m, f"should have length ({m},)")
 
-    verify_type(x0, numpy.ndarray)
-    verify_type(Ω, numpy.ndarray)
-    verify_type(μ, numpy.ndarray)
-
     npts = get_param_default_if_missing("npts", 1000, **kwargs)
+    verify_condition("npts", npts >= n, f"should be at least the process order ({n})")
 
     return create_space(npts=npts), var.var(x0, μ, Φ, Ω, npts)
 
@@ -338,7 +347,9 @@ def compute_lag_order(samples: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[
     trend = get_param_default_if_missing("trend", 'c', **kwargs)
 
     result = var.lag_order_estimate(samples.T, maxlags, trend)
-    return result, __var_order_test_report_from_result(result)
+    # without a constant statsmodels starts the criteria at lag 1, not lag 0
+    p_min = 1 if trend == "n" else 0
+    return result, __var_order_test_report_from_result(result, p_min)
 
 
 def compute_estimate(samples: NDArray[numpy.floating[Any]], **kwargs):
@@ -371,26 +382,34 @@ def __var_estimate_from_result(result: VARResultsWrapper) -> VAREst:
     est_params = result.coefs
     n, m, _ = est_params.shape
 
-    est_stderr = numpy.array([a.T for a in numpy.array_split(result.stderr[1:], n)])
-    est_const = result.params[0]
-    est_const_stderr = result.stderr[0]
-    est_omega = result.resid_corr
+    # statsmodels stacks the deterministic terms above the lag rows: one row for
+    # trend='c', none for 'n', two for 'ct', three for 'ctt'. Count them rather
+    # than assuming a constant, or every reported Φ error is off by a row.
+    ndet = result.stderr.shape[0] - n*m
+    est_stderr = numpy.array([a.T for a in numpy.array_split(result.stderr[ndet:], n)])
+    # Ω is the noise covariance, not the residual correlation
+    est_omega = result.sigma_u
 
     est_id = str(uuid.uuid4())
     const = []
     params = []
     omega = []
      
-    for i in range(m):
-        const.append(ParamEst(est_id=est_id, 
-                              est=est_const[i], 
-                              err=est_const_stderr[i], 
-                              est_label=f"$\\hat{{M}}$", 
-                              err_label=f"$\\sigma^M$", 
-                              order=i + 1,
-                              row=0,
-                              column=0,                     
-                              param_type=VARParamType.VAR_CONST.value))
+    # trend='n' has no constant to report
+    if ndet > 0:
+        est_const = result.params[0]
+        est_const_stderr = result.stderr[0]
+        for i in range(m):
+            const.append(ParamEst(est_id=est_id,
+                                  est=est_const[i],
+                                  err=est_const_stderr[i],
+                                  est_label=f"$\\hat{{M}}$",
+                                  err_label=f"$\\sigma^M$",
+                                  # equation index goes in row, matching the VECM facade
+                                  order=0,
+                                  row=i,
+                                  column=0,
+                                  param_type=VARParamType.VAR_CONST.value))
 
     for i in range(n):
         for j in range(m):

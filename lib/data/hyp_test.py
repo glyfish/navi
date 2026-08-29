@@ -431,23 +431,30 @@ class VAROrderTestReport:
             return json.dumps(self, default=lambda o: o.__dict__)
 
 
-def __var_order_test_report_from_result(result: LagOrderResults) -> VAROrderTestReport:
+def __var_order_test_report_from_result(result: LagOrderResults, p_min: int=0) -> VAROrderTestReport:
+    # statsmodels indexes ics[k] from p_min -- 1 for trend='n', where lag 0 has no
+    # regressors to fit, and 0 otherwise -- while reporting the selected order on the
+    # lag scale. LagOrderResults does not carry p_min, so the caller supplies it;
+    # indexing by the order alone runs off the end of the list for trend='n'.
     test_id = str(uuid.uuid4())
 
+    def metric_at_selected_order(name):
+        return result.ics[name][getattr(result, name) - p_min]
+
     order = StatisticalTestParam(test_id, r"$\tau_{AIC}$", int(result.aic))
-    metric_value = StatisticalTestParam(test_id, r"$\varepsilon_{AIC}$", result.ics['aic'][result.aic])
+    metric_value = StatisticalTestParam(test_id, r"$\varepsilon_{AIC}$", metric_at_selected_order('aic'))
     aic_test = LagOrderTestResult(test_id, order, ErrorMetric.AIC, metric_value)
 
     order = StatisticalTestParam(test_id, r"$\tau_{BIC}$", int(result.bic))
-    metric_value = StatisticalTestParam(test_id, r"$\varepsilon_{BIC}$", result.ics['bic'][result.bic])
+    metric_value = StatisticalTestParam(test_id, r"$\varepsilon_{BIC}$", metric_at_selected_order('bic'))
     bic_test = LagOrderTestResult(test_id, order, ErrorMetric.BIC, metric_value)
 
     order = StatisticalTestParam(test_id, r"$\tau_{FPE}$", int(result.fpe))
-    metric_value = StatisticalTestParam(test_id, r"$\varepsilon_{FPE}$", result.ics['fpe'][result.fpe])
+    metric_value = StatisticalTestParam(test_id, r"$\varepsilon_{FPE}$", metric_at_selected_order('fpe'))
     fpe_test = LagOrderTestResult(test_id, order, ErrorMetric.FPE, metric_value)
 
     order = StatisticalTestParam(test_id, r"$\tau_{HQIC}$", int(result.hqic))
-    metric_value = StatisticalTestParam(test_id, r"$\varepsilon_{HQIC}$", result.ics['hqic'][result.hqic])
+    metric_value = StatisticalTestParam(test_id, r"$\varepsilon_{HQIC}$", metric_at_selected_order('hqic'))
     hqic_test = LagOrderTestResult(test_id, order, ErrorMetric.HQIC, metric_value)
 
     order_results = numpy.bincount([result.aic, result.bic, result.hqic])
