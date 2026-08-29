@@ -1,5 +1,6 @@
 
 from typing import Any, Tuple, cast
+import warnings
 import numpy
 from numpy.typing import NDArray
 from statsmodels.tsa.vector_ar.var_model import LagOrderResults
@@ -153,7 +154,23 @@ def johansen_test_coint(samples, max_lags, trend: int=0) -> JohansenTestResult:
         Johansen cointegration test result.
     """
 
-    return coint_johansen(samples, trend, max_lags)
+    # numpy>=2 returns complex128 from linalg.eig unconditionally, even for the
+    # real spectrum this test always has. coint_johansen was written against
+    # numpy 1.x (where eig downcast to real) and assigns those values straight
+    # into float arrays at vecm.py:731-732, so every call raises ComplexWarning
+    # with nothing actually discarded. Silence that, then check the assumption.
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=numpy.exceptions.ComplexWarning)
+        result = coint_johansen(samples, trend, max_lags)
+
+    if numpy.iscomplexobj(result.eig):
+        imag = float(numpy.abs(numpy.imag(result.eig)).max())
+        if imag > 1.0e-10:
+            warnings.warn(f"Johansen eigenvalues carry non-negligible imaginary parts "
+                          f"(max |imag| = {imag:.3e}); the trace and maximum eigenvalue "
+                          f"statistics discard them.", RuntimeWarning, stacklevel=2)
+
+    return result
 
 
 def predict(vecm: VECMResults, steps: int, alpha: float=0.05) -> Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:

@@ -233,7 +233,10 @@ def __vecm_johansen_coint_test_report_from_result(result: JohansenTestResult) ->
     trace_statistic_report = [JohansenCointTestStatistic(test_id, i, trace_statistic[i], trace_critical_vals[i]) for i in range(n)]
     eigen_value_statistic_report = [JohansenCointTestStatistic(test_id, i, eigen_value_statistic[i], eigen_value_critical_values[i]) for i in range(n)]
     rank_report = JohansenCointTestRank(test_id, ranks)
-    eigen_value_report = [JohansenCointTestEigenVector(test_id, eigen_values[i], eigen_vectors[i]) for i in range(n)]
+    # statsmodels returns the eigenvectors as COLUMNS of evec, so vector i is
+    # evec[:, i]; evec[i] is a row and is not a cointegrating vector.
+    # JohansenTestReport.summary (reports.py) already reads the columns.
+    eigen_value_report = [JohansenCointTestEigenVector(test_id, eigen_values[i], eigen_vectors[:, i]) for i in range(n)]
 
     return JohansenCointTestReport(test_id, trace_statistic_report, eigen_value_statistic_report, rank_report, eigen_value_report)
 

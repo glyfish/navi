@@ -207,8 +207,11 @@ class JohansenTestReport:
     """
 
     def __init__(self, result: JohansenTestResult):
-        self.eigen_values = result.eig
-        self.eigen_vectors = numpy.array(result.evec)
+        # eig/evec come back complex128 from numpy>=2 with an identically zero
+        # imaginary part; keeping them complex makes tabulate raise ComplexWarning
+        # under floatfmt and prints every eigenvector cell with a '+0.j' on it.
+        self.eigen_values = numpy.real(result.eig)
+        self.eigen_vectors = numpy.real(numpy.array(result.evec))
         self.trace_critical_vals = numpy.array(result.cvt)
         self.trace_statistic = result.lr1
         self.eigen_value_critical_values = numpy.array(result.cvm)
@@ -232,7 +235,9 @@ class JohansenTestReport:
         null_hypothesis = [f"r <= {i}" for i in range(n)]
         trace_results = [[null_hypothesis[i], self.trace_statistic[i], self.trace_critical_vals[i][0], self.trace_critical_vals[i][1], self.trace_critical_vals[i][2]] for i in range(n)]
         eigen_value_results = [[null_hypothesis[i], self.eigen_value_statistic[i], self.eigen_value_critical_values[i][0], self.eigen_value_critical_values[i][1], self.eigen_value_critical_values[i][2]] for i in range(n)]
-        eigen_values_vectors = [[self.eigen_values[i], str(self.eigen_vectors[:,i].T)] for i in range(n)]
+        # array2string keeps the bracketed space-separated form but caps the
+        # components at 4 decimals instead of numpy's full 8-digit repr
+        eigen_values_vectors = [[self.eigen_values[i], numpy.array2string(self.eigen_vectors[:, i], precision=4, suppress_small=True)] for i in range(n)]
 
         print("Trace Statistic")
         print(tabulate(trace_results, tablefmt=tablefmt, headers=test_headers, floatfmt=".3f"))
