@@ -372,7 +372,7 @@ def lag_order_estimate(samples: NDArray[numpy.floating[Any]], maxlags: int=12, t
 
     return __var_model(samples).select_order(maxlags=maxlags)
         
-def __var_model(endog: NDArray[numpy.floating[Any]]) -> VAR:
+def __var_model(endog: NDArray[numpy.floating[Any]] | DataFrame) -> VAR:
     """
     Estimate the parameters for and assumed VAR(n) model.
 

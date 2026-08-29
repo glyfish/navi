@@ -27,7 +27,7 @@ class HypothesisTestStatus(str, Enum):
         return self.value == "PASSED"
 
     @staticmethod
-    def from_bool(status: bool):
+    def from_bool(status: bool | numpy.bool_):
         return HypothesisTestStatus.PASSED if status else HypothesisTestStatus.FAILED
 
 # ##############################################################
@@ -638,7 +638,7 @@ class JohansenCointTestEigenVector:
         Canonical variate eigen vector.
     """
 
-    def __init__(self, test_id: str, eigen_value: float, eigen_vector: NDArray[numpy.floating[Any]]):
+    def __init__(self, test_id: str, eigen_value: float | complex, eigen_vector: NDArray[numpy.floating[Any]] | NDArray[numpy.complexfloating[Any, Any]]):
         self.test_id = test_id
         # numpy>=2 returns complex128 from linalg.eig even when every imaginary part is
         # zero, and json cannot serialize it. statsmodels discards them the same way

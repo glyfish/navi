@@ -6,6 +6,7 @@ Metrics in used in financial analysis.
 """
 
 import numpy
+from pandas import Series
 from numpy.typing import NDArray
 
 from typing import Any, Tuple
@@ -13,7 +14,7 @@ from typing import Any, Tuple
 from lib.utils import verify_condition
 
 
-def compute_zscore(time: NDArray[numpy.floating[Any]], data: NDArray[numpy.floating[Any]], window: int) -> Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
+def compute_zscore(time: NDArray[Any], data: NDArray[numpy.number[Any]] | Series, window: int) -> Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Calculate the z-score for a time series using a rolling window. The order of the
     time series is assumed oldest data to most recent data.
@@ -41,7 +42,7 @@ def compute_zscore(time: NDArray[numpy.floating[Any]], data: NDArray[numpy.float
     return time[window - 1:], numpy.array(zscores)
 
 
-def compute_std(time: NDArray[numpy.floating[Any]], data: NDArray[numpy.floating[Any]], window: int) -> Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
+def compute_std(time: NDArray[Any], data: NDArray[numpy.number[Any]] | Series, window: int) -> Tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Calculate the standard deviation for a time series using a rolling window. The order of the
     time series is assumed oldest data to most recent data.
@@ -69,7 +70,7 @@ def compute_std(time: NDArray[numpy.floating[Any]], data: NDArray[numpy.floating
     return time[window - 1:], numpy.array(stds)
 
 
-def zscore(samples: NDArray[numpy.floating[Any]]) -> float:
+def zscore(samples: NDArray[numpy.number[Any]] | Series) -> float:
     """
     Calculate the z-score using samples to compute the mean and standard deviation
     and use the last value in samples as the test value.
@@ -103,7 +104,7 @@ def zscore(samples: NDArray[numpy.floating[Any]]) -> float:
     return 0.0 if std == 0 else float("nan")
 
 
-def std(samples: NDArray[numpy.floating[Any]]) -> float:    
+def std(samples: NDArray[numpy.number[Any]] | Series) -> float:    
     """
     Calculate the standard deviation of the samples.
 

@@ -18,6 +18,7 @@ from pandas import DataFrame, Index
 import statsmodels.formula.api as smf
 
 from lib import stats
+from lib.stats import EnsembleSamples
 from lib.data.param_est import (ParamEst, OLSResult, OLSParamType)
 from lib.data.hyp_test import (GrangerCausalityTestResult, GrangerCausalityTestReport)
 from lib.utils import (get_param_throw_if_missing, get_param_default_if_missing, get_s_vals, 
@@ -323,7 +324,7 @@ def compute_lag_var(data: NDArray[numpy.floating[Any]], **kwargs) -> tuple[list[
     return s_vals, stats.lag_var_scan(data, s_vals)
 
 
-def compute_ensemble_mean(time: NDArray[numpy.floating[Any]], data: list[NDArray[numpy.floating[Any]]]) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
+def compute_ensemble_mean(time: NDArray[numpy.floating[Any]], data: EnsembleSamples) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute the time varying mean of the sampled ensemble.
 
@@ -348,7 +349,7 @@ def compute_ensemble_mean(time: NDArray[numpy.floating[Any]], data: list[NDArray
     return time, stats.ensemble_mean(data)
 
 
-def compute_ensemble_sd(time: numpy.ndarray, data: list[NDArray[numpy.floating[Any]]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
+def compute_ensemble_sd(time: NDArray[numpy.floating[Any]], data: EnsembleSamples, **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute the time varying standard deviation of the sampled ensemble.
 
@@ -377,7 +378,7 @@ def compute_ensemble_sd(time: numpy.ndarray, data: list[NDArray[numpy.floating[A
     return time, stats.ensemble_sd(data, Δt)
 
 
-def compute_ensemble_var(time: NDArray[numpy.floating[Any]], data: list[NDArray[numpy.floating[Any]]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
+def compute_ensemble_var(time: NDArray[numpy.floating[Any]], data: EnsembleSamples, **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute the time varying variance of the sampled ensemble.
 
@@ -406,7 +407,7 @@ def compute_ensemble_var(time: NDArray[numpy.floating[Any]], data: list[NDArray[
     return time, stats.ensemble_var(data, Δt)
 
 
-def compute_ensemble_acf(time: numpy.ndarray, data: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
+def compute_ensemble_acf(time: NDArray[numpy.floating[Any]], data: EnsembleSamples, **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute the ensemble averaged autocorrelation function of the sampled ensemble.
 
@@ -435,7 +436,7 @@ def compute_ensemble_acf(time: numpy.ndarray, data: NDArray[numpy.floating[Any]]
     return time[:nlags], stats.ensemble_acf(data, nlags)
 
 
-def compute_ensemble_cov(time: NDArray[numpy.floating[Any]], x: list[NDArray[numpy.floating[Any]]], y: list[NDArray[numpy.floating[Any]]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
+def compute_ensemble_cov(time: NDArray[numpy.floating[Any]], x: EnsembleSamples, y: EnsembleSamples, **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute the ensemble averaged covariance function of the sampled ensemble.
 
@@ -462,7 +463,7 @@ def compute_ensemble_cov(time: NDArray[numpy.floating[Any]], x: list[NDArray[num
     return time, stats.ensemble_cov(x, y)
 
 
-def compute_ensemble_correlation_coefficient(time: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]], y: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
+def compute_ensemble_correlation_coefficient(time: NDArray[numpy.floating[Any]], x: EnsembleSamples, y: EnsembleSamples, **kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
     """
     Compute the ensemble averaged covariance function of the sampled ensemble.
 

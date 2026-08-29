@@ -6,6 +6,7 @@ Simulations and analysis of ARIMA(p,d,q) random process.
 
 from typing import Any
 import numpy
+from pandas import Series
 from numpy.typing import NDArray
 
 import statsmodels.api as sm
@@ -549,7 +550,7 @@ def ar_fit(samples: NDArray[numpy.floating[Any]], order: int) -> ARIMAResults:
     return ___ar_model(samples, order).fit()
 
 
-def __ar_offset_model(samples: NDArray[numpy.floating[Any]], order: int) -> ARIMA:
+def __ar_offset_model(samples: NDArray[numpy.floating[Any]] | Series, order: int) -> ARIMA:
     """
     Create and AR(p) with an offset of the specified order with the specified samples.
 
@@ -569,7 +570,7 @@ def __ar_offset_model(samples: NDArray[numpy.floating[Any]], order: int) -> ARIM
     return ARIMA(samples, order=(order, 0, 0), trend='c')
 
 
-def ar_offset_fit(samples: NDArray[numpy.floating[Any]], order: int) -> ARIMAResults:
+def ar_offset_fit(samples: NDArray[numpy.floating[Any]] | Series, order: int) -> ARIMAResults:
     """
     Estimate the parameters for the assumed AR(p) with offset model from the samples
     assuming the specified order.
