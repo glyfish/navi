@@ -2,6 +2,7 @@ from tabulate import tabulate
 from typing import Any
 import numpy
 from numpy.typing import NDArray
+from statsmodels.tsa.arima.model import ARIMAResults, ARIMAResultsWrapper
 from statsmodels.tsa.vector_ar.vecm import JohansenTestResult
 
 from lib.data.hyp_test import HypothesisTestType, HypothesisType
@@ -148,32 +149,45 @@ class OUEstReport:
         self.ar_result = result
         self.delta_t = Δt
         self.x0 = x0
+        # statsmodels' ARIMA with trend="c" (what arima.ar_offset_fit returns)
+        # reports the process mean itself as the constant, while an OLS AR(1)
+        # fit reports the intercept μ(1 - φ). The two parameterisations cannot
+        # be told apart from the parameter names, so branch on the result type.
+        self.mean_parameterised = isinstance(result, (ARIMAResults, ARIMAResultsWrapper))
         self.offset_est = result.params.iloc[0]
         self.offset_error = result.bse.iloc[0]
         self.coeff_est = result.params.iloc[1]
         self.coeff_error = result.bse.iloc[1]
-        self.sigma2_est = result.params.iloc[2]
-        self.sigma2_error = result.bse.iloc[2]
+        # the AR innovation variance, not the OU σ² -- sigma2_est() derives that
+        self.ar_var_est = result.params.iloc[2]
+        self.ar_var_error = result.bse.iloc[2]
 
     def mu_est(self):
+        if self.mean_parameterised:
+            return self.offset_est
         return self.offset_est/(1.0 - self.coeff_est)
 
     def mu_error(self):
-        return (self.offset_est*self.coeff_error + self.offset_error)/(1.0 - self.coeff_est)
+        if self.mean_parameterised:
+            return self.offset_error
+        # d(μ)/d(a) = 1/(1 - φ) and d(μ)/d(φ) = a/(1 - φ)²
+        return self.offset_error/(1.0 - self.coeff_est) + \
+               self.offset_est*self.coeff_error/(1.0 - self.coeff_est)**2
 
     def lambda_est(self):
         return -numpy.log(self.coeff_est)/self.delta_t
 
     def lambda_error(self):
-        return -self.coeff_error/(self.coeff_est*self.delta_t)
+        # an uncertainty is a magnitude; the derivative dλ/dφ is negative
+        return abs(self.coeff_error/(self.coeff_est*self.delta_t))
 
     def sigma2_est(self):
-        return 2.0*self.lambda_est()*self.sigma2_est/(1.0 - self.coeff_est**2)
+        return 2.0*self.lambda_est()*self.ar_var_est/(1.0 - self.coeff_est**2)
 
     def sigma2_error(self):
-        return 4.0*self.lambda_est()*self.coeff_est*self.sigma2_est*self.coeff_error/(1.0 - self.coeff_est**2)**2 + \
-               2.0*self.sigma2_est*self.lambda_error()/(1.0 - self.coeff_est**2) + \
-               2.0*self.lambda_est()*self.sigma2_error/(1.0 - self.coeff_est**2)
+        return 4.0*self.lambda_est()*self.coeff_est*self.ar_var_est*self.coeff_error/(1.0 - self.coeff_est**2)**2 + \
+               2.0*self.ar_var_est*self.lambda_error()/(1.0 - self.coeff_est**2) + \
+               2.0*self.lambda_est()*self.ar_var_error/(1.0 - self.coeff_est**2)
 
     def summary(self, tablefmt="fancy_grid"):
         header = [["Δt", self.delta_t],

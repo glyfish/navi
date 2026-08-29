@@ -164,9 +164,8 @@ def compute_cov(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.f
     λ = get_param_default_if_missing("λ", 1.0, **kwargs)
     s = get_param_default_if_missing("s", 1.0, **kwargs)
 
-    xmin = s
-    xmax = npts * Δt
-    t = create_space(xmin=xmin, xmax=xmax, Δx=Δt)
+    # npts is the number of points, as everywhere else in this module
+    t = create_space(xmin=s, npts=npts, Δx=Δt)
 
     return t, ou.cov(λ, s, t, σ)
 
@@ -236,7 +235,13 @@ def compute_pdf(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.f
     σ = get_param_default_if_missing("σ", 1.0, **kwargs)
     x0 = get_param_default_if_missing("x0", 0.0, **kwargs)
 
-    x = create_space(xmin=xmin, xmax=xmax, npts=npts)
+    # Δx is documented; create_space ignores it whenever npts is supplied,
+    # so pass one or the other.
+    Δx = get_param_default_if_missing("Δx", None, **kwargs)
+    if Δx is None:
+        x = create_space(xmin=xmin, xmax=xmax, npts=npts)
+    else:
+        x = create_space(xmin=xmin, xmax=xmax, Δx=Δx)
 
     return x, ou.pdf(x, μ, λ, t, σ=σ, x0=x0)
 
@@ -278,7 +283,13 @@ def compute_cdf(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.f
     σ = get_param_default_if_missing("σ", 1.0, **kwargs)
     x0 = get_param_default_if_missing("x0", 0.0, **kwargs)
     
-    x = create_space(xmin=xmin, xmax=xmax, npts=npts)
+    # Δx is documented; create_space ignores it whenever npts is supplied,
+    # so pass one or the other.
+    Δx = get_param_default_if_missing("Δx", None, **kwargs)
+    if Δx is None:
+        x = create_space(xmin=xmin, xmax=xmax, npts=npts)
+    else:
+        x = create_space(xmin=xmin, xmax=xmax, Δx=Δx)
 
     return x, ou.cdf(x, μ, λ, t, σ=σ, x0=x0)
 
@@ -314,7 +325,13 @@ def compute_pdf_limit(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[n
     λ = get_param_default_if_missing("λ", 1.0, **kwargs)
     σ = get_param_default_if_missing("σ", 1.0, **kwargs)
 
-    x = create_space(xmin=xmin, xmax=xmax, npts=npts)
+    # Δx is documented; create_space ignores it whenever npts is supplied,
+    # so pass one or the other.
+    Δx = get_param_default_if_missing("Δx", None, **kwargs)
+    if Δx is None:
+        x = create_space(xmin=xmin, xmax=xmax, npts=npts)
+    else:
+        x = create_space(xmin=xmin, xmax=xmax, Δx=Δx)
 
     return x, ou.pdf_limit(x, μ, λ, σ=σ)
 
@@ -351,7 +368,13 @@ def compute_cdf_limit(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[n
     σ = get_param_default_if_missing("σ", 1.0, **kwargs)
     x0 = get_param_default_if_missing("x0", 0.0, **kwargs)
 
-    x = create_space(xmin=xmin, xmax=xmax, npts=npts)
+    # Δx is documented; create_space ignores it whenever npts is supplied,
+    # so pass one or the other.
+    Δx = get_param_default_if_missing("Δx", None, **kwargs)
+    if Δx is None:
+        x = create_space(xmin=xmin, xmax=xmax, npts=npts)
+    else:
+        x = create_space(xmin=xmin, xmax=xmax, Δx=Δx)
 
     return x, ou.cdf_limit(x, μ, λ, σ=σ, x0=x0)
 
@@ -424,7 +447,10 @@ def create_xt_source(**kwargs) -> NDArray[numpy.floating[Any]]:
     """
 
     t = get_param_throw_if_missing("t", **kwargs)
-    npts = get_param_default_if_missing("npts", 10, **kwargs)
+    # n is the documented name; npts is kept working for existing callers
+    npts = get_param_default_if_missing("n", None, **kwargs)
+    if npts is None:
+        npts = get_param_default_if_missing("npts", 10, **kwargs)
     μ = get_param_default_if_missing("μ", 0.0, **kwargs)
     λ = get_param_default_if_missing("λ", 1.0, **kwargs)
     σ = get_param_default_if_missing("σ", 1.0, **kwargs)
@@ -459,7 +485,10 @@ def create_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy
     """
 
     Δt = get_param_default_if_missing("Δt", 1.0, **kwargs)
-    npts = get_param_default_if_missing("npts", 10, **kwargs)
+    # n is the documented name; npts is kept working for existing callers
+    npts = get_param_default_if_missing("n", None, **kwargs)
+    if npts is None:
+        npts = get_param_default_if_missing("npts", 10, **kwargs)
     μ = get_param_default_if_missing("μ", 0.0, **kwargs)
     λ = get_param_default_if_missing("λ", 1.0, **kwargs)
     σ = get_param_default_if_missing("σ", 1.0, **kwargs)
@@ -503,8 +532,8 @@ def __half_life_transform(result: OLSResult, dt: float) -> None:
                             param_type=OLSParamType.TRANS_PARAM.value)
 
     const = ParamEst(est_id=result.est_id,
-                     est=result.const.est,
-                     err=result.const.err,
+                     est=result.const.est / dt,
+                     err=result.const.err / dt,
                      est_label=r"$\mu$",
                      err_label=r"$\sigma_{\mu}$",
                      order=1,

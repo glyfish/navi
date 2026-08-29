@@ -93,7 +93,9 @@ def cov(λ: float, s: float, t: NDArray[numpy.floating[Any]], σ: float=1.0) -> 
         Covariance as a function of time for given parameters.
     """
 
-    c = numpy.exp(-λ*(t - s)) - numpy.exp(-λ*(t + s))
+    # Cov(X_s, X_t) depends on |t - s|; without the abs the t < s half plane
+    # grows exponentially instead of decaying, and the function is not symmetric.
+    c = numpy.exp(-λ*numpy.abs(t - s)) - numpy.exp(-λ*(t + s))
     return σ**2*c/(2.0*λ)
 
 def pdf(x: NDArray[numpy.floating[Any]], μ: float, λ: float, t: float, σ: float=1.0, x0: float=0.0) -> NDArray[numpy.floating[Any]]:
@@ -123,6 +125,10 @@ def pdf(x: NDArray[numpy.floating[Any]], μ: float, λ: float, t: float, σ: flo
 
     μt = __mean(μ, λ, t, x0)
     σt = numpy.sqrt(__var(λ, t, σ))
+    # At t = 0 the variance is 0 and X_0 is the point mass at x0; scipy returns
+    # nan for scale=0, so evaluate the degenerate law directly.
+    if σt == 0.0:
+        return numpy.where(numpy.asarray(x, dtype=float) == μt, numpy.inf, 0.0)
     return norm.pdf(x, loc=μt, scale=σt)
 
 def cdf(x: NDArray[numpy.floating[Any]], μ: float, λ: float, t: float, σ: float=1.0, x0: float=0.0) -> NDArray[numpy.floating[Any]]:
@@ -152,6 +158,9 @@ def cdf(x: NDArray[numpy.floating[Any]], μ: float, λ: float, t: float, σ: flo
 
     μt = __mean(μ, λ, t, x0)
     σt = numpy.sqrt(__var(λ, t, σ))
+    # The point mass at x0 has the unit step for its CDF, right continuous at x0.
+    if σt == 0.0:
+        return (numpy.asarray(x, dtype=float) >= μt).astype(float)
     return norm.cdf(x, loc=μt, scale=σt)
 
 def pdf_limit(x: NDArray[numpy.floating[Any]], μ: float, λ: float, σ: float=1.0) -> NDArray[numpy.floating[Any]]:
@@ -276,9 +285,12 @@ def ou(μ: float, λ: float, Δt: float, n: int, σ: float=1.0, x0: float=0) -> 
 
     x = numpy.zeros(n)
     ε = numpy.random.normal(0.0, 1.0, n)
-    x[0] = x0
+    if n > 0:
+        x[0] = x0
     for i in range(0, n-1):
-        x[i+1] = x[i] + λ*(μ - x[i])*Δt + σ*Δt*ε[i]
+        # Euler-Maruyama: the Wiener increment over Δt has standard deviation
+        # σ√Δt, not σΔt. The drift stays first order in Δt.
+        x[i+1] = x[i] + λ*(μ - x[i])*Δt + σ*numpy.sqrt(Δt)*ε[i]
     return x
 
 def __var(λ: float, t: float, σ: float=1.0) -> float:
