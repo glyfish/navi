@@ -206,7 +206,7 @@ def compute_omega_companion_form(Ω: NDArray[numpy.floating[Any]], n: int) -> nu
     return var.omega_comp(Ω, n)
 
 
-def compute_vec(m: numpy.matrix) -> numpy.matrix:
+def compute_vec(m: NDArray[numpy.floating[Any]] | numpy.matrix) -> numpy.matrix:
     """
     Apply the vec operator to the given matrix. The vec operation 
     applied to the matrix,
@@ -314,7 +314,7 @@ def create_source(Φ: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[NDArray[n
 
     return create_space(npts=npts), var.var(x0, μ, Φ, Ω, npts)
 
-def compute_order(samples: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[LagOrderResults, VAROrderTestReport]:
+def compute_lag_order(samples: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[LagOrderResults, VAROrderTestReport]:
     """
     Determine the order of a VAR process using the AIC criterion.
 
@@ -337,7 +337,7 @@ def compute_order(samples: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[LagO
     maxlags = get_param_default_if_missing("maxlags", 12, **kwargs)
     trend = get_param_default_if_missing("trend", 'c', **kwargs)
 
-    result = var.order_estimate(samples.T, maxlags, trend)
+    result = var.lag_order_estimate(samples.T, maxlags, trend)
     return result, __var_order_test_report_from_result(result)
 
 

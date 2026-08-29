@@ -46,9 +46,9 @@ def compute_estimate(samples: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[V
 
     return result, __vecm_estimate_from_result(result)
 
-def compute_order(samples: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[LagOrderResults, VAROrderTestReport]:
+def compute_lag_order(samples: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[LagOrderResults, VAROrderTestReport]:
     """
-    Determine the order of a VAR process using the AIC criterion.
+    Determine the lag order of a VAR process using the AIC criterion.
 
     Parameters
     ----------
@@ -66,13 +66,13 @@ def compute_order(samples: NDArray[numpy.floating[Any]], **kwargs) -> Tuple[LagO
     Returns
     -------
     LagOrderResults
-        Order results.
+        Lag order results.
     """
 
     maxlags = get_param_default_if_missing("maxlags", 12, **kwargs)
     trend = get_param_default_if_missing("trend", 'co', **kwargs)
 
-    result = vecm.order_estimate(samples.T, maxlags, trend)
+    result = vecm.lag_order_estimate(samples.T, maxlags, trend)
     return result, __var_order_test_report_from_result(result)
 
 

@@ -37,9 +37,9 @@ def fit(endog: NDArray[numpy.floating[Any]], maxlags: int, rank: int, trend: str
 
     return __vecm_model(endog, maxlags=maxlags, rank=rank, trend=trend).fit()
 
-def order_estimate(samples: NDArray[numpy.floating[Any]], maxlags: int=12, deterministic='n') -> LagOrderResults:
+def lag_order_estimate(samples: NDArray[numpy.floating[Any]], maxlags: int=12, deterministic='n') -> LagOrderResults:
     """
-    Estimate order of VECM samples.
+    Estimate lag order of VECM samples.
 
     Parameters
     ----------
@@ -55,7 +55,7 @@ def order_estimate(samples: NDArray[numpy.floating[Any]], maxlags: int=12, deter
     Returns
     -------
     LagOrderResults
-        Order results.
+        Lag order results.
     """
 
     return select_order(samples, maxlags=maxlags, deterministic=deterministic)

@@ -2,6 +2,7 @@
 from typing import Any
 import numpy
 from numpy.typing import NDArray
+from pandas import DataFrame
 from statsmodels.tsa.vector_ar.var_model import VAR, VARResults, VARResultsWrapper, LagOrderResults
 
 from lib.stats import multivariate_normal_samples
@@ -218,7 +219,7 @@ def omega_comp(ω: NDArray[numpy.floating[Any]], n: int) -> numpy.matrix:
     return numpy.matrix(p)
 
 
-def vec(m: numpy.matrix) -> numpy.matrix:
+def vec(m: NDArray[numpy.floating[Any]] | numpy.matrix) -> numpy.matrix:
     """
     Apply the vec operator to the given matrix. The vec operation 
     applied to the matrix,
@@ -243,6 +244,11 @@ def vec(m: numpy.matrix) -> numpy.matrix:
     NDArray[numpy.floating[Any]]
         Input vector converted to vec form.
     """
+
+    # m[:, i] must come back as an (n, 1) column to fill the column slice below;
+    # a plain ndarray gives (n,) and fails to broadcast. asmatrix is a view when
+    # m is already a matrix, so this accepts both at no cost.
+    m = numpy.asmatrix(m)
 
     _, n = m.shape
     v = numpy.matrix(numpy.zeros(n**2)).T
@@ -322,7 +328,7 @@ def var(x0: NDArray[numpy.floating[Any]], μ: NDArray[numpy.floating[Any]], φ: 
             xt[i] += numpy.squeeze(numpy.array(t1), axis=1)
     return numpy.transpose(xt)
     
-def fit(endog: NDArray[numpy.floating[Any]], maxlags: int=12, trend: str="c") -> VARResultsWrapper:
+def fit(endog: NDArray[numpy.floating[Any]] | DataFrame, maxlags: int=12, trend: str="c") -> VARResultsWrapper:
     """
     Estimate the parameters for and assumed VAR(n) model.
 
@@ -344,7 +350,7 @@ def fit(endog: NDArray[numpy.floating[Any]], maxlags: int=12, trend: str="c") ->
 
     return __var_model(endog).fit(maxlags=maxlags, trend=trend)
     
-def order_estimate(samples: NDArray[numpy.floating[Any]], maxlags: int=12, trend: str="c") -> LagOrderResults:
+def lag_order_estimate(samples: NDArray[numpy.floating[Any]], maxlags: int=12, trend: str="c") -> LagOrderResults:
     """
     Estimate order of VAR samples.
 
