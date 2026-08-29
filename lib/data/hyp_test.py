@@ -570,14 +570,20 @@ class JohansenCointTestStatistic:
         test result.
     """
 
-    def __init__(self, test_id: str, test_rank: int, test_stat: float, critical_values: NDArray[numpy.floating[Any]]):
+    def __init__(self, test_id: str, test_rank: int, test_stat: float, critical_values: NDArray[numpy.floating[Any]],
+                 null_hypothesis: str | None = None):
         self.test_id = test_id
         self.test_rank = test_rank
-        self.null_hypothesis = f"r<={test_rank}"
+        # Default is the trace test's null; the maximum eigenvalue test passes
+        # its own r = i label.
+        self.null_hypothesis = null_hypothesis if null_hypothesis is not None else f"r<={test_rank}"
         self.test_stat = test_stat
         self.critical_values = critical_values.tolist()
-        self.significance_levels = ["Critical Value 90%", "Critical Value 95%", "Critical Value 99%"]
         self.test_result = [bool(test_stat > cv) for cv in critical_values]
+        # One label per critical value actually handed in, so a short row
+        # cannot leave 'Critical Value 99%' with no result behind it.
+        self.significance_levels = ["Critical Value 90%", "Critical Value 95%",
+                                    "Critical Value 99%"][:len(self.test_result)]
 
     def __repr__(self):
         return f"JohansenCointTestStatistic({self.__props()})"

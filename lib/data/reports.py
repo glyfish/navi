@@ -218,13 +218,22 @@ class JohansenTestReport:
         self.eigen_value_statistic = result.lr2
 
     def compute_rank(self):
-        test_result = []
-        n = len(self.trace_statistic)
-        for i in range(n):
-            test_result.append(self.trace_statistic[i] > self.trace_critical_vals[i])
-        test_result = numpy.array(test_result)
-        nonzero = [numpy.asarray(test_result[:,i]).nonzero() for i in range(n)]
-        return [max(col[0] + 1) if len(col[0]) > 0 else 0 for col in nonzero] 
+        # One rank per significance level (the columns of the (nvars, 3)
+        # critical value matrix), following Johansen's sequential procedure:
+        # walk the nulls r<=0, r<=1, ... and stop at the first one not
+        # rejected. Iterating the levels -- not the series -- keeps a two
+        # variable system from dropping the 99% column and a four variable
+        # system from walking off the three column table.
+        rejections = numpy.asarray(self.trace_statistic)[:, None] > numpy.asarray(self.trace_critical_vals)
+        ranks = []
+        for level in range(rejections.shape[1]):
+            rank = 0
+            for rejected in rejections[:, level]:
+                if not rejected:
+                    break
+                rank += 1
+            ranks.append(rank)
+        return ranks
 
 
     def summary(self, tablefmt="fancy_grid"):

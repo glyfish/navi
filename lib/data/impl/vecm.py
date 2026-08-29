@@ -219,19 +219,30 @@ def __vecm_johansen_coint_test_report_from_result(result: JohansenTestResult) ->
     eigen_value_statistic = result.lr2
 
     def compute_rank():
-        test_result = []
-        n = len(trace_statistic)
-        for i in range(n):
-            test_result.append(trace_statistic[i] > trace_critical_vals[i])
-        test_result = numpy.array(test_result)               
-        return [len(test_result[:,i][test_result[:,i]]) for i in range(n)]
+        # Same sequential rule as JohansenTestReport.compute_rank: one rank
+        # per significance level column, stopping at the first null not
+        # rejected. Plain ints -- the ranks are serialized through
+        # json.dumps(default=lambda o: o.__dict__), which cannot encode
+        # numpy integer scalars.
+        rejections = numpy.asarray(trace_statistic)[:, None] > numpy.asarray(trace_critical_vals)
+        ranks = []
+        for level in range(rejections.shape[1]):
+            rank = 0
+            for rejected in rejections[:, level]:
+                if not rejected:
+                    break
+                rank += 1
+            ranks.append(int(rank))
+        return ranks
 
     ranks = compute_rank()
     n = len(eigen_values)
     test_id = str(uuid.uuid4())
 
     trace_statistic_report = [JohansenCointTestStatistic(test_id, i, trace_statistic[i], trace_critical_vals[i]) for i in range(n)]
-    eigen_value_statistic_report = [JohansenCointTestStatistic(test_id, i, eigen_value_statistic[i], eigen_value_critical_values[i]) for i in range(n)]
+    # The maximum eigenvalue test's null is r = i (against r = i + 1), not
+    # the trace test's r <= i.
+    eigen_value_statistic_report = [JohansenCointTestStatistic(test_id, i, eigen_value_statistic[i], eigen_value_critical_values[i], null_hypothesis=f"r={i}") for i in range(n)]
     rank_report = JohansenCointTestRank(test_id, ranks)
     # statsmodels returns the eigenvectors as COLUMNS of evec, so vector i is
     # evec[:, i]; evec[i] is a row and is not a cointegrating vector.
