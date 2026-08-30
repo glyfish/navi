@@ -26,7 +26,7 @@ import matplotlib.dates as mdates
 import matplotlib.units as munits
 from matplotlib import pyplot, rcParams, axes
 from numpy.typing import NDArray
-from typing import Any, Sequence
+from typing import Any, Sequence, cast
 
 
 from lib.plots.comp.axis import (PlotType, logStyle, logXStyle, logYStyle)
@@ -385,7 +385,7 @@ def twinx(axis: axes.Axes, left: NDArray, right: NDArray, x: NDArray | list[NDAr
     left_ylim       = get_param_default_if_missing("left_ylim", None, **kwargs)
     right_ylim      = get_param_default_if_missing("right_ylim", None, **kwargs)
     xlim            = get_param_default_if_missing("xlim", None, **kwargs)
-    legend_loc      = get_param_default_if_missing("legend_loc", "best", **kwargs)
+    legend_loc      = cast(Any, get_param_default_if_missing("legend_loc", "best", **kwargs))
     legend_title    = get_param_default_if_missing("legend_title", None, **kwargs)
     npts            = get_param_default_if_missing("npts", None, **kwargs)
 
@@ -486,7 +486,7 @@ def twinx_comparison(axis: axes.Axes, left: list[NDArray], right: list[NDArray],
     left_ylim       = get_param_default_if_missing("left_ylim", None, **kwargs)
     right_ylim      = get_param_default_if_missing("right_ylim", None, **kwargs)
     xlim            = get_param_default_if_missing("xlim", None, **kwargs)
-    legend_loc      = get_param_default_if_missing("legend_loc", "best", **kwargs)
+    legend_loc      = cast(Any, get_param_default_if_missing("legend_loc", "best", **kwargs))
     legend_title    = get_param_default_if_missing("legend_title", None, **kwargs)
     npts            = get_param_default_if_missing("npts", None, **kwargs)
     scilimits       = get_param_default_if_missing("scilimits", (-3, 3), **kwargs)
@@ -686,7 +686,7 @@ def scatter_comparison(axis: axes.Axes, data: list[NDArray], x: NDArray, **kwarg
     scilimits      = get_param_default_if_missing("scilimits", (-4, 4), **kwargs)
     markers        = get_param_default_if_missing("marker", None, **kwargs)
     marker_size    = get_param_default_if_missing("marker_size", 5.0, **kwargs)
-    legend_loc     = get_param_default_if_missing("legend_loc", "best", **kwargs)
+    legend_loc     = cast(Any, get_param_default_if_missing("legend_loc", "best", **kwargs))
     legend_title   = get_param_default_if_missing("legend_title", None, **kwargs)
 
     ncurve = len(data)

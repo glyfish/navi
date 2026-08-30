@@ -4,7 +4,7 @@ import matplotlib.dates as mdates
 import matplotlib.units as munits
 from matplotlib import pyplot, rcParams, axes
 from datetime import datetime, date
-from typing import Any, Sequence
+from typing import Any, Sequence, cast
 from numpy.typing import NDArray
 
 from lib.plots.comp.plot_utils import (__plot_curve, __plot_curves, __twinx_ticks, __plot_bar, 
@@ -225,7 +225,7 @@ def twinx_bar_line(axis: axes.Axes, y_bar: NDArray, y_line: NDArray, x_bar: NDAr
     labels          = get_param_default_if_missing("labels", None, **kwargs)
     bar_ylim        = get_param_default_if_missing("bar_ylim", None, **kwargs)
     line_ylim       = get_param_default_if_missing("line_ylim", None, **kwargs)
-    legend_loc      = get_param_default_if_missing("legend_loc", "best", **kwargs)
+    legend_loc      = cast(Any, get_param_default_if_missing("legend_loc", "best", **kwargs))
 
     if x_bar is None:
         x_bar = numpy.linspace(0, len(y_bar) - 1, len(y_bar))
@@ -317,7 +317,7 @@ def twinx_bar_line_comparison(axis: axes.Axes, y_bar: NDArray, y_line: Sequence[
     labels          = get_param_default_if_missing("labels", None, **kwargs)
     bar_ylim        = get_param_default_if_missing("bar_ylim", None, **kwargs)
     line_ylim       = get_param_default_if_missing("line_ylim", None, **kwargs)
-    legend_loc      = get_param_default_if_missing("legend_loc", "best", **kwargs)
+    legend_loc      = cast(Any, get_param_default_if_missing("legend_loc", "best", **kwargs))
     bar_color       = get_param_default_if_missing("bar_color", "#0067C4", **kwargs)
     line_colors      = get_param_default_if_missing("line_colors", None, **kwargs)
 
@@ -391,7 +391,7 @@ def hist(axis: axes.Axes, samples: NDArray, fx=None, **kwargs):
     ylim            = get_param_default_if_missing("ylim", None, **kwargs)
     xlim            = get_param_default_if_missing("xlim", None, **kwargs)
     labels          = get_param_default_if_missing("labels", None, **kwargs)
-    legend_loc      = get_param_default_if_missing("legend_loc", "best", **kwargs)
+    legend_loc      = cast(Any, get_param_default_if_missing("legend_loc", "best", **kwargs))
 
     if title is not None:
         axis.set_title(title, y=title_offset)

@@ -9,7 +9,7 @@ from lib.plots.comp.axis import PlotType
 from lib.data import OLSResult, stats
 
 def training(forecast_data: NDArray[numpy.floating[Any]], observed_data: NDArray[numpy.floating[Any]], upper_bound_error: NDArray[numpy.floating[Any]], 
-             lower_bound_error: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]]=None, title: str=None, title_offset: float=0.015,
+             lower_bound_error: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]] | None=None, title: str | None=None, title_offset: float=0.015,
              figsize: Tuple[int, int]=(10, 6), alpha: float=0.05, ylabel=None):
     """"
     Plot the result of a training analysis.
@@ -44,7 +44,7 @@ def training(forecast_data: NDArray[numpy.floating[Any]], observed_data: NDArray
 
     title = f"Training Analysis, $\\alpha$={alpha: 2.2f}\nBIAS={bias: 2.2f}, MAE={mae: 2.2f}, RMSE={rmse: 2.2f}" if title is None else title
     ylabel = r"$X_t$" if ylabel is None else ylabel
-    x = numpy.arange(len(forecast_data)) if x is None else x
+    x = numpy.arange(len(forecast_data), dtype=float) if x is None else x
     labels = ["Observation", "Forecast"]
 
     comp.comparison(axis, [observed_data, forecast_data], x, title=title, title_offset=title_offset, labels=labels, xlabel="$t$", 
@@ -53,7 +53,7 @@ def training(forecast_data: NDArray[numpy.floating[Any]], observed_data: NDArray
 
 
 def prediction(training_data: NDArray[numpy.floating[Any]], forecast_data: NDArray[numpy.floating[Any]], upper_bound_error: NDArray[numpy.floating[Any]], 
-               lower_bound_error: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]]=None, title: str=None, title_offset: float=0.0,
+               lower_bound_error: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]] | None=None, title: str | None=None, title_offset: float=0.0,
                figsize: Tuple[int, int]=(10, 6), alpha: float=0.05, ylabel=None):
     """"
     Plot the result of a training analysis.
@@ -83,7 +83,7 @@ def prediction(training_data: NDArray[numpy.floating[Any]], forecast_data: NDArr
     _, axis = pyplot.subplots(figsize=figsize)
 
     title = f"Prediction, $\\alpha$={alpha: 2.2f}" if title is None else title
-    x = numpy.arange(len(training_data)) if x is None else x
+    x = numpy.arange(len(training_data), dtype=float) if x is None else x
     ylabel = r"$X_t$" if ylabel is None else ylabel
 
     x_forecast = numpy.arange(len(training_data), len(training_data) + len(forecast_data))

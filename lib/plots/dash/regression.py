@@ -8,7 +8,7 @@ from lib.plots import comp
 from lib.plots.comp.axis import PlotType
 from lib.data import OLSResult
 
-def periodogram(data: NDArray[numpy.floating[Any]], results: OLSResult, x: NDArray[numpy.floating[Any]]=None, **kwargs):
+def periodogram(data: NDArray[numpy.floating[Any]], results: OLSResult, x: NDArray[numpy.floating[Any]] | None=None, **kwargs):
     """"
     Plot the results of an FBM periodogram analysis used to estimate the Hurst parameter.
 
@@ -53,7 +53,10 @@ def periodogram(data: NDArray[numpy.floating[Any]], results: OLSResult, x: NDArr
         kwargs["title"] = f"FBM Periodogram"
 
     transforms = results.param_transforms
-    const = results.const_transform.param
+    const_transform = results.const_transform
+    if transforms is None or const_transform is None:
+        raise Exception("results must carry parameter transforms: use the estimator's compute_* facade")
+    const = const_transform.param
     H = transforms[0].param.est
     func = lambda x: const.est*x**(1.0 - 2.0*H)
 
@@ -79,7 +82,7 @@ def periodogram(data: NDArray[numpy.floating[Any]], results: OLSResult, x: NDArr
                   ylabel=ylabel, xlabel=xlabel, **kwargs)
     
 
-def variance_agg(data: NDArray[numpy.floating[Any]], results: OLSResult, x: NDArray[numpy.floating[Any]]=None, **kwargs):
+def variance_agg(data: NDArray[numpy.floating[Any]], results: OLSResult, x: NDArray[numpy.floating[Any]] | None=None, **kwargs):
     """"
     Plot the results of an FBM variance aggregation analysis used to estimate the Hurst parameter.
 
@@ -124,7 +127,10 @@ def variance_agg(data: NDArray[numpy.floating[Any]], results: OLSResult, x: NDAr
         kwargs["title"] = f"FBM Aggregated Variance"
 
     transforms = results.param_transforms
-    const = results.const_transform.param
+    const_transform = results.const_transform
+    if transforms is None or const_transform is None:
+        raise Exception("results must carry parameter transforms: use the estimator's compute_* facade")
+    const = const_transform.param
     H = transforms[0].param.est
     func = lambda x:  const.est*x**(2.0*(H - 1.0))
 
@@ -150,7 +156,7 @@ def variance_agg(data: NDArray[numpy.floating[Any]], results: OLSResult, x: NDAr
                   ylabel=ylabel, xlabel=xlabel, **kwargs)
 
 
-def ecm_beta(data: NDArray[numpy.floating[Any]], results: OLSResult, x: NDArray[numpy.floating[Any]]=None, **kwargs):
+def ecm_beta(data: NDArray[numpy.floating[Any]], results: OLSResult, x: NDArray[numpy.floating[Any]] | None=None, **kwargs):
     """"
     Plot the results OLS analysis that computes ECM beta parameter.
 
@@ -195,7 +201,10 @@ def ecm_beta(data: NDArray[numpy.floating[Any]], results: OLSResult, x: NDArray[
         kwargs["title"] = r"ECM $\beta$ Estimation"
 
     transforms = results.param_transforms
-    const = results.const_transform.param
+    const_transform = results.const_transform
+    if transforms is None or const_transform is None:
+        raise Exception("results must carry parameter transforms: use the estimator's compute_* facade")
+    const = const_transform.param
     beta = transforms[0].param.est
     func = lambda x:  const.est + beta * x
 
@@ -281,8 +290,12 @@ def mean_reversion_halflife(data: NDArray[numpy.floating[Any]], results: OLSResu
     if title is None:
         kwargs["title"] = f"Mean Reversion Half-Life"
 
-    transform = results.param_transforms[0].param
-    const = results.const_transform.param
+    transforms = results.param_transforms
+    const_transform = results.const_transform
+    if transforms is None or const_transform is None:
+        raise Exception("results must carry parameter transforms: use the estimator's compute_* facade")
+    transform = transforms[0].param
+    const = const_transform.param
     param = results.params[0]
 
     mean_reversion_halflife = transform.est

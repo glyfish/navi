@@ -46,7 +46,7 @@ def variance_ratio_test(report: VarianceRatioTestReport, **kwargs):
     text = axis.text(x_vals[0], 0.05*y_vals[-1], f"Significance={format(100.0*sig_level, '2.0f')}%", fontsize=18)
     text.set_bbox(dict(facecolor='white', alpha=0.75, edgecolor='white'))
 
-    axis.set_ylim([-0.05, 1.05])
+    axis.set_ylim(-0.05, 1.05)
 
     axis.set_title(title)
     axis.set_ylabel("Normal(CDF)")

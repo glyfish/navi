@@ -15,7 +15,7 @@ from datetime import datetime, date
 from matplotlib import pyplot, rcParams, axes
 import matplotlib.dates as mdates
 import matplotlib.units as munits
-from typing import Any, Callable, Sequence
+from typing import Any, Callable, Sequence, cast
 from numpy.typing import NDArray
 
 from lib.plots.comp.axis import (PlotType, logStyle, logXStyle, logYStyle)
@@ -79,7 +79,7 @@ def fpoints(axis: axes.Axes, data: NDArray, func: NDArray, x: Sequence[Any] | ND
     yscilimits: tuple[int, int]         = get_param_default_if_missing("yscilimits", (-4, 4), **kwargs)
     xscilimits: tuple[int, int]         = get_param_default_if_missing("xscilimits", (-4, 4), **kwargs)
     plot_axis_type: PlotType            = get_param_default_if_missing("plot_axis_type", PlotType.LINEAR, **kwargs)
-    legend_loc: str                     = get_param_default_if_missing("legend_loc", "best", **kwargs)
+    legend_loc: Any                     = get_param_default_if_missing("legend_loc", "best", **kwargs)
     legend_title: str | None            = get_param_default_if_missing("legend_title", None, **kwargs)
 
     if x is None:
@@ -311,7 +311,7 @@ def fscatter(axis: axes.Axes, data: NDArray, func: Callable[[NDArray], NDArray],
     ylim           = get_param_default_if_missing("ylim", None, **kwargs)
     xlim           = get_param_default_if_missing("xlim", None, **kwargs)
     scilimits      = get_param_default_if_missing("scilimits", (-4, 4), **kwargs)
-    legend_loc     = get_param_default_if_missing("legend_loc", "best", **kwargs)
+    legend_loc     = cast(Any, get_param_default_if_missing("legend_loc", "best", **kwargs))
     legend_title   = get_param_default_if_missing("legend_title", None, **kwargs)
 
     if x is None:
@@ -465,7 +465,7 @@ def fbar(axis: axes.Axes, y: NDArray, fy: NDArray, x: NDArray, fx: NDArray, **kw
     labels         = get_param_default_if_missing("labels", None, **kwargs)
     title_offset   = get_param_default_if_missing("title_offset", 0.0, **kwargs)
     lw             = get_param_default_if_missing("lw", 2, **kwargs)
-    legend_loc     = get_param_default_if_missing("legend_loc", "best", **kwargs)
+    legend_loc     = cast(Any, get_param_default_if_missing("legend_loc", "best", **kwargs))
     legend_title   = get_param_default_if_missing("legend_title", None, **kwargs)
 
     if title is not None:

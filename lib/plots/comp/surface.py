@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, cast
 import numpy
 from numpy.typing import NDArray
 from matplotlib import pyplot, figure, colors, axes
@@ -49,9 +49,9 @@ def contour(axis: axes.Axes,  f: NDArray[numpy.floating[Any]], x: NDArray[numpy.
     contour_font_size = get_param_default_if_missing("contour_font_size", 15, **kwargs)
 
     if xlim is None:
-        xlim = (numpy.min(x), numpy.max(x))
+        xlim = (float(numpy.min(x)), float(numpy.max(x)))
     if ylim is None:
-        ylim = (numpy.min(y), numpy.max(y))
+        ylim = (float(numpy.min(y)), float(numpy.max(y)))
     axis.set_xlim(xlim)
     axis.set_ylim(ylim)
 
@@ -61,7 +61,7 @@ def contour(axis: axes.Axes,  f: NDArray[numpy.floating[Any]], x: NDArray[numpy.
     axis.set_title(title, y=1.0 + title_offset)
 
     contour = axis.contour(x, y, f, values, cmap=config.contour_color_map)
-    axis.clabel(contour, contour.levels, fmt="%.3f", inline=True, fontsize=contour_font_size)
+    axis.clabel(contour, numpy.asarray(contour.levels), fmt="%.3f", inline=True, fontsize=contour_font_size)
 
 
 def contour_hist(axis: axes.Axes, figure: figure.Figure, samples: NDArray[numpy.floating[Any]], f: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]], 
@@ -111,9 +111,9 @@ def contour_hist(axis: axes.Axes, figure: figure.Figure, samples: NDArray[numpy.
     contour_font_size = get_param_default_if_missing("contour_font_size", 15, **kwargs)
 
     if xlim is None:
-        xlim = (numpy.min(x), numpy.max(x))
+        xlim = (float(numpy.min(x)), float(numpy.max(x)))
     if ylim is None:
-        ylim = (numpy.min(y), numpy.max(y))
+        ylim = (float(numpy.min(y)), float(numpy.max(y)))
     axis.set_xlim(xlim)
     axis.set_ylim(ylim)
 
@@ -127,7 +127,7 @@ def contour_hist(axis: axes.Axes, figure: figure.Figure, samples: NDArray[numpy.
     figure.colorbar(image)
 
     contour = axis.contour(x, y, f, values, cmap=config.contour_color_map)
-    axis.clabel(contour, contour.levels, fmt="%.3f", inline=True, fontsize=contour_font_size)
+    axis.clabel(contour, numpy.asarray(contour.levels), fmt="%.3f", inline=True, fontsize=contour_font_size)
 
 
 def colored_scatter(axis: axes.Axes, figure: figure.Figure, y: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]], color_values: NDArray[numpy.floating[Any]], **kwargs):
@@ -186,7 +186,7 @@ def colored_scatter(axis: axes.Axes, figure: figure.Figure, y: NDArray[numpy.flo
     color_bar_limit   = get_param_default_if_missing("color_bar_limit", None, **kwargs)
     plot_axis_type    = get_param_default_if_missing("plot_axis_type", PlotType.LINEAR, **kwargs)
     labels            = get_param_default_if_missing("labels", None, **kwargs)
-    legend_loc        = get_param_default_if_missing("legend_loc", "best", **kwargs)
+    legend_loc        = cast(Any, get_param_default_if_missing("legend_loc", "best", **kwargs))
 
     if title is not None:
         offset = 1.0 + title_offset
@@ -217,7 +217,7 @@ def colored_scatter(axis: axes.Axes, figure: figure.Figure, y: NDArray[numpy.flo
         logXStyle(axis, x, y)
         plt = axis.scatter(x, y, marker="o", c=color_values, cmap=config.contour_color_map, zorder=5)
         axis.set_xscale('log')
-    elif plot_axis_type.value == PlotType.XYLOG.value:
+    elif plot_axis_type.value == PlotType.LOG.value:
         logStyle(axis, x, y)
         plt = axis.scatter(x, y, marker="o", c=color_values, cmap="magma", zorder=5, norm=colors.LogNorm())
         axis.set_yscale('log')
@@ -234,7 +234,7 @@ def colored_scatter(axis: axes.Axes, figure: figure.Figure, y: NDArray[numpy.flo
             color_bar.mappable.set_clim(color_bar_limit[0], color_bar_limit[1])
 
 
-def colored_scatter_contour(axis: axes.Axes, figure: figure.Figure, ydata: list[numpy.ndarray], xdata: list[numpy.ndarray], color_values: list[float], cont_ydata: list[float], cont_xdata: list[float], **kwargs):
+def colored_scatter_contour(axis: axes.Axes, figure: figure.Figure, ydata: list[numpy.ndarray], xdata: list[numpy.ndarray], color_values: list[float], cont_ydata: list[numpy.ndarray], cont_xdata: numpy.ndarray, **kwargs):
     """
     Make a scatter plot of the x and y data and color the scatter dots with value 
     specified in colors.
@@ -331,7 +331,7 @@ def colored_scatter_contour(axis: axes.Axes, figure: figure.Figure, ydata: list[
         logXStyle(axis, xdata, ydata)
         plt = axis.scatter(xdata, ydata, marker="o", c=color_values, cmap=config.contour_color_map, zorder=5)
         axis.set_xscale('log')
-    elif plot_axis_type.value == PlotType.XYLOG.value:
+    elif plot_axis_type.value == PlotType.LOG.value:
         logStyle(axis, xdata, ydata)
         plt = axis.scatter(xdata, ydata, marker="o", c=color_values, cmap=config.alternate_color_map, zorder=5, norm=colors.LogNorm())
         axis.set_yscale('log')
@@ -350,7 +350,7 @@ def colored_scatter_contour(axis: axes.Axes, figure: figure.Figure, ydata: list[
     for i in range(ncurve):
         yplot = cont_ydata[i]
 
-        if npts is None or npts > len(yplot):
+        if npts is None or int(npts) > len(yplot):
             npts = len(yplot)
         
         if not isinstance(cont_xdata, (numpy.ndarray, numpy.generic)):
@@ -366,7 +366,7 @@ def colored_scatter_contour(axis: axes.Axes, figure: figure.Figure, ydata: list[
         elif plot_axis_type.value == PlotType.YLOG.value:
             logYStyle(axis, cont_xdata, yplot)
             axis.semilogy(cont_xdata, yplot, lw=lw, label=label, color='grey')
-        elif plot_axis_type.value == PlotType.XYLOG.value:
+        elif plot_axis_type.value == PlotType.LOG.value:
             axis.loglog(cont_xdata, yplot, lw=lw, label=label, color='grey')
         else:
             raise Exception("Invalid PlotAxisType")

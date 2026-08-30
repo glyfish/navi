@@ -1,3 +1,4 @@
+from typing import Any, cast
 """
 Reusable plot components.
 
@@ -85,7 +86,7 @@ def __plot_curve(axis, x, y, n, shared_cycler, **kwargs):
 # Plot curves
 def __plot_curves(axis, x, y, **kwargs):
     labels         = get_param_default_if_missing("labels", None, **kwargs)
-    legend_loc     = get_param_default_if_missing("legend_loc", "best", **kwargs)
+    legend_loc     = cast(Any, get_param_default_if_missing("legend_loc", "best", **kwargs))
     legend_title   = get_param_default_if_missing("legend_title", None, **kwargs)
     npts           = get_param_default_if_missing("npts", None, **kwargs)
     color_cycler   = get_param_default_if_missing("color_cycler", None, **kwargs)
@@ -115,7 +116,7 @@ def __plot_curves(axis, x, y, **kwargs):
 
 def __plot_symbols(axis, x, y, loc, **kwargs):
     labels         = get_param_default_if_missing("labels", None, **kwargs)
-    legend_loc     = get_param_default_if_missing("legend_loc", "best", **kwargs)
+    legend_loc     = cast(Any, get_param_default_if_missing("legend_loc", "best", **kwargs))
     legend_title   = get_param_default_if_missing("legend_title", None, **kwargs)
     markers        = get_param_default_if_missing("markers", None, **kwargs)
     marker_colors  = get_param_default_if_missing("marker_colors", None, **kwargs)
@@ -265,7 +266,7 @@ def __plot_multi_bar(axis, x, y, shared_cycler, zorder=10, **kwargs):
     ylabel           = get_param_default_if_missing("ylabel", "y", **kwargs)
     xlim             = get_param_default_if_missing("xlim", None, **kwargs)
     ylim             = get_param_default_if_missing("ylim", None, **kwargs)
-    legend_loc       = get_param_default_if_missing("legend_loc", "best", **kwargs)
+    legend_loc       = cast(Any, get_param_default_if_missing("legend_loc", "best", **kwargs))
 
     ndatasets = len(y)
     ncategories = len(x)

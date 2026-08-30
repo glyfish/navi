@@ -1,3 +1,5 @@
+from typing import Any
+
 import numpy
 from enum import Enum
 
@@ -21,7 +23,7 @@ class PlotType(Enum):
     XLOG = 3
     YLOG = 4
 
-def logStyle(axis, x: numpy.ndarray, y: numpy.ndarray):
+def logStyle(axis, x: Any, y: Any):
     """
     Configure axis for log x and y axis.
 
@@ -40,7 +42,7 @@ def logStyle(axis, x: numpy.ndarray, y: numpy.ndarray):
         axis.spines['left'].set_color("#b0b0b0")
         axis.set_xlim([min(x)/1.5, 1.5*max(x)])
 
-def logXStyle(axis, x: numpy.ndarray, y: numpy.ndarray):
+def logXStyle(axis, x: Any, y: Any):
     """
     Configure axis for log x and linear y axis.
 
@@ -58,7 +60,7 @@ def logXStyle(axis, x: numpy.ndarray, y: numpy.ndarray):
         axis.spines['bottom'].set_color("#b0b0b0")
         axis.set_xlim([min(x)/1.5, 1.5*max(x)])
 
-def logYStyle(axis, x: numpy.ndarray, y: numpy.ndarray):
+def logYStyle(axis, x: Any, y: Any):
     """
     Configure axis for linear x and log y axis.
 
