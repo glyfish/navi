@@ -286,6 +286,7 @@ class ARMAParamType(str, Enum):
     ARMA_CONST = "ARMA_CONST"
     ARMA_PARAM = "ARMA_PARAM"
     ARMA_SIG2 = "ARMA_SIG2"
+    ARMA_OFFSET = "ARMA_OFFSET"
 
 
 class ARMAEst:
@@ -304,16 +305,26 @@ class ARMAEst:
         Estimate of variance of model random component.
     arma_est_type: ARMAEstType
         ARMA model estimate type.
+    trend: str | None
+        The deterministic term the fit actually used, as reported by the
+        estimator ('c' when a constant was fitted, 'n' when none was).
+    offset: ParamEst | None
+        Estimate of the model offset μ*, present only for the estimate types
+        whose model declares one. statsmodels reports the process MEAN as its
+        constant, so μ* is derived from it: see __offset_estimate.
     """
 
-    def __init__(self, est_id: str, const: ParamEst, params: list[ParamEst], sigma2: ParamEst, arma_est_type: ARMAEstType=ARMAEstType.AR):
+    def __init__(self, est_id: str, const: ParamEst, params: list[ParamEst], sigma2: ParamEst,
+                 arma_est_type: ARMAEstType=ARMAEstType.AR, trend: str | None=None):
         self.est_model = EstModel.ARMA
         self.arma_est_type = arma_est_type
+        self.trend = trend
         self.const = const
         self.order = len(params)
         self.params = params
         self.sigma2 = sigma2
         self.est_id = est_id
+        self.offset = self.__offset_estimate()
         self.__set_const_labels()
         self.__set_params_labels()
         self.__set_sigma2_labels()
@@ -337,11 +348,49 @@ class ARMAEst:
                f"const=({self.const}), " \
                f"order=({self.order}), " \
                f"params=({self.params}), " \
+               f"trend=({self.trend}), " \
+               f"offset=({self.offset}), " \
                f"sigma2=({self.sigma2})"
 
+    def __offset_estimate(self):
+        """
+        Derive the model offset μ* from the fitted constant.
+
+        The estimator reports the process MEAN as its constant. For an MA(q) the
+        mean is μ* already, since the offset does not pass through the moving
+        average. For an AR(p) the mean is μ*/(1 - Σφ_i), so μ* = μ(1 - Σφ_i) and
+        the two differ by a factor that grows without bound as Σφ_i -> 1.
+
+        Returns None for the estimate types whose model carries no offset term.
+        """
+
+        if self.arma_est_type not in (ARMAEstType.AR_OFFSET, ARMAEstType.MA_OFFSET):
+            return None
+
+        if self.arma_est_type is ARMAEstType.AR_OFFSET:
+            φ_sum = sum(p.est for p in self.params)
+            est = self.const.est*(1.0 - φ_sum)
+            # first order propagation, in magnitudes: dμ*/dμ = (1 - Σφ), dμ*/dφ_i = -μ
+            err = abs(1.0 - φ_sum)*self.const.err + abs(self.const.est)*sum(abs(p.err) for p in self.params)
+        else:
+            est = self.const.est
+            err = self.const.err
+
+        return ParamEst(est_id=self.est_id,
+                        est=est,
+                        err=err,
+                        est_label=r"$\hat{\mu^*}$",
+                        err_label=r"$\sigma_{\hat{\mu^*}}$",
+                        order=0,
+                        row=0,
+                        column=0,
+                        param_type=ARMAParamType.ARMA_OFFSET.value)
+
     def __set_const_labels(self):
-        self.const.set_labels(est_label=r"$\hat{\mu^*}$",
-                              err_label=r"$\sigma_{\hat{\mu^*}}$")
+        # the fitted constant is the process MEAN, not the offset -- μ* is
+        # reported separately by __offset_estimate
+        self.const.set_labels(est_label=r"$\hat{\mu}$",
+                              err_label=r"$\sigma_{\hat{\mu}}$")
 
     def __set_params_labels(self):
         for i in range(len(self.params)):

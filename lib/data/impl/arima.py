@@ -487,7 +487,7 @@ def compute_ma_offset_estimate(samples: NDArray[numpy.floating[Any]], **kwargs) 
     result = arima.ma_offset_fit(samples, order)
     return result, __arma_estimate_from_result(result, ARMAEstType.MA_OFFSET)
 
-def __arma_estimate_from_result(result: ARIMAResults, arma_est_type) -> ARMAEst:
+def  __arma_estimate_from_result(result: ARIMAResults, arma_est_type) -> ARMAEst:
     """
     Create ARMA(p,q) result object for given result.
 
@@ -519,4 +519,7 @@ def __arma_estimate_from_result(result: ARIMAResults, arma_est_type) -> ARMAEst:
                                  "est_id": est_id,
                                  "param_type": ARMAParamType.ARMA_SIG2.value})
     
-    return ARMAEst( est_id, const, params, sigma2, arma_est_type)
+    # record the deterministic term the fit actually used rather than the one the
+    # estimate type implies -- statsmodels defaults to 'c' at d = 0
+    trend = getattr(getattr(result, "model", None), "trend", None)
+    return ARMAEst(est_id, const, params, sigma2, arma_est_type, trend)
