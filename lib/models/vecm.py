@@ -62,7 +62,7 @@ def lag_order_estimate(samples: NDArray[numpy.floating[Any]], maxlags: int=12, d
     return select_order(samples, maxlags=maxlags, deterministic=deterministic)
 
 
-def vecm1(λ: NDArray[numpy.floating[Any]], β: NDArray[numpy.floating[Any]], a: NDArray[numpy.floating[Any]], 
+def vecm1(λ: numpy.matrix, β: numpy.matrix, a: NDArray[numpy.floating[Any]], 
           Ω: NDArray[numpy.floating[Any]], nsamp: int) -> NDArray[numpy.floating[Any]]:
     """
     Simulate a first order Vector Error Correction Model (VECM) process with the specified parameters.
@@ -91,12 +91,12 @@ def vecm1(λ: NDArray[numpy.floating[Any]], β: NDArray[numpy.floating[Any]], a:
     εt = numpy.matrix(stats.multivariate_normal_samples(numpy.zeros(n), Ω, nsamp))
     for i in range(2, nsamp):
         Δxt1 = xt[:,i-1] - xt[:,i-2]
-        Δxt = λ@β@xt[:,i-1] + a@Δxt1 + εt[i].T
+        Δxt = λ*β*xt[:,i-1] + a*Δxt1 + εt[i].T
         xt[:,i] = Δxt + xt[:,i-1]
     return xt
 
 
-def vecm(λ: NDArray[numpy.floating[Any]], β: NDArray[numpy.floating[Any]], a: NDArray[numpy.floating[Any]], Ω: NDArray[numpy.floating[Any]], nsamp: int) -> NDArray[numpy.floating[Any]]:
+def vecm(λ: numpy.matrix, β: numpy.matrix, a: NDArray[numpy.floating[Any]], Ω: NDArray[numpy.floating[Any]], nsamp: int) -> NDArray[numpy.floating[Any]]:
     """
     Simulate a first order Vector Error Correction Model (VECM) process with the specified parameters.
 
@@ -126,8 +126,8 @@ def vecm(λ: NDArray[numpy.floating[Any]], β: NDArray[numpy.floating[Any]], a: 
     for i in range(m + 1, nsamp):
         lag_terms = 0.0
         for j in range(m):
-            lag_terms += a_matrix[j]@(xt[:,i-j-1] - xt[:,i-j-2])
-        Δxt = λ@β@xt[:,i-1] + lag_terms + εt[i].T
+            lag_terms += a_matrix[j]*(xt[:,i-j-1] - xt[:,i-j-2])
+        Δxt = λ*β*xt[:,i-1] + lag_terms + εt[i].T
         xt[:,i] = Δxt + xt[:,i-1]
     return xt
 
