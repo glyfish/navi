@@ -260,8 +260,9 @@ class ARMAEstType(str, Enum):
 
     def set_param_labels(self, param, i):
         if self.value == ARMAEstType.AR.value or self.value == ARMAEstType.AR_OFFSET.value:
-            param.set_labels(est_label=rf"$\hat{{\phi_{{{i}}}}}$",
-                             err_label=rf"$\sigma_{{\hat{{\phi_{{{i}}}}}}}$")
+            # \varphi, matching formula()'s "\sum_{i=1}^p \varphi_i X_{t-i}"
+            param.set_labels(est_label=rf"$\hat{{\varphi_{{{i}}}}}$",
+                             err_label=rf"$\sigma_{{\hat{{\varphi_{{{i}}}}}}}$")
         elif self.value == ARMAEstType.MA.value or self.value == ARMAEstType.MA_OFFSET.value:
             param.set_labels(est_label=rf"$\hat{{\theta_{{{i}}}}}$",
                              err_label=rf"$\sigma_{{\hat{{\theta_{{{i}}}}}}}$")
@@ -393,8 +394,12 @@ class ARMAEst:
                               err_label=r"$\sigma_{\hat{\mu}}$")
 
     def __set_params_labels(self):
-        for i in range(len(self.params)):
-            self.arma_est_type.set_param_labels(self.params[i], i)
+        # formula() sums i = 1..p, so the lag-1 coefficient is subscript 1, not 0.
+        # Numbering from the position rather than from param.order keeps the labels
+        # distinct even if a caller leaves order unset; the estimators in
+        # lib/data/impl/arima.py store order = i + 1, so the two agree there.
+        for i, param in enumerate(self.params):
+            self.arma_est_type.set_param_labels(param, i + 1)
 
     def __set_sigma2_labels(self):
         self.sigma2.set_labels(est_label=r"$\hat{\sigma^2}$",
