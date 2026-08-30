@@ -295,16 +295,26 @@ def __vecm_estimate_from_result(result: VECMResults) -> VECMEst:
                                column=j,                     
                                param_type=VECMParamType.VECM_BETA.value))
             
-    for i in range(neq):
-        const_result.append(ParamEst(est_id=est_id, 
-                            est=const_est[i,0], 
-                            err=const_err[i,0], 
-                            est_label=f"$\\hat{{M}}$", 
-                            err_label=f"$\\sigma_{{M}}$", 
-                            order=0,
-                            row=i,
-                            column=0,                     
-                            param_type=VECMParamType.VECM_CONST.value))
+    # det_coef is empty for trends with no deterministic term outside the
+    # cointegration relation ('n') or with it inside ('ci', 'li'), where it lives
+    # in det_coef_coint instead. For 'lo' the column is the LINEAR TREND slope,
+    # not the model constant, so it gets its own label -- otherwise a persisted
+    # estimate cannot tell the two apart.
+    is_linear_trend = str(getattr(result, "deterministic", "co")).startswith("l")
+    const_est_label = "$\\hat{D}$" if is_linear_trend else "$\\hat{M}$"
+    const_err_label = "$\\sigma_{D}$" if is_linear_trend else "$\\sigma_{M}$"
+
+    if numpy.asarray(const_est).shape[1] > 0:
+        for i in range(neq):
+            const_result.append(ParamEst(est_id=est_id,
+                                est=const_est[i,0],
+                                err=const_err[i,0],
+                                est_label=const_est_label,
+                                err_label=const_err_label,
+                                order=0,
+                                row=i,
+                                column=0,
+                                param_type=VECMParamType.VECM_CONST.value))
             
     
             
@@ -320,12 +330,14 @@ def __vecm_estimate_from_result(result: VECMResults) -> VECMEst:
                                 column=j,
                                 param_type=VECMParamType.VECM_OMEGA.value))
 
+    # gamma is (neq, neq*order): lag k occupies columns [k*neq, (k+1)*neq).
+    # Indexing a_est[i, j] read the lag-1 block for every lag.
     for k in range(order):
         for j in range(neq):
             for i in range(neq):
-                a_result.append(ParamEst(est_id=est_id, 
-                                         est=a_est[i,j], 
-                                         err=a_err[i,j],
+                a_result.append(ParamEst(est_id=est_id,
+                                         est=a_est[i, k*neq + j],
+                                         err=a_err[i, k*neq + j],
                                          est_label=f"$\\hat{{A}}$", 
                                          err_label=f"$\\sigma_A$", 
                                          order=k + 1,
