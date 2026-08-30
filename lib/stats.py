@@ -880,8 +880,21 @@ def causality_matrix(samples: NDArray[numpy.floating[Any]], nlags: int, add_cons
 
     for i in range(n):
         for j in range(n):
-            test_result = grangercausalitytests(numpy.array([samples[i], samples[j]]).T, nlags, addconst=add_const)
-            pval = min([round(test_result[k][0]['ssr_ftest'][1], 4) for k in range(1, nlags+1)])
+            if i == j:
+                # A series against itself. The joint design matrix repeats the
+                # same lag columns, so it is rank deficient and the added lags
+                # reduce SSR by exactly zero: the F test is degenerate. For a
+                # well conditioned series that yields p = 1.0, but when the
+                # series is near constant SSR underflows and the ratio is
+                # floating point noise -- observed p = 0.0 at nlags >= 2, which
+                # counts as self-causation and inflates the reported rank.
+                # Record the degenerate answer directly instead of fitting a
+                # model that cannot inform it. This also avoids the
+                # SingularMatrixWarning statsmodels raises from 0.15 on.
+                pval = 1.0
+            else:
+                test_result = grangercausalitytests(numpy.array([samples[i], samples[j]]).T, nlags, addconst=add_const)
+                pval = min([round(test_result[k][0]['ssr_ftest'][1], 4) for k in range(1, nlags+1)])
             results.append({'pvalue': pval, 
                             'critical_value': critical_value,
                             'result': pval <= critical_value,
