@@ -192,8 +192,9 @@ def compute_cov_limit(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[n
     Δt = get_param_default_if_missing("Δt", 1.0, **kwargs)
     s = get_param_default_if_missing("s", 1.0, **kwargs)
 
-    xmin = int(s/Δt)
-    t = create_space(xmin=xmin, npts=npts, Δx=Δt)
+    # the axis starts at the time s, matching compute_cov, so the two can be
+    # drawn together; int(s/Δt) is a step index and misaligns whenever Δt != 1
+    t = create_space(xmin=s, npts=npts, Δx=Δt)
 
     return t, numpy.full(npts, 0.0)
 

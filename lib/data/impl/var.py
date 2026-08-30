@@ -31,8 +31,9 @@ def compute_mean(φ: NDArray[numpy.floating[Any]], μ: NDArray[numpy.floating[An
         Stationary mean matrix.
     """
 
-    verify_condition(φ, len(φ) > 0, "len(φ) > 0")
-    verify_type(φ[0], numpy.ndarray)
+    # the shared check: every sibling facade uses it, and it verifies the blocks
+    # are square and equally sized rather than only that φ[0] is an ndarray
+    __verify_phi(φ)
     m, _ = φ[0].shape
 
     μ = numpy.zeros(m) if μ is None else μ

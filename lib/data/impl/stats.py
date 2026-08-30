@@ -576,7 +576,9 @@ def compute_multivariate_normal_pdf(μ: NDArray[numpy.floating[Any]], Ω: NDArra
     """
 
     nvars = len(μ)
-    if nvars == 1 or nvars > 3:
+    # "nvars == 1 or nvars > 3" let a zero length mean through, which then died
+    # in min(numpy.diag(Ω)) with an empty-iterable ValueError
+    if nvars < 2 or nvars > 3:
         raise Exception("Number of variables must be between 2 or 3")
 
     # Ω's diagonal holds variances; the grid is sized in standard deviations
