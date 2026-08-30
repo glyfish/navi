@@ -6,7 +6,6 @@ from importlib import resources
 from typing import Literal, Sequence
 from matplotlib import colors as mcolors
 
-from IPython.core.display import Image
 from cycler import cycler
 
 # Style sheets ship inside the package, so lookup is anchored to the package

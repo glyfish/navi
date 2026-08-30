@@ -1,7 +1,9 @@
 {
-  "include": ["."],
+  "include": [
+    "."
+  ],
   "reportMissingModuleSource": "none",
-  "venvPath": "/Users/troy/.pyenv/versions",
-  "venv": "yada-3.14.7",
+  "venvPath": "/Users/troy/.pyenv/versions/3.14.7/envs",
+  "venv": "navi-3.14.7",
   "pythonVersion": "3.14"
 }

@@ -28,7 +28,9 @@ dependencies = [
 [project.optional-dependencies]
 # lib/__init__.py imports mcp_client inside a try/except and sets it to None when
 # unavailable, so the MCP client is genuinely optional.
-mcp = ["mcp>=1.0"]
+# mcp_client reads Tool.inputSchema, which 2.0 renamed to input_schema; meida
+# also needs <2 because 2.0 drops the SSE transport its server runs on.
+mcp = ["mcp>=1.0,<2"]
 
 [tool.setuptools.packages.find]
 where = ["."]
