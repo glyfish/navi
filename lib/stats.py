@@ -857,7 +857,10 @@ def causality_matrix(samples: NDArray[numpy.floating[Any]], nlags: int, add_cons
     nlags: int
         Maximum number of lags.
     add_const: bool
-        Add constant term to model (default True).
+        Add constant term to model (default True). True is the only supported
+        value: statsmodels' grangercausalitytests raises a bare
+        NotImplementedError for addconst=False, so False is rejected here with
+        an explanatory message rather than being silently ignored.
     critical_value: float
         Critical value for causality F-test (default 0.05)
 
