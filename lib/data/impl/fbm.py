@@ -315,7 +315,10 @@ def create_noise_cholesky_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]]
     dB = get_param_default_if_missing("dB", None, **kwargs)
     L = get_param_default_if_missing("L", None, **kwargs)
 
-    return Δt * create_space(xmin=0, npts=npts + 1), fbm.cholesky_noise(H, npts, dB, L)
+    # the generators work in unit steps, so on a grid spaced Δt the process has
+    # to be scaled too: Var(B_H(Δt k)) = (Δt k)**(2H) needs a Δt**H on the values,
+    # or the returned pair is not an fBm on the grid it is paired with
+    return Δt * create_space(xmin=0, npts=npts + 1), Δt**H * fbm.cholesky_noise(H, npts, dB, L)
 
 
 def create_noise_fft_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
@@ -345,7 +348,10 @@ def create_noise_fft_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDA
     Δt = get_param_default_if_missing("Δt", 1.0, **kwargs)
     dB = get_param_default_if_missing("dB", None, **kwargs)
 
-    return Δt * create_space(xmin=0, npts=npts), fbm.fft_noise(H, npts, dB)
+    # the generators work in unit steps, so on a grid spaced Δt the process has
+    # to be scaled too: Var(B_H(Δt k)) = (Δt k)**(2H) needs a Δt**H on the values,
+    # or the returned pair is not an fBm on the grid it is paired with
+    return Δt * create_space(xmin=0, npts=npts), Δt**H * fbm.fft_noise(H, npts, dB)
 
 
 def create_cholesky_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
@@ -377,7 +383,10 @@ def create_cholesky_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDAr
     dB = get_param_default_if_missing("dB", None, **kwargs)
     L = get_param_default_if_missing("L", None, **kwargs)
 
-    return Δt * create_space(xmin=0, npts=npts + 1), fbm.generate_cholesky(H, npts, dB, L)
+    # the generators work in unit steps, so on a grid spaced Δt the process has
+    # to be scaled too: Var(B_H(Δt k)) = (Δt k)**(2H) needs a Δt**H on the values,
+    # or the returned pair is not an fBm on the grid it is paired with
+    return Δt * create_space(xmin=0, npts=npts + 1), Δt**H * fbm.generate_cholesky(H, npts, dB, L)
 
 
 def create_fft_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
@@ -405,7 +414,10 @@ def create_fft_source(**kwargs) -> tuple[NDArray[numpy.floating[Any]], NDArray[n
     Δt = get_param_default_if_missing("Δt", 1.0, **kwargs)
     dB = get_param_default_if_missing("dB", None, **kwargs)
 
-    return Δt * create_space(xmin=0, npts=npts), fbm.generate_fft(H, npts, dB)
+    # the generators work in unit steps, so on a grid spaced Δt the process has
+    # to be scaled too: Var(B_H(Δt k)) = (Δt k)**(2H) needs a Δt**H on the values,
+    # or the returned pair is not an fBm on the grid it is paired with
+    return Δt * create_space(xmin=0, npts=npts), Δt**H * fbm.generate_fft(H, npts, dB)
     
 
 def compute_H_estimate_periodogram(freq: NDArray[numpy.floating[Any]], pspec: NDArray[numpy.floating[Any]]) -> tuple[sm.regression.linear_model.RegressionResultsWrapper, OLSResult]:

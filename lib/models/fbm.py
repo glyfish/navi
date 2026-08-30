@@ -554,14 +554,20 @@ def __delta_factor(samples: NDArray[numpy.floating[Any]], j: int) -> float:
         Heteroscedastic variance ratio test delta factor.
     """
 
+    # Lo & MacKinlay (1988) eq. (18):
+    #   δ(j) = Σ_{k=j+1}^{t} (ΔX_k - μ)² (ΔX_{k-j} - μ)² / [Σ_{k=1}^{t} (ΔX_k - μ)²]²
+    # The sum runs THROUGH k = t, and the normalisation is the squared sum of
+    # squares itself -- dividing by lag_var(samples, 1)**2 instead left a
+    # (t-1)²/t² factor once __theta_factor divided again by t².
     t = len(samples) - 1
     μ = (samples[t] - samples[0]) / t
+    d = numpy.diff(samples) - μ
     factor = 0.0
-    for i in range(j+1, t):
+    for i in range(j+1, t+1):
         f1 = (samples[i] - samples[i-1] - μ)**2
         f2 = (samples[i-j] - samples[i-j-1] - μ)**2
         factor += f1*f2
-    return factor / stats.lag_var(samples, 1)**2
+    return factor / numpy.sum(d**2)**2
 
 def __theta_factor(samples: NDArray[numpy.floating[Any]], s: int) -> float:
     """
@@ -580,12 +586,12 @@ def __theta_factor(samples: NDArray[numpy.floating[Any]], s: int) -> float:
         Heteroscedastic variance ratio test theta factor.
     """
 
-    t = len(samples) - 1
+    # θ(s) = Σ_{j=1}^{s-1} [2(s-j)/s]² δ(j); δ already carries the normalisation
     factor = 0.0
     for j in range(1, s):
         delta = __delta_factor(samples, j)
         factor += delta*(2.0*(s-j)/s)**2
-    return factor/t**2
+    return factor
 
 def __vr(samples: NDArray[numpy.floating[Any]], s: int) -> float:
     """
