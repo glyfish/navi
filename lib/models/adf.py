@@ -355,5 +355,9 @@ def __adfuller_test(samples: NDArray[numpy.floating[Any]], test_type: str, max_l
         Result of the performed ADF test.
     """
 
-    result = sm.tsa.stattools.adfuller(samples, regression=test_type, maxlag=max_lag)
+    # statsmodels 0.15 will switch adfuller to an ADFullerResult object in 0.16 or
+    # after July 2027. ADFTestReport reads the tuple positionally, so keep the tuple
+    # explicitly until that report is migrated rather than inheriting the flip.
+    result = sm.tsa.stattools.adfuller(samples, regression=test_type, maxlag=max_lag,
+                                       result_object=False)
     return ADFTestReport(result)

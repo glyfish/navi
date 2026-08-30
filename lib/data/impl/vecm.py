@@ -257,15 +257,17 @@ def __vecm_estimate_from_result(result: VECMResults) -> VECMEst:
     order = result.k_ar - 1
     neq, _ = result.alpha.shape
 
-    const_est = result.det_coef
-    const_err = result.stderr_det_coef
-    a_est = result.gamma
-    a_err = result.stderr_gamma
-    beta_est = result.beta
-    beta_err = result.stderr_beta
-    lambda_est = result.alpha
-    lambda_err = result.stderr_alpha
-    omega_est = result.sigma_u
+    # statsmodels 0.15 exposes these as cache_readonly descriptors; read each into
+    # an array once so the 2-D indexing below is on an array, not a descriptor
+    const_est = numpy.asarray(result.det_coef)
+    const_err = numpy.asarray(result.stderr_det_coef)
+    a_est = numpy.asarray(result.gamma)
+    a_err = numpy.asarray(result.stderr_gamma)
+    beta_est = numpy.asarray(result.beta)
+    beta_err = numpy.asarray(result.stderr_beta)
+    lambda_est = numpy.asarray(result.alpha)
+    lambda_err = numpy.asarray(result.stderr_alpha)
+    omega_est = numpy.asarray(result.sigma_u)
 
     est_id = str(uuid.uuid4())
     lambda_result = []

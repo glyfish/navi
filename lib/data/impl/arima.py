@@ -500,22 +500,26 @@ def  __arma_estimate_from_result(result: ARIMAResults, arma_est_type) -> ARMAEst
     """
 
     est_id = str(uuid.uuid4())
-    nparams = len(result.params)
+    # cache_readonly descriptors in statsmodels 0.15, and a pandas Series when the
+    # fit was given one: as arrays the positional indexing below is unambiguous
+    est_params = numpy.asarray(result.params)
+    est_errs = numpy.asarray(result.bse)
+    nparams = len(est_params)
     params = []
 
     for i in range(1, nparams-1):
-        params.append(ParamEst.from_dict({"est": result.params[i], 
-                                          "err": result.bse[i],
+        params.append(ParamEst.from_dict({"est": est_params[i], 
+                                          "err": est_errs[i],
                                           "order": i, 
                                           "est_id": est_id,
                                           "param_type": ARMAParamType.ARMA_PARAM.value}))
         
-    const = ParamEst.from_dict({"est": result.params[0], 
-                                "err": result.bse[0],
+    const = ParamEst.from_dict({"est": est_params[0], 
+                                "err": est_errs[0],
                                 "est_id": est_id,
                                 "param_type": ARMAParamType.ARMA_CONST.value})
-    sigma2 = ParamEst.from_dict({"est": result.params[nparams-1], 
-                                 "err": result.bse[nparams-1],
+    sigma2 = ParamEst.from_dict({"est": est_params[nparams-1], 
+                                 "err": est_errs[nparams-1],
                                  "est_id": est_id,
                                  "param_type": ARMAParamType.ARMA_SIG2.value})
     

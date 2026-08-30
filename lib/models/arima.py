@@ -486,7 +486,8 @@ def yw(samples: NDArray[numpy.floating[Any]], order: int) -> NDArray[numpy.float
         Estimate of AR(p) coefficients.
     """
 
-    pacf = sm.regression.yule_walker(samples, order=order, method='mle')
+    # same 0.16 return-type switch as adfuller; this reads pacf[0] positionally
+    pacf = sm.regression.yule_walker(samples, order=order, method='mle', result_object=False)
     return pacf[0]
 
 def pacf(samples: NDArray[numpy.floating[Any]], nlags: int) -> NDArray[numpy.floating[Any]]:

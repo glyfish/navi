@@ -11,7 +11,24 @@ dependencies = [
     "pydantic>=2.7.0",
     "python-dotenv>=1.0.0",
     "curl_cffi>=0.15.0",
+    # the analysis and plot stack lib/ actually imports. Declared here rather than
+    # hand-listed by each consumer, which is how alef, yada and meida drifted onto
+    # different statsmodels and pandas versions.
+    "numpy>=2.0",
+    "pandas>=2.0",
+    "scipy>=1.11",
+    "statsmodels>=0.14",
+    "matplotlib>=3.8",
+    "matplotlib-label-lines>=0.7",
+    "cycler>=0.12",
+    "tabulate>=0.9",
+    "shortuuid>=1.0",
 ]
+
+[project.optional-dependencies]
+# lib/__init__.py imports mcp_client inside a try/except and sets it to None when
+# unavailable, so the MCP client is genuinely optional.
+mcp = ["mcp>=1.0"]
 
 [tool.setuptools.packages.find]
 where = ["."]
