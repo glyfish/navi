@@ -70,7 +70,7 @@ def periodogram(data: NDArray[numpy.floating[Any]], results: OLSResult, x: NDArr
                 f"{transforms[0].param.err_label}={format(transforms[0].param.err, '1.2e')}\n" + \
                 f"{const.est_label}={format(const.est, '1.2e')}, " + \
                 f"{const.err_label}={format(const.err, '1.2e')}\n" + \
-                f"$R^2$={format(results.r2, '1.2f')}"
+                f"$R^2$={format(results.r2.est, '1.2f')}"
 
     bbox = dict(boxstyle='square,pad=1', facecolor='white', alpha=0.75, edgecolor='white')
     axis.text(x_text, y_text, estimates, bbox=bbox, fontsize=12.0, zorder=7, transform=axis.transAxes)
@@ -141,7 +141,7 @@ def variance_agg(data: NDArray[numpy.floating[Any]], results: OLSResult, x: NDAr
                 f"{transforms[0].param.err_label}={format(transforms[0].param.err, '1.2e')}\n" + \
                 f"{const.est_label}={format(const.est, '1.2e')}, " + \
                 f"{const.err_label}={format(const.err, '1.2e')}\n" + \
-                f"$R^2$={format(results.r2, '1.2f')}"
+                f"$R^2$={format(results.r2.est, '1.2f')}"
 
     bbox = dict(boxstyle='square,pad=1', facecolor='white', alpha=0.75, edgecolor='white')
     axis.text(x_text, y_text, estimates, bbox=bbox, fontsize=12.0, zorder=7, transform=axis.transAxes)
@@ -225,7 +225,7 @@ def ecm_beta(data: NDArray[numpy.floating[Any]], results: OLSResult, x: NDArray[
                 f"{transforms[0].param.err_label}={format(transforms[0].param.err, '1.2e')}\n" + \
                 f"{const.est_label}={format(const.est, '1.2e')}, " + \
                 f"{const.err_label}={format(const.err, '1.2e')}\n" + \
-                f"$R^2$={format(results.r2, '1.2f')}"
+                f"$R^2$={format(results.r2.est, '1.2f')}"
 
     bbox = dict(boxstyle='square,pad=1', facecolor='white', alpha=0.75, edgecolor='white')
     axis.text(x_text, y_text, estimates, bbox=bbox, fontsize=12.0, zorder=7, transform=axis.transAxes)
@@ -309,7 +309,7 @@ def mean_reversion_halflife(data: NDArray[numpy.floating[Any]], results: OLSResu
     estimates = f"{transform.est_label}={transform.est: 1.2f}, {transform.err_label}={transform.err: 1.2e}\n" + \
                 f"$\\lambda$={param.est: 1.2e}, $\\sigma_\\lambda$={param.err: 1.2e}\n" + \
                 f"{const.est_label}={const.est: 1.2e}, {const.err_label}={const.err: 1.2e}\n" + \
-                f"$R^2$={results.r2: 1.2f}"
+                f"$R^2$={results.r2.est: 1.2f}"
 
     bbox = dict(boxstyle='square,pad=1', facecolor='white', alpha=0.75, edgecolor='white')
     axis.text(x_result, y_result, estimates, bbox=bbox, fontsize=12.0, zorder=7, transform=axis.transAxes)

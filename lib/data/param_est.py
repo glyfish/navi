@@ -2,7 +2,6 @@ import numpy
 from enum import Enum
 from json import dumps
 
-from statsmodels.tsa.vector_ar.var_model import LagOrderResults
 
 def _json_default(o):
     """json.dumps hook: unwrap numpy scalars, then fall back to __dict__.
@@ -191,7 +190,18 @@ class OLSResult:
         self.est_model = EstModel.OLS
         self.const = const
         self.params = params
-        self.r2 = r2
+        # every row of a persisted estimate is a ParamEst, so r2 is one too rather
+        # than a bare float. OLS gives no standard error for it, so err is 0.0 --
+        # the same convention the VAR and VECM facades use for their Omega rows.
+        self.r2 = ParamEst(est_id=est_id,
+                           est=r2,
+                           err=0.0,
+                           est_label=r"$R^2$",
+                           err_label=r"$\sigma_{R^2}$",
+                           order=0,
+                           row=0,
+                           column=0,
+                           param_type=OLSParamType.OLS_R2.value)
         self.param_transforms: list[OLSTransform] | None = None
         self.const_transform: OLSTransform | None = None
         self.est_id = est_id
