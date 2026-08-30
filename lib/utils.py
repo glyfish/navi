@@ -184,7 +184,9 @@ def create_logspace(**kwargs) -> NDArray[numpy.floating[Any]]:
     npts = get_param_throw_if_missing("npts", **kwargs)
     xmax = get_param_throw_if_missing("xmax", **kwargs)
     xmin = get_param_default_if_missing("xmin", 1.0, **kwargs)
-    return numpy.logspace(numpy.log10(xmin), numpy.log10(xmax/xmin), npts)
+    # the endpoints are log10 of the range itself; dividing xmax by xmin made a
+    # scan stop at xmax/xmin, which only coincides with xmax when xmin is 1
+    return numpy.logspace(numpy.log10(xmin), numpy.log10(xmax), npts)
 
 
 def create_parameter_scan(source: Callable[..., tuple[NDArray, NDArray]], *args) -> tuple[list[NDArray], list[NDArray]]:

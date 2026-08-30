@@ -262,7 +262,8 @@ def ensemble_acf(samples: EnsembleSamples, nlags: int | None=None) -> NDArray[nu
         raise Exception(f"Input must be a two dimensional array.")
 
     nsim = len(samples)
-    if nlags is None or nlags > len(samples):
+    # nlags is bounded by the number of POINTS, not the number of realizations
+    if nlags is None or nlags > len(samples[0]):
         nlags = len(samples[0])
     ac_avg = numpy.zeros(nlags)
 
@@ -292,6 +293,9 @@ def ensemble_cov(x: EnsembleSamples, y: EnsembleSamples) -> NDArray[numpy.floati
 
     x = numpy.asarray(x)
     y = numpy.asarray(y)
+    # rank first: unpacking a 1-D shape raises ValueError, not the documented message
+    if len(x.shape) != 2 or len(y.shape) != 2:
+        raise Exception(f"Samples are not a two dimensional array.")
     x_nsim, x_npts = x.shape
     y_nsim, y_npts = y.shape
     npts = min(x_npts, y_npts)
@@ -741,7 +745,10 @@ def agg_time(x: NDArray[numpy.floating[Any]], m: int) -> NDArray[numpy.floating[
 
     n = len(x)
     d = int(n/m)
-    return numpy.linspace(x[0], x[n-1], d)
+    # one time per bin, at the centre of the values that bin averages -- a
+    # linspace over the whole original range labelled bin k with a time that
+    # falls outside it
+    return numpy.array([numpy.mean(x[k*m:(k + 1)*m]) for k in range(d)])
 
 
 def lag_var(samples: NDArray[numpy.floating[Any]], s: int) -> float:
@@ -839,7 +846,7 @@ def multivariate_normal_samples(μ: NDArray[numpy.floating[Any]], Ω: NDArray[nu
     return numpy.random.multivariate_normal(μ, Ω, n)
 
 
-def causality_matrix(samples: NDArray[numpy.floating[Any]], nlags: int, add_const: bool=False, critical_value: float=0.05) -> DataFrame:
+def causality_matrix(samples: NDArray[numpy.floating[Any]], nlags: int, add_const: bool=True, critical_value: float=0.05) -> DataFrame:
     """
     Compute Granger causality matrix for the given samples.
 
@@ -850,7 +857,7 @@ def causality_matrix(samples: NDArray[numpy.floating[Any]], nlags: int, add_cons
     nlags: int
         Maximum number of lags.
     add_const: bool
-        Add constant term to model (default False).
+        Add constant term to model (default True).
     critical_value: float
         Critical value for causality F-test (default 0.05)
 
@@ -861,11 +868,16 @@ def causality_matrix(samples: NDArray[numpy.floating[Any]], nlags: int, add_cons
     """
 
     n, _ = samples.shape
+    # statsmodels raises a bare NotImplementedError for addconst=False, so True is
+    # the only model it can build; say so rather than letting that surface
+    if not add_const:
+        raise Exception(f"add_const=False is not implemented by statsmodels grangercausalitytests")
+
     results = []
 
     for i in range(n):
         for j in range(n):
-            test_result = grangercausalitytests(numpy.array([samples[i], samples[j]]).T, nlags)
+            test_result = grangercausalitytests(numpy.array([samples[i], samples[j]]).T, nlags, addconst=add_const)
             pval = min([round(test_result[k][0]['ssr_ftest'][1], 4) for k in range(1, nlags+1)])
             results.append({'pvalue': pval, 
                             'critical_value': critical_value,

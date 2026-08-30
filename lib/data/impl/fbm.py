@@ -221,7 +221,7 @@ def compute_vr_scan(samples: NDArray[numpy.floating[Any]], **kwargs) -> tuple[li
         Lags and variance ratio values.
     """
 
-    s_vals = [int(s) for s in get_s_vals(**kwargs)]
+    s_vals = [int(round(s)) for s in get_s_vals(**kwargs)]
     return s_vals, fbm.vr_scan(samples, s_vals)
 
 
@@ -251,7 +251,7 @@ def compute_homo_vr_stat_scan(samples: NDArray[numpy.floating[Any]], **kwargs) -
         Lags and variance ratio values.
     """
 
-    s_vals = [int(s) for s in get_s_vals(**kwargs)]
+    s_vals = [int(round(s)) for s in get_s_vals(**kwargs)]
     return s_vals, fbm.vr_stat_homo_scan(samples, s_vals)
 
 
@@ -281,7 +281,7 @@ def compute_hetero_vr_stat_scan(samples: NDArray[numpy.floating[Any]], **kwargs)
         Lags and variance ratio values.
     """
 
-    s_vals = [int(s) for s in get_s_vals(**kwargs)]
+    s_vals = [int(round(s)) for s in get_s_vals(**kwargs)]
     return s_vals, fbm.vr_stat_hetero_scan(samples, s_vals)
 
 

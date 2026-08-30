@@ -270,7 +270,9 @@ def compute_agg_var(data: numpy.ndarray, **kwargs) -> tuple[NDArray[numpy.floati
     m_max = get_param_throw_if_missing("m_max", **kwargs)
     m_min = get_param_default_if_missing("m_min", 1, **kwargs)
 
-    m_vals = create_space(npts=npts, xmax=m_max, xmin=m_min)
+    # agg_var truncates each size with int() before aggregating, so return the
+    # sizes it actually used rather than the fractional ones create_space made
+    m_vals = numpy.trunc(create_space(npts=npts, xmax=m_max, xmin=m_min))
     return m_vals, stats.agg_var(data, m_vals)
 
 
@@ -320,7 +322,9 @@ def compute_lag_var(data: NDArray[numpy.floating[Any]], **kwargs) -> tuple[list[
         lagged variance for specified lag values.
     """
 
-    s_vals =  [int(s) for s in get_s_vals(**kwargs)]
+    # lags are counts: a log scan lands on 63.999... for 64, so round rather
+    # than truncate or the largest lag comes back one short
+    s_vals = [int(round(s)) for s in get_s_vals(**kwargs)]
     return s_vals, stats.lag_var_scan(data, s_vals)
 
 
@@ -517,7 +521,14 @@ def compute_pdf_hist(data: NDArray[numpy.floating[Any]], **kwargs) -> tuple[NDAr
     xmin = get_param_default_if_missing("xmin", None, **kwargs)
     xmax = get_param_default_if_missing("xmax", None, **kwargs)
 
-    hist_range = None if xmin is None or xmax is None else (xmin, xmax)
+    # a supplied bound is honoured even on its own: the missing side comes from
+    # the data rather than dropping the bound the caller gave
+    if xmin is None and xmax is None:
+        hist_range = None
+    else:
+        lo = float(numpy.min(data)) if xmin is None else xmin
+        hi = float(numpy.max(data)) if xmax is None else xmax
+        hist_range = (lo, hi)
     pdf, bin_edges = stats.pdf_hist(data, hist_range, nbins)
 
     return (bin_edges[:-1] + bin_edges[1:]) / 2, pdf
@@ -568,7 +579,8 @@ def compute_multivariate_normal_pdf(μ: NDArray[numpy.floating[Any]], Ω: NDArra
     if nvars == 1 or nvars > 3:
         raise Exception("Number of variables must be between 2 or 3")
 
-    σ = min(numpy.diag(Ω))
+    # Ω's diagonal holds variances; the grid is sized in standard deviations
+    σ = numpy.sqrt(min(numpy.diag(Ω)))
     δ = 6.0*σ / (n - 1)
 
     x1 = -3.0*σ + μ[0]
@@ -578,12 +590,12 @@ def compute_multivariate_normal_pdf(μ: NDArray[numpy.floating[Any]], Ω: NDArra
 
     if nvars == 2:
         vals = numpy.mgrid[x1:x2:δ, y1:y2:δ]
-        coords = numpy.transpose(vals)[:,:,::-1]
+        coords = numpy.transpose(vals)
     else:
-        z1 = -3.0*σ + μ[3]
-        z2 = 3.0*σ + δ + μ[3]
+        z1 = -3.0*σ + μ[2]
+        z2 = 3.0*σ + δ + μ[2]
         vals =  numpy.mgrid[x1:x2:δ, y1:y2:δ, z1:z2:δ]
-        coords = numpy.transpose(vals)[:,:,:,::-1]
+        coords = numpy.transpose(vals)
 
     return vals, stats.multivariate_normal_pdf(coords, μ, Ω)
 
@@ -599,7 +611,7 @@ def compute_causality_matrix(samples: NDArray[numpy.floating[Any]], **kwargs):
     nlags: int
         Maximum number of lags.
     add_const: bool
-        Add constant term to model (default False).
+        Add constant term to model (default True).
     critical_value: float
         Critical value for causality test (default 0.05)
         
@@ -610,7 +622,7 @@ def compute_causality_matrix(samples: NDArray[numpy.floating[Any]], **kwargs):
     """
 
     nlags = get_param_default_if_missing("nlags", 12, **kwargs)
-    add_const = get_param_default_if_missing("add_const", False, **kwargs)
+    add_const = get_param_default_if_missing("add_const", True, **kwargs)
     critical_value = get_param_default_if_missing("critical_value", 0.05, **kwargs)
 
     result = stats.causality_matrix(samples, nlags, add_const, critical_value)
@@ -790,6 +802,8 @@ class OLS(Enum):
             OLS report and result model.
         """
 
+        # the formula path bypassed __OLS_fit, so every member fitted the raw data
+        y, x = self.__transform(y, x)
         x_cols = [f"x{i+1}" for i in range(len(x))]
         cols = ['y'] + x_cols
         data = numpy.concatenate((numpy.reshape(y, (1,len(y))), x), axis=0)
@@ -815,12 +829,28 @@ class OLS(Enum):
             OLS object
         """
 
-        if self.value == OLS.LOG.value:
-            x = numpy.log10(x)
-            y = numpy.log10(y)
-
+        y, x = self.__transform(y, x)
         exog = sm.add_constant(x)
         return sm.OLS(y, exog, missing='drop').fit()
+
+
+    def __transform(self, y: NDArray[numpy.floating[Any]], x: NDArray[numpy.floating[Any]]) -> tuple[NDArray[numpy.floating[Any]], NDArray[numpy.floating[Any]]]:
+        """
+        Apply the linearising transform the enum member documents.
+
+        LOG (y = b x**a) is linear in log10 on both sides, and the base cancels
+        so the recovered slope is a. XLOG (y = b exp(a x)) and YLOG (y = b ln(a x))
+        transform one side only, where the base does not cancel -- the natural log
+        is what makes the fitted slope the a and b the docstrings name.
+        """
+
+        if self.value == OLS.LOG.value:
+            return numpy.log10(y), numpy.log10(x)
+        if self.value == OLS.XLOG.value:
+            return numpy.log(y), x
+        if self.value == OLS.YLOG.value:
+            return y, numpy.log(x)
+        return y, x
     
 
     def __OLS_formula_fit(self, data: DataFrame, formula: str) -> sm.regression.linear_model.RegressionResultsWrapper:
