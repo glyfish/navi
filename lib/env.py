@@ -18,6 +18,7 @@ DEFAULT_BIS_BASE_URL = "https://stats.bis.org/api/v1"
 DEFAULT_MCP_URL = "http://localhost:8080/sse"
 DEFAULT_TIINGO_BASE_URL = "https://api.tiingo.com/tiingo"
 DEFAULT_CDC_BASE_URL = "https://data.cdc.gov"
+DEFAULT_MEIDA_DB_URL = "postgresql+psycopg://meida@localhost/meida"
 
 if _ENV_PATH.exists():
     load_dotenv(_ENV_PATH)
@@ -98,3 +99,13 @@ def get_cdc_api_key(required: bool = False) -> str | None:
 def get_cdc_base_url() -> str:
     """Return the base URL for CDC Socrata requests."""
     return os.getenv("CDC_BASE_URL", DEFAULT_CDC_BASE_URL)
+
+
+def get_meida_db_url() -> str:
+    """Return the SQLAlchemy URL for meida's time-series source database.
+
+    meida owns this database -- schema, migrations, and the client that reads
+    it. Named for its owner rather than any consumer, so nothing here needs to
+    know which project is asking.
+    """
+    return os.getenv("MEIDA_DB_URL", DEFAULT_MEIDA_DB_URL)
