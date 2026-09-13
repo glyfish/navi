@@ -10,9 +10,9 @@ import importlib
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # names for the type checker only; no runtime import
-    from lib import config, env, logger, plots, utils, models
+    from lib import config, logger, plots, utils, models
 
-__all__ = ["config", "env", "logger", "plots", "utils", "models"]
+__all__ = ["config", "logger", "plots", "utils", "models"]
 
 # optional dependency: absent or unsupported installs get None, as before
 try:
