@@ -4,6 +4,9 @@ patch.antialiased: True
 
 axes.edgecolor: white
 axes.grid : True
+# Grid below everything, not just below lines. matplotlib's default
+# ('line') draws it over filled areas -- fill_between, bars, histograms.
+axes.axisbelow : True
 axes.titlesize: 15
 axes.labelsize: 13
 axes.facecolor: white
