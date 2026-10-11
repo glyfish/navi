@@ -28,9 +28,11 @@ dependencies = [
 [project.optional-dependencies]
 # lib/__init__.py imports mcp_client inside a try/except and sets it to None when
 # unavailable, so the MCP client is genuinely optional.
-# mcp_client reads Tool.inputSchema, which 2.0 renamed to input_schema; meida
-# also needs <2 because 2.0 drops the SSE transport its server runs on.
-mcp = ["mcp>=1.0,<2"]
+# mcp_client reads the tool schema under either name, so it works against 1.x
+# and 2.x alike -- the repos installing navi are not on the same side of that
+# upgrade at the same moment. 2.0 renamed FastMCP to MCPServer and moved the
+# transport settings; it did NOT drop SSE, which an earlier comment here claimed.
+mcp = ["mcp>=1.0,<3"]
 
 [tool.setuptools.packages.find]
 where = ["."]

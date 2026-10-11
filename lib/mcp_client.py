@@ -62,8 +62,13 @@ class MCPClient:
     async def get_tool_schema(self, name: str) -> Mapping[str, Any] | None:
         tools = await self.list_tools()
         for tool in tools:
-            if tool.name == name and tool.inputSchema:
-                return tool.inputSchema
+            # 2.x renamed Tool.inputSchema to input_schema. navi is installed
+            # into repos on both sides of that upgrade, so read either rather
+            # than forcing them to move together.
+            schema = (getattr(tool, "input_schema", None)
+                      or getattr(tool, "inputSchema", None))
+            if tool.name == name and schema:
+                return schema
         return None
 
     async def call_tool(self, name: str, arguments: Mapping[str, Any] | None = None) -> CallToolResult:
