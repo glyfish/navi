@@ -339,13 +339,14 @@ def bar(y, x=None, **kwargs):
 
     figsize = get_param_default_if_missing("figsize", (10,6), **kwargs)
     file_name = get_param_default_if_missing("file_name", None, **kwargs)
-    file_name = get_param_default_if_missing("file_name", None, **kwargs)
+    dpi = get_param_default_if_missing("dpi", None, **kwargs)
 
     fig, axis = pyplot.subplots(figsize=figsize)
     comp.bar(axis, y, x, **kwargs)
 
     if file_name is not None:   
-        fig.savefig(file_name, bbox_inches='tight', dpi=300)
+        fig.savefig(file_name, bbox_inches='tight',
+                    **({'dpi': dpi} if dpi is not None else {}))
         pyplot.close(fig)
 
 
@@ -394,12 +395,14 @@ def multibar(y: list[numpy.ndarray], x: numpy.ndarray, **kwargs):
 
     figsize   = get_param_default_if_missing("figsize", (10, 6), **kwargs)
     file_name = get_param_default_if_missing("file_name", None, **kwargs)
+    dpi       = get_param_default_if_missing("dpi", None, **kwargs)
 
     fig, axis = pyplot.subplots(figsize=figsize)
     comp.multibar(axis, y, x, **kwargs)
 
     if file_name is not None:
-        fig.savefig(file_name, bbox_inches='tight', dpi=300)
+        fig.savefig(file_name, bbox_inches='tight',
+                    **({'dpi': dpi} if dpi is not None else {}))
         pyplot.close(fig)
 
 
