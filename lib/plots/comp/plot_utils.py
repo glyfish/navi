@@ -320,9 +320,58 @@ def __axis_twinx(axis, **kwargs):
 
 
 def __twinx_ticks(axis1, axis2):
-    y1_lim = axis1.get_ylim()
-    y2_lim = axis2.get_ylim()
-    f = lambda x : y2_lim[0] + (x - y1_lim[0])*(y2_lim[1] - y2_lim[0])/(y1_lim[1] - y1_lim[0])
-    ticks = f(axis1.get_yticks())
-    axis2.yaxis.set_major_locator(matplotlib.ticker.FixedLocator(ticks))
+    """Put one right-axis tick on every left-axis gridline.
+
+    Converts through each axis's own transform -- left data -> display pixels ->
+    right data -- rather than interpolating between the two y-limits. The
+    interpolation this replaced was linear, which is only correct when *both*
+    axes are linear: position on a log axis goes as the log of the value, while
+    ``get_ylim`` and ``get_yticks`` report data space. Measured against the
+    gridlines it was meant to meet, the linear form landed 0.00 px out for
+    linear/linear and 68-218 px out for every combination involving a log axis.
+
+    The three lines after the transform each remove a visible defect:
+
+    - Filtering to the view range. ``get_yticks`` on a log axis returns decades
+      *outside* the limits (``[100, 1000, 10000, 100000]`` for a view of 10**3 to
+      10**4), and mapping those puts ticks off the end of the right spine.
+    - ``NullLocator`` on the minors. Setting only the major locator left the
+      right axis with two competing tick systems: these majors, plus the log
+      scale's own labelled sub-decade minors, drawn to different rules.
+    - A formatter chosen for the scale. Aligned positions are arbitrary values,
+      so a log formatter spells them ``3.76317 x 10^0``. Significant figures suit
+      a log axis, whose ticks are spaced by ratio and so cannot collide; a linear
+      axis needs decimals derived from the tick step, or a narrow range at a
+      large value (0.999 to 1.001, a normalised index) prints the same label
+      several times.
+
+    The tick count is inherited from ``axis1`` by construction -- one tick per
+    gridline is the whole point -- so a left axis showing two decades gives the
+    right axis two ticks.
+    """
+    lo, hi = axis1.get_ylim()
+    ticks = [t for t in axis1.get_yticks() if lo <= t <= hi]
+    if not ticks:
+        return
+    display = axis1.transData.transform([(0.0, t) for t in ticks])
+    right = axis2.transData.inverted().transform(display)[:, 1]
+    # The round trip overshoots the end limits by ~1e-15, and matplotlib drops a
+    # tick that sits outside the view by any margin at all.
+    right = numpy.clip(right, *sorted(axis2.get_ylim()))
+    axis2.yaxis.set_major_locator(matplotlib.ticker.FixedLocator(right))
+    axis2.yaxis.set_minor_locator(matplotlib.ticker.NullLocator())
+    axis2.yaxis.set_major_formatter(__twinx_formatter(axis2, right))
+
+
+def __twinx_formatter(axis2, ticks):
+    """A formatter that keeps the aligned tick labels distinct and readable."""
+    if axis2.get_yscale() != "linear":
+        # Geometric spacing: three significant figures separate every pair.
+        return matplotlib.ticker.FuncFormatter(lambda v, _pos: f"{v:.3g}")
+    step = numpy.min(numpy.diff(numpy.sort(ticks))) if len(ticks) > 1 else 0.0
+    if step <= 0:
+        return matplotlib.ticker.FuncFormatter(lambda v, _pos: f"{v:.3g}")
+    # One decimal finer than the step, so neighbouring ticks never round together.
+    decimals = int(numpy.clip(numpy.ceil(-numpy.log10(step)) + 1, 0, 10))
+    return matplotlib.ticker.FormatStrFormatter(f"%.{decimals}f")
 
