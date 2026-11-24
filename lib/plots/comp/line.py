@@ -521,7 +521,11 @@ def twinx_comparison(axis: axes.Axes, left: list[NDArray], right: list[NDArray],
     if right_ylabel is not None:
         axis2.set_ylabel(right_ylabel, rotation=-90, labelpad=15)
 
-    list2 = [__plot_curve(axis2, x[i], right[i], len(left) + i, color_cycler, **kwargs)  for i in range(len(right))]
+    # x[len(left) + i], not x[i]: the right-hand curves follow the left ones in
+    # the x list. Indexing from 0 handed them the LEFT curves' x arrays -- which
+    # is invisible while x is a tiled single vector (every row identical) and
+    # wrong the moment a caller supplies one x per curve, as the type allows.
+    list2 = [__plot_curve(axis2, x[len(left) + i], right[i], len(left) + i, color_cycler, **kwargs)  for i in range(len(right))]
 
     plot_axis_type = get_param_default_if_missing("plot_axis_type", PlotType.LINEAR, **kwargs)
     y_is_log = plot_axis_type.value in (PlotType.YLOG.value, PlotType.LOG.value)
