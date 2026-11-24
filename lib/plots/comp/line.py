@@ -199,7 +199,6 @@ def stack(axis: Sequence[axes.Axes] | NDArray, y: Sequence[NDArray] | NDArray, x
     """
 
     title: str | None                = get_param_default_if_missing("title", None, **kwargs)
-    title_offset: float              = get_param_default_if_missing("title_offset", 0.05, **kwargs)
     xlabel: str | None               = get_param_default_if_missing("xlabel", None, **kwargs)
     ylabels: str | list[str] | None  = get_param_default_if_missing("ylabels", None, **kwargs)
     ylim: tuple[float, float] | None = get_param_default_if_missing("ylim", None, **kwargs)
@@ -207,6 +206,15 @@ def stack(axis: Sequence[axes.Axes] | NDArray, y: Sequence[NDArray] | NDArray, x
     npts: int | None                 = get_param_default_if_missing("npts", None, **kwargs)
 
     nplot = len(y)
+
+    # Scaled by the panel count because `y=1.0 + title_offset` is in AXES
+    # coordinates: the top panel of an n-panel stack is 1/n of the figure, so a
+    # flat 0.05 buys 1/n of the clearance it buys on a single plot. With three
+    # panels that left the title sitting on the y axis's scientific-notation
+    # offset text -- the `x10^4` a linear axis draws just above itself, which a
+    # log axis never produces because its ticks carry the exponent. An explicit
+    # title_offset is honoured as given.
+    title_offset: float              = get_param_default_if_missing("title_offset", 0.05 * nplot, **kwargs)
 
     axis[0].set_title(title or "", y=1.0 + title_offset)
     axis[nplot-1].set_xlabel(xlabel or "")
@@ -283,7 +291,8 @@ def comparison_stack(axis: Sequence[axes.Axes] | NDArray, y: Sequence[NDArray] |
     """
 
     title            = get_param_default_if_missing("title", None, **kwargs)
-    title_offset     = get_param_default_if_missing("title_offset", 0.05, **kwargs)
+    # Axes coordinates again -- see stack() above.
+    title_offset     = get_param_default_if_missing("title_offset", 0.05 * len(y), **kwargs)
     xlabel           = get_param_default_if_missing("xlabel", "", **kwargs)
     ylabels          = get_param_default_if_missing("ylabels", None, **kwargs)
     curve_labels     = get_param_default_if_missing("labels", [], **kwargs)
