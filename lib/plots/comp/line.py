@@ -442,7 +442,7 @@ def twinx(axis: axes.Axes, left: NDArray, right: NDArray, x: NDArray | list[NDAr
         axis.legend(labels_list, labs, loc=legend_loc, title=legend_title, bbox_to_anchor=(0.1, 0.1, 0.9, 0.9)).set_zorder(10)
 
 
-def twinx_comparison(axis: axes.Axes, left: list[NDArray], right: list[NDArray], x: NDArray | None = None, **kwargs):
+def twinx_comparison(axis: axes.Axes, left: list[NDArray], right: list[NDArray], x: NDArray | list[NDArray] | None = None, **kwargs):
     """
     Plot two curves with different scales on the y-axis that use the same scale on the
     x-axis.

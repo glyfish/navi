@@ -246,7 +246,7 @@ def twinx(left: numpy.ndarray, right: numpy.ndarray, x: numpy.ndarray | list[num
         pyplot.close(fig)
 
 
-def twinx_comparison(left: list[numpy.ndarray], right: list[numpy.ndarray], x: numpy.ndarray | None=None, **kwargs):
+def twinx_comparison(left: list[numpy.ndarray], right: list[numpy.ndarray], x: numpy.ndarray | list[numpy.ndarray] | None=None, **kwargs):
     """
     Plot two curves with different scales on the y-axis that use the same scale on the
     x-axis.
