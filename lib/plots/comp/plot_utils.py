@@ -319,6 +319,67 @@ def __axis_twinx(axis, **kwargs):
     return axis2
 
 
+def __fit_ylabels(axes, floor: float = 8.0) -> None:
+    """Shrink rotated y labels, but only when they actually collide.
+
+    A stack's y labels are rotated, so their length competes with panel height --
+    the one dimension a stack spends as panels multiply. The room a centred label
+    has is its panel plus the gap it may bleed into, and a long unit string
+    outgrows that: 'Index 1982-1984=100' needs 198px against a 163px budget at
+    three panels. It stays invisible while the neighbouring label is short, since
+    the overflow lands in empty margin, and collides outright when two long ones
+    are adjacent.
+
+    Measured and conditional on purpose. Scaling every label by panel count was
+    the obvious move and is wrong: it bypasses the two style sheets that exist to
+    set text size per display target, gives one label different sizes in one
+    document, and shrinks text hardest exactly where the chart is already busiest.
+    This leaves the style's size alone unless labels genuinely overlap.
+
+    Two draws, not a search: text height is near-linear in font size, so one
+    measurement gives the scale directly. `floor` stops it shrinking into
+    illegibility -- past that the labels still overlap and the caller needs a
+    different fix (units belong in the per-panel annotation, which has the full
+    panel *width*), but a readable overlap beats unreadable text.
+    """
+    labels = [a.yaxis.label for a in axes if a.yaxis.label.get_text()]
+    if len(labels) < 2:
+        return
+    figure = axes[0].figure
+
+    # `gap` is the separation aimed for, not merely the absence of overlap:
+    # scaling to the exact ratio leaves about a pixel between labels, and three
+    # labels a pixel apart read as one unbroken column of text.
+    gap = 10.0
+
+    # Up to three corrective passes rather than one calculation. Height is only
+    # NEAR-linear in font size -- the font's metrics quantise -- so a single
+    # estimate undershoots, measurably: 4.7px where 10 was asked for. Each pass
+    # re-measures, so the error cannot accumulate, and most charts exit on the
+    # first when nothing collides.
+    for _ in range(3):
+        figure.canvas.draw()
+        boxes = [l.get_window_extent() for l in labels]
+        centres = [(b.y0 + b.y1) / 2 for b in boxes]
+        # Per PAIR, not against the tallest label. Two labels centred on their
+        # panels touch when their MEAN height exceeds the centre-to-centre pitch,
+        # so a long unit string next to a short one ('Index 1982-1984=100' beside
+        # '%') is harmless however far it overruns its own panel -- the overrun
+        # lands in empty margin. Testing the tallest shrinks that case for nothing.
+        worst = min(((abs(centres[i] - centres[i + 1]) - gap)
+                     / ((boxes[i].height + boxes[i + 1].height) / 2))
+                    for i in range(len(boxes) - 1))
+        if worst >= 1.0:
+            return
+        size = labels[0].get_fontsize()
+        scaled = max(floor, size * worst)
+        if scaled >= size:
+            return
+        for label in labels:
+            label.set_fontsize(scaled)
+    figure.canvas.draw()
+
+
 def __twinx_ticks(axis1, axis2):
     """Put one right-axis tick on every left-axis gridline.
 

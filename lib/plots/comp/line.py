@@ -30,7 +30,7 @@ from typing import Any, Sequence, cast
 
 
 from lib.plots.comp.axis import (PlotType, logStyle, logXStyle, logYStyle)
-from lib.plots.comp.plot_utils import (__plot_curve, __plot_curves, __twinx_ticks, __plot_symbols,
+from lib.plots.comp.plot_utils import (__plot_curve, __plot_curves, __twinx_ticks, __plot_symbols, __fit_ylabels,
                                        __plot_symbol)
 from lib.config import SharedCycler
 from lib.utils import get_param_default_if_missing
@@ -250,6 +250,10 @@ def stack(axis: Sequence[axes.Axes] | NDArray, y: Sequence[NDArray] | NDArray, x
 
         color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
         __plot_curve(axis[i], x_plot, y_plot, i, color_cycler, ylabel=ylabel, **kwargs)
+
+    # Once every panel has its label: rotated y labels compete with panel height,
+    # and only a measurement can say whether these particular strings collide.
+    __fit_ylabels(axis)
 
 
 def comparison_stack(axis: Sequence[axes.Axes] | NDArray, y: Sequence[NDArray] | NDArray, x: Sequence[numpy.ndarray] | numpy.ndarray | None=None, **kwargs):
