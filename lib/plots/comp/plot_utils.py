@@ -399,18 +399,20 @@ def __twinx_ticks(axis1, axis2):
     - ``NullLocator`` on the minors. Setting only the major locator left the
       right axis with two competing tick systems: these majors, plus the log
       scale's own labelled sub-decade minors, drawn to different rules.
-    - A formatter chosen for the scale. Aligned positions are arbitrary values,
-      so a log formatter spells them ``3.76317 x 10^0``. Significant figures suit
-      a log axis, whose ticks are spaced by ratio and so cannot collide; a linear
-      axis needs decimals derived from the tick step, or a narrow range at a
-      large value (0.999 to 1.001, a normalised index) prints the same label
-      several times.
+    - A formatter, but only on a log axis. Aligned positions are arbitrary
+      values, so a log formatter spells them ``3.76317 x 10^0`` and significant
+      figures read better. A linear axis keeps the formatter it has, because
+      that is the one carrying the caller's ``scilimits``. See
+      ``__twinx_formatter``.
 
     The tick count is inherited from ``axis1`` by construction -- one tick per
     gridline is the whole point -- so a left axis showing two decades gives the
     right axis two ticks.
     """
-    lo, hi = axis1.get_ylim()
+    # Sorted, as axis2's limits are two lines below: an inverted axis reports
+    # ``(top, bottom)``, and an unsorted ``lo <= t <= hi`` then matches nothing,
+    # so every tick is filtered out and the axes are left unaligned.
+    lo, hi = sorted(axis1.get_ylim())
     ticks = [t for t in axis1.get_yticks() if lo <= t <= hi]
     if not ticks:
         return
@@ -421,18 +423,42 @@ def __twinx_ticks(axis1, axis2):
     right = numpy.clip(right, *sorted(axis2.get_ylim()))
     axis2.yaxis.set_major_locator(matplotlib.ticker.FixedLocator(right))
     axis2.yaxis.set_minor_locator(matplotlib.ticker.NullLocator())
-    axis2.yaxis.set_major_formatter(__twinx_formatter(axis2, right))
+    formatter = __twinx_formatter(axis2, right)
+    if formatter is not None:
+        axis2.yaxis.set_major_formatter(formatter)
 
 
 def __twinx_formatter(axis2, ticks):
-    """A formatter that keeps the aligned tick labels distinct and readable."""
-    if axis2.get_yscale() != "linear":
-        # Geometric spacing: three significant figures separate every pair.
-        return matplotlib.ticker.FuncFormatter(lambda v, _pos: f"{v:.3g}")
-    step = numpy.min(numpy.diff(numpy.sort(ticks))) if len(ticks) > 1 else 0.0
-    if step <= 0:
-        return matplotlib.ticker.FuncFormatter(lambda v, _pos: f"{v:.3g}")
-    # One decimal finer than the step, so neighbouring ticks never round together.
-    decimals = int(numpy.clip(numpy.ceil(-numpy.log10(step)) + 1, 0, 10))
-    return matplotlib.ticker.FormatStrFormatter(f"%.{decimals}f")
+    """Pick a formatter for the aligned ticks, or ``None`` to keep the axis's own.
+
+    A LINEAR axis keeps what it has, which is the ``ScalarFormatter`` that every
+    twinx entry point configures from the caller's ``scilimits``. Overriding it
+    was a regression, and a quiet one, because it applied to the right axis
+    alone: the left kept its shared exponent while the right spelled the same
+    magnitude in full, so one chart carried two notations (left ``2.1 x10^4``,
+    right ``21000``) from GDP magnitudes upward. Worse, full-digit labels grow
+    without bound -- at FRED dollar scale they reach past the figure edge and
+    push the right y label off a canvas saved without ``bbox_inches="tight"``,
+    which is how ``dash`` saves, so the units vanish from the image.
+
+    The duplicate labels that override was written to prevent do not occur:
+    ``ScalarFormatter`` renders a normalised index of 0.999 to 1.001 as nine
+    distinct labels, because it factors out an offset rather than printing
+    decimals.
+
+    A LOG axis does need one. Its own formatter assumes ticks sit on decades and
+    spells an aligned position ``3.76317 x 10^0``. Significant figures read far
+    better, but a fixed three of them is not always enough: ``%g`` switches to
+    exponential once the exponent reaches the precision, which coarsens the
+    granularity to 10 across [1000, 10000) and renders neighbouring ticks of a
+    sub-percent view identically. So the precision is raised until the labels
+    this call will actually draw are distinct, rather than assumed.
+    """
+    if axis2.get_yscale() == "linear":
+        return None
+    precision = 3
+    while precision < 8 and len({f"{t:.{precision}g}" for t in ticks}) < len(ticks):
+        precision += 1
+    return matplotlib.ticker.FuncFormatter(
+        lambda v, _pos, p=precision: f"{v:.{p}g}")
 

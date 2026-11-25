@@ -320,9 +320,14 @@ def comparison_stack(axis: Sequence[axes.Axes] | NDArray, y: Sequence[NDArray] |
                 x_curve.append(numpy.linspace(0.0, float(ypts-1), ypts))
             x.append(numpy.array(x_curve))
     elif isinstance(x, numpy.ndarray):
+        # Bound before `x` is rebound: tiling `x` after clearing it tiled the
+        # empty accumulator, so the shared-x form this branch exists to serve
+        # could never draw -- it raised from inside `numpy.tile` or left
+        # `__plot_curves` indexing a zero-width array.
+        shared = x
         x = []
         for _ in range(nplot):
-            x.append(numpy.tile(x, (ncurve, 1)))
+            x.append(numpy.tile(shared, (ncurve, 1)))
 
     for i in range(nplot):
         y_plot = y[i]
