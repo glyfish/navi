@@ -309,7 +309,7 @@ def __axis_twinx(axis, **kwargs):
     axis2 = axis.twinx()
 
     if ylabel is not None:
-        axis2.set_ylabel(ylabel, rotation=-90, labelpad=20)
+        axis2.set_ylabel(ylabel, rotation=-90, labelpad=12)
     axis2.ticklabel_format(style='sci', axis='y', scilimits=scilimits, useMathText=True)
 
     axis2.grid(False)
@@ -419,11 +419,50 @@ def __twinx_ticks(axis1, axis2):
     # The round trip overshoots the end limits by ~1e-15, and matplotlib drops a
     # tick that sits outside the view by any margin at all.
     right = numpy.clip(right, *sorted(axis2.get_ylim()))
+    if axis2.get_yscale() == "linear":
+        right = __shorten_ticks(axis2, right)
     axis2.yaxis.set_major_locator(matplotlib.ticker.FixedLocator(right))
     axis2.yaxis.set_minor_locator(matplotlib.ticker.NullLocator())
     formatter = __twinx_formatter(axis2, right)
     if formatter is not None:
         axis2.yaxis.set_major_formatter(formatter)
+
+
+def __shorten_ticks(axis2, ticks, tolerance: float = 0.5):
+    """Round aligned ticks to the shortest form that still lands on the gridline.
+
+    Alignment puts the right axis's ticks wherever the left axis's gridlines
+    fall, which is almost never a round number: nine gridlines over a z-score
+    of -4 to 4 give 0.90909..., and ``ScalarFormatter`` sizes its precision
+    from the values it is handed, so it spends three decimals on them. That
+    makes the right labels half again as wide as the left's round ones, and the
+    right column -- gap, labels, rotated unit label -- then does not fit the
+    margin a twin was never accounted for: the unit label is pushed off the
+    canvas.
+
+    So the tick is moved to the nearest short value instead of the label being
+    made to describe an exact one. ``tolerance`` is the budget for that move,
+    in PIXELS rather than data units, because what matters is whether the eye
+    can see the tick leave its gridline; half a pixel cannot be seen, and on a
+    typical axis it buys a decimal place or two. The rounding is rejected if it
+    would make two labels equal, so a dense axis keeps the digits it needs.
+
+    Linear axes only. A log axis spans decades, where a single decimal count
+    fits no part of the range well, and its formatter already caps the digits
+    drawn.
+    """
+    lo, hi = sorted(axis2.get_ylim())
+    span, height = hi - lo, axis2.bbox.height
+    if span <= 0 or height <= 0:
+        return ticks
+    budget = tolerance * span / height
+    for decimals in range(0, 13):
+        candidate = numpy.round(ticks, decimals)
+        if len(numpy.unique(candidate)) < len(numpy.unique(ticks)):
+            continue
+        if numpy.max(numpy.abs(candidate - ticks)) <= budget:
+            return candidate
+    return ticks
 
 
 def __twinx_formatter(axis2, ticks):
