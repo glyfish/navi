@@ -307,13 +307,11 @@ def __axis_twinx(axis, **kwargs):
     scilimits   = get_param_default_if_missing("scilimits", (-3, 3), **kwargs)
 
     axis2 = axis.twinx()
-    axis2._get_lines.prop_cycler = axis._get_lines.prop_cycler
 
     if ylabel is not None:
         axis2.set_ylabel(ylabel, rotation=-90, labelpad=20)
     axis2.ticklabel_format(style='sci', axis='y', scilimits=scilimits, useMathText=True)
 
-    __twinx_ticks(axis, axis2)
     axis2.grid(False)
 
     return axis2

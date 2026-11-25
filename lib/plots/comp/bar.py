@@ -239,7 +239,7 @@ def twinx_bar_line(axis: axes.Axes, y_bar: NDArray, y_line: NDArray, x_bar: NDAr
     color_cycler = SharedCycler(rcParams['axes.prop_cycle'])
     list1 = __plot_bar(axis, x_bar, y_bar, color_cycler, 0, 10, **dict(kwargs, ylim=bar_ylim, ylabel=bar_ylabel))
     axis2 = __axis_twinx(axis, ylabel=line_ylabel)
-    list2 = __plot_curve(axis2, x_line, y_line, color_cycler, 1, **dict(kwargs, ylim=line_ylim, ylabel=line_ylabel))
+    list2 = __plot_curve(axis2, x_line, y_line, 1, color_cycler, **dict(kwargs, ylim=line_ylim, ylabel=line_ylabel))
 
     __twinx_ticks(axis, axis2)
 
@@ -325,7 +325,9 @@ def twinx_bar_line_comparison(axis: axes.Axes, y_bar: NDArray, y_line: Sequence[
         x_bar = numpy.linspace(0, len(y_bar) - 1, len(y_bar))
 
     if x_line is None:
-        x_line = numpy.linspace(0, len(y_line) - 1, len(y_line))
+        # One x per curve: `y_line` is a list of curves here, and `__plot_curves`
+        # indexes `x[i]` for each. A single shared vector made `x[i]` a scalar.
+        x_line = [numpy.linspace(0, len(y) - 1, len(y)) for y in y_line]
 
     if title is not None:
         axis.set_title(title, y=title_offset + 1.0)
